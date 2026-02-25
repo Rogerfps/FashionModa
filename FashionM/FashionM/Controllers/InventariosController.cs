@@ -18,12 +18,26 @@ namespace FashionM.Controllers
         }
 
         // GET: Inventarios
-        public IActionResult Index()
+        public IActionResult Index(string search)
         {
-            var inventarios = _context.Inventarios
+            var query = _context.Inventarios
                 .Include(i => i.Tallas)
                 .Include(i => i.Fotos)
-                .ToList();
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(i =>
+                    i.Codigo.ToString().Contains(search) ||
+                    i.Marca.Contains(search) ||
+                    i.SKU.Contains(search) ||
+                    i.Color.Contains(search)
+                );
+            }
+
+            var inventarios = query.ToList();
+
+            ViewBag.Search = search;
 
             return View(inventarios);
         }
@@ -48,6 +62,12 @@ namespace FashionM.Controllers
 
             if (!ModelState.IsValid)
             {
+                return View(inventario);
+            }
+
+            if (_context.Inventarios.Any(i => i.Codigo == inventario.Codigo))
+            {
+                ModelState.AddModelError("Codigo", "Ya existe un inventario con este código");
                 return View(inventario);
             }
 
@@ -204,4 +224,4 @@ namespace FashionM.Controllers
             return RedirectToAction("Details", new { id = inventarioCodigo });
         }
     }
-}
+}   

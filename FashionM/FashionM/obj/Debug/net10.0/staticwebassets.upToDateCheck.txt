@@ -1,8 +1,6 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\inventarios\5_f8a8a581-42de-472d-8d4c-4b42c8dbfd2c.jpg
-wwwroot\images\inventarios\9d09c730-8aa5-4869-8d9a-41513f85b66d.jpg
-wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -64,6 +62,10 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
+wwwroot\images\inventarios\7094d08a-0fcc-4e47-812d-fea2589dd4e7.jpg
+wwwroot\images\inventarios\289cd45b-b968-4b7f-afaf-ad9a48a06bfa.jpg
+wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\site.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\favicon.ico
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\js\site.js
