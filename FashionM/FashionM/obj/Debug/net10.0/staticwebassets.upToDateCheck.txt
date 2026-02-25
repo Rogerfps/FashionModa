@@ -66,6 +66,11 @@ wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
 wwwroot\images\inventarios\7094d08a-0fcc-4e47-812d-fea2589dd4e7.jpg
 wwwroot\images\inventarios\289cd45b-b968-4b7f-afaf-ad9a48a06bfa.jpg
 wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
+wwwroot\images\inventarios\9ff305fc-430a-4e23-8b29-740f5612d703.jpg
+wwwroot\images\inventarios\d98be7ea-8403-4a2c-abbb-3f308e5aecee.jpg
+wwwroot\images\inventarios\0bcf5543-9bac-4204-8996-cf113ccc69fd.jpg
+wwwroot\images\inventarios\acacfde0-e0ff-4bc7-a8d7-ead6b4279b8a.webp
+wwwroot\images\inventarios\0e2aec2b-b614-495a-a87d-b836c81372bf.jpg
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\site.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\favicon.ico
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\js\site.js

@@ -18,13 +18,16 @@ namespace FashionM.Controllers
         }
 
         // GET: Inventarios
-        public IActionResult Index(string search)
+        public IActionResult Index(string search, int page = 1)
         {
+            int pageSize = 6;
+
             var query = _context.Inventarios
                 .Include(i => i.Tallas)
                 .Include(i => i.Fotos)
                 .AsQueryable();
 
+            // 🔍 Buscador
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(i =>
@@ -35,8 +38,19 @@ namespace FashionM.Controllers
                 );
             }
 
-            var inventarios = query.ToList();
+            // 🔢 Total de registros
+            int totalItems = query.Count();
 
+            // 📄 Paginación REAL
+            var inventarios = query
+                .OrderBy(i => i.Codigo)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 📦 Datos para la vista
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             ViewBag.Search = search;
 
             return View(inventarios);
@@ -75,6 +89,30 @@ namespace FashionM.Controllers
             {
                 talla.InventarioCodigo = inventario.Codigo;
                 talla.Inventario = inventario;
+            }
+
+            if (imagenes != null && imagenes.Any())
+            {
+                var folder = Path.Combine(_environment.WebRootPath, "images", "inventarios");
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                foreach (var img in imagenes)
+                {
+                    if (img.Length == 0) continue;
+
+                    var name = $"{Guid.NewGuid()}{Path.GetExtension(img.FileName)}";
+                    var path = Path.Combine(folder, name);
+
+                    using var stream = new FileStream(path, FileMode.Create);
+                    await img.CopyToAsync(stream);
+
+                    inventario.Fotos.Add(new Foto
+                    {
+                        Ruta = "/images/inventarios/" + name
+                    });
+                }
             }
 
             _context.Inventarios.Add(inventario);
