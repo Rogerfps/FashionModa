@@ -4,64 +4,118 @@
     ViewData["Title"] = "Inventario";
 }
 
-<h2>Inventario</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">📦 Inventario</h2>
 
-<!-- 👇 BOTÓN CREATE -->
-<a asp-action="Create" class="btn btn-primary mb-3">
-    Nuevo Inventario
-</a>
+    <a asp-action="Create" class="btn btn-primary">
+        ➕ Nuevo Inventario
+    </a>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Marca</th>
-            <th>Color</th>
-            <th>Detalle</th>
-            <th>SKU</th>
-            <th>Precios</th>
-            <th>Tallas</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
             <tr>
-                <td>@item.Codigo</td>
-                <td>@item.Marca</td>
-                <td>@item.Color</td>
-                <td>@item.Detalle</td>
-                <td>@item.SKU</td>
-                <td>
-                    Costo: @item.PrecioCosto <br />
-                    Venta: @item.PrecioVenta
-                </td>
-                <td>
-                    @foreach (var talla in item.Tallas)
-                    {
-                        <div>
-                            Talla @talla.Numero :
-                            <strong>@talla.Cantidad</strong>
-                        </div>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Codigo">Editar</a> |
-                    <form asp-action="Delete"
-                          method="post"
-                          onsubmit="return confirm('¿Eliminar este inventario?')">
-
-                        <input type="hidden" name="codigo" value="@item.Codigo" />
-
-                        <button class="btn btn-danger btn-sm">
-                            🗑 Eliminar
-                        </button>
-
-                        @Html.AntiForgeryToken()
-                    </form>
-                </td>
+                <th>Foto</th>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th>Precios</th>
+                <th>Tallas</th>
+                <th>Stock Total</th>
+                <th class="text-center">Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (item.Fotos != null && item.Fotos.Any())
+                        {
+                            <img src="@item.Fotos.First().Ruta"
+                                 alt="Foto zapato"
+                                 style="width:80px;
+                            height:80px;
+                            object-fit:cover;
+                            border-radius:8px;
+                            border:1px solid #ccc;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin imagen</span>
+                        }
+                    </td>
+
+                    <td class="fw-bold">@item.Codigo</td>
+
+                    <td>
+                        <div><strong>Marca:</strong> @item.Marca</div>
+                        <div><strong>Color:</strong> @item.Color</div>
+                        <div class="text-muted small">@item.Detalle</div>
+                    </td>
+
+                    <td>@item.SKU</td>
+
+                    <td>
+                        <div><strong>Costo:</strong> ₡@item.PrecioCosto</div>
+                        <div><strong>Venta:</strong> ₡@item.PrecioVenta</div>
+                    </td>
+
+                    <td>
+                        @if (item.Tallas != null && item.Tallas.Any())
+                        {
+                            foreach (var talla in item.Tallas.OrderBy(t => t.Numero))
+                            {
+                                <span class="badge bg-secondary me-1 mb-1">
+                                    @talla.Numero : @talla.Cantidad
+                                </span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin tallas</span>
+                        }
+                    </td>
+
+                    <td>
+                        <span class="badge bg-success">
+                            @item.StockTotal
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.Codigo"
+                               class="btn btn-info btn-sm">
+                                👁 Ver
+                            </a>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Codigo"
+                               class="btn btn-sm btn-warning">
+                                ✏️
+                            </a>
+
+                            <form asp-action="Delete"
+                                  method="post"
+                                  onsubmit="return confirm('¿Eliminar este inventario?')">
+
+                                <input type="hidden" name="codigo" value="@item.Codigo" />
+                                @Html.AntiForgeryToken()
+
+                                <button class="btn btn-sm btn-danger">
+                                    🗑
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

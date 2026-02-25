@@ -18,10 +18,18 @@ namespace FashionM.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Inventario -> Fotos
             modelBuilder.Entity<Foto>()
                 .HasOne(f => f.Inventario)
                 .WithMany(i => i.Fotos)
                 .HasForeignKey(f => f.InventarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //  Inventario -> Tallas 
+            modelBuilder.Entity<TallaInventario>()
+                .HasOne(t => t.Inventario)
+                .WithMany(i => i.Tallas)
+                .HasForeignKey(t => t.InventarioCodigo)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

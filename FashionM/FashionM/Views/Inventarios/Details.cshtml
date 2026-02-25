@@ -1,0 +1,111 @@
+﻿@model Inventario
+
+@{
+    ViewData["Title"] = "Detalle de Inventario";
+}
+
+<h2>📦 Detalle del Inventario</h2>
+
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Código</dt>
+    <dd class="col-sm-9">@Model.Codigo</dd>
+
+    <dt class="col-sm-3">Marca</dt>
+    <dd class="col-sm-9">@Model.Marca</dd>
+
+    <dt class="col-sm-3">Color</dt>
+    <dd class="col-sm-9">@Model.Color</dd>
+
+    <dt class="col-sm-3">Detalle</dt>
+    <dd class="col-sm-9">@Model.Detalle</dd>
+
+    <dt class="col-sm-3">SKU</dt>
+    <dd class="col-sm-9">@Model.SKU</dd>
+
+    <dt class="col-sm-3">Precio Costo</dt>
+    <dd class="col-sm-9">@Model.PrecioCosto</dd>
+
+    <dt class="col-sm-3">Precio Venta</dt>
+    <dd class="col-sm-9">@Model.PrecioVenta</dd>
+</dl>
+
+<hr />
+
+<h4>👟 Tallas</h4>
+
+@if (Model.Tallas.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Talla</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Tallas)
+            {
+                <tr>
+                    <td>@t.Numero</td>
+                    <td>@t.Cantidad</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No hay tallas registradas.</p>
+}
+
+<hr />
+
+<h4>📷 Fotos</h4>
+
+@if (Model.Fotos.Any())
+{
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (var foto in Model.Fotos)
+        {
+            <div class="text-center">
+                <img src="@foto.Ruta"
+                     style="max-width: 200px;
+                                    border-radius: 8px;
+                                    border:1px solid #ccc;" />
+
+                <form asp-action="DeleteFoto"
+                      method="post"
+                      class="mt-2"
+                      onsubmit="return confirm('¿Eliminar esta imagen?')">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="id" value="@foto.Id" />
+                    <input type="hidden" name="inventarioCodigo" value="@Model.Codigo" />
+
+                    <button class="btn btn-danger btn-sm">
+                        🗑 Eliminar
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted">No hay fotos.</p>
+}
+
+<hr />
+
+<a asp-action="Edit"
+   asp-route-id="@Model.Codigo"
+   class="btn btn-warning">
+    ✏ Editar
+</a>
+
+<a asp-action="Index" class="btn btn-secondary">
+    Volver
+</a>

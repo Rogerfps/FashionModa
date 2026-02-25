@@ -75,7 +75,7 @@ namespace FashionM.Controllers
             if (inventario == null)
                 return NotFound();
 
-            // 🗑️ borrar imágenes físicas
+            //  borrar imagenes físicas
             foreach (var foto in inventario.Fotos)
             {
                 var ruta = Path.Combine(
@@ -91,6 +91,117 @@ namespace FashionM.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+        //Editar
+        public async Task<IActionResult> Edit(int id)
+        {
+            var inventario = await _context.Inventarios
+                .Include(i => i.Tallas)
+                .Include(i => i.Fotos)
+                .FirstOrDefaultAsync(i => i.Codigo == id);
+
+            if (inventario == null)
+                return NotFound();
+
+            return View(inventario);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Inventario model, List<IFormFile> nuevasFotos)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var inventario = await _context.Inventarios
+                .Include(i => i.Tallas)
+                .Include(i => i.Fotos)
+                .FirstAsync(i => i.Codigo == model.Codigo);
+
+            // 🔹 CAMPOS SIMPLES
+            inventario.Marca = model.Marca;
+            inventario.Color = model.Color;
+            inventario.Detalle = model.Detalle;
+            inventario.SKU = model.SKU;
+            inventario.PrecioCosto = model.PrecioCosto;
+            inventario.PrecioVenta = model.PrecioVenta;
+
+            // 🔹 TALLAS (BORRAR Y VOLVER A INSERTAR)
+            _context.TallasInventario.RemoveRange(inventario.Tallas);
+
+            foreach (var talla in model.Tallas)
+            {
+                inventario.Tallas.Add(new TallaInventario
+                {
+                    Numero = talla.Numero,
+                    Cantidad = talla.Cantidad
+                });
+            }
+
+            // 🔹 NUEVAS FOTOS
+            if (nuevasFotos != null && nuevasFotos.Any())
+            {
+                var folder = Path.Combine(_environment.WebRootPath, "images", "inventarios");
+
+                foreach (var img in nuevasFotos)
+                {
+                    var name = $"{Guid.NewGuid()}{Path.GetExtension(img.FileName)}";
+                    var path = Path.Combine(folder, name);
+
+                    using var stream = new FileStream(path, FileMode.Create);
+                    await img.CopyToAsync(stream);
+
+                    inventario.Fotos.Add(new Foto
+                    {
+                        Ruta = "/images/inventarios/" + name
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        //Details
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var inventario = await _context.Inventarios
+                .Include(i => i.Tallas)
+                .Include(i => i.Fotos)
+                .FirstOrDefaultAsync(i => i.Codigo == id);
+
+            if (inventario == null)
+                return NotFound();
+
+            return View(inventario);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFoto(int id, int inventarioCodigo)
+        {
+            var foto = await _context.Fotos.FindAsync(id);
+
+            if (foto == null)
+                return NotFound();
+
+            // borrar archivo físico
+            var rutaFisica = Path.Combine(
+                _environment.WebRootPath,
+                foto.Ruta.TrimStart('/')
+            );
+
+            if (System.IO.File.Exists(rutaFisica))
+            {
+                System.IO.File.Delete(rutaFisica);
+            }
+
+            _context.Fotos.Remove(foto);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = inventarioCodigo });
         }
     }
 }

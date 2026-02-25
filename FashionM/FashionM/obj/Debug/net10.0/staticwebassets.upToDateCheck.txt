@@ -1,8 +1,8 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
-wwwroot\images\inventarios\400_1f0ff546-b339-4c1c-97d7-ea147f866654.jpg
-wwwroot\images\inventarios\400_79f3e47a-6c1f-413f-a9f0-5eacb7f336a5.jpg
 wwwroot\images\inventarios\5_f8a8a581-42de-472d-8d4c-4b42c8dbfd2c.jpg
+wwwroot\images\inventarios\9d09c730-8aa5-4869-8d9a-41513f85b66d.jpg
+wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map

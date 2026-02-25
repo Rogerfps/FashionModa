@@ -1,0 +1,89 @@
+﻿@model Inventario
+
+<h2>✏ Editar Inventario</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Codigo" />
+
+    <label>Marca</label>
+    <input asp-for="Marca" class="form-control mb-2" />
+
+    <label>Color</label>
+    <input asp-for="Color" class="form-control mb-2" />
+
+    <label>Detalle</label>
+    <textarea asp-for="Detalle" class="form-control mb-2"></textarea>
+
+    <label>SKU</label>
+    <input asp-for="SKU" class="form-control mb-2" />
+
+    <div class="row mb-3">
+        <div class="col">
+            <label>Precio costo</label>
+            <input asp-for="PrecioCosto" class="form-control" />
+        </div>
+        <div class="col">
+            <label>Precio venta</label>
+            <input asp-for="PrecioVenta" class="form-control" />
+        </div>
+    </div>
+
+    <h4>Tallas</h4>
+
+    <table class="table" id="tablaTallas">
+        <tbody>
+            @for (int i = 0; i < Model.Tallas.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input name="Tallas[@i].Numero"
+                               value="@Model.Tallas[i].Numero"
+                               class="form-control" />
+                    </td>
+                    <td>
+                        <input name="Tallas[@i].Cantidad"
+                               value="@Model.Tallas[i].Cantidad"
+                               class="form-control" />
+                    </td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="this.closest('tr').remove()">
+                            X
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary"
+            onclick="addRow()">
+        ➕ Talla
+    </button>
+
+    <hr />
+
+    <label>Agregar fotos</label>
+    <input type="file" name="nuevasFotos" multiple class="form-control mb-3" />
+
+    <button class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <script>
+        function addRow() {
+            let i = document.querySelectorAll("#tablaTallas tbody tr").length;
+            document.querySelector("#tablaTallas tbody").insertAdjacentHTML("beforeend",
+                `<tr>
+                    <td><input name="Tallas[${i}].Numero" class="form-control"/></td>
+                    <td><input name="Tallas[${i}].Cantidad" class="form-control"/></td>
+                    <td><button type="button" class="btn btn-danger"
+                        onclick="this.closest('tr').remove()">X</button></td>
+                </tr>`);
+        }
+    </script>
+}

@@ -19,5 +19,8 @@ namespace FashionM.Models
 
         public List<TallaInventario> Tallas { get; set; } = new();
         public List<Foto> Fotos { get; set; } = new();
+
+        [NotMapped]
+        public int StockTotal => Tallas.Sum(t => t.Cantidad);
     }
 }

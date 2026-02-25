@@ -16,7 +16,7 @@ namespace FashionM.Models
         // FK
         public int InventarioCodigo { get; set; }
 
-        // ✅ NO MAPEADA (CLAVE)
+        //  NO MAPEADA 
         [NotMapped]
         public Inventario? Inventario { get; set; }
     }
