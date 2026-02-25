@@ -1,0 +1,151 @@
+﻿@model FashionM.Models.Inventario
+
+@{
+    ViewData["Title"] = "Crear Inventario";
+}
+
+<h2>Nuevo Inventario</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <!-- Código -->
+    <div class="mb-3">
+        <label asp-for="Codigo"></label>
+        <input asp-for="Codigo" class="form-control" />
+        <span asp-validation-for="Codigo" class="text-danger"></span>
+    </div>
+
+    <!-- Marca -->
+    <div class="mb-3">
+        <label asp-for="Marca"></label>
+        <input asp-for="Marca" class="form-control" />
+        <span asp-validation-for="Marca" class="text-danger"></span>
+    </div>
+
+    <!-- Color -->
+    <div class="mb-3">
+        <label asp-for="Color"></label>
+        <input asp-for="Color" class="form-control" />
+        <span asp-validation-for="Color" class="text-danger"></span>
+    </div>
+
+    <!-- Detalle -->
+    <div class="mb-3">
+        <label asp-for="Detalle"></label>
+        <textarea asp-for="Detalle" class="form-control"></textarea>
+        <span asp-validation-for="Detalle" class="text-danger"></span>
+    </div>
+
+    <!-- SKU -->
+    <div class="mb-3">
+        <label asp-for="SKU"></label>
+        <input asp-for="SKU" class="form-control" />
+        <span asp-validation-for="SKU" class="text-danger"></span>
+    </div>
+
+    <!-- Precio Costo -->
+    <div class="mb-3">
+        <label asp-for="PrecioCosto"></label>
+        <input asp-for="PrecioCosto" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="PrecioCosto" class="text-danger"></span>
+    </div>
+
+    <!-- Precio Venta -->
+    <div class="mb-3">
+        <label asp-for="PrecioVenta"></label>
+        <input asp-for="PrecioVenta" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="PrecioVenta" class="text-danger"></span>
+    </div>
+
+    <hr />
+
+    <!-- 🔥 TALLAS -->
+    <h4>Tallas</h4>
+
+    <table class="table" id="tablaTallas">
+        <thead>
+            <tr>
+                <th>Talla</th>
+                <th>Cantidad</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button type="button"
+            class="btn btn-primary mb-3"
+            onclick="agregarTalla()">
+        Agregar talla
+    </button>
+
+    <hr />
+
+    <!-- Fotos -->
+    <div class="mb-3">
+        <label class="form-label">Fotos</label>
+        <input type="file" name="imagenes" multiple class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let indiceTalla = 0;
+
+        function agregarTalla() {
+            const tabla = document.querySelector("#tablaTallas tbody");
+
+            const fila = `
+                <tr>
+                    <td>
+                        <input type="number"
+                               name="Tallas[${indiceTalla}].Numero"
+                               class="form-control"
+                               required />
+                    </td>
+                    <td>
+                        <input type="number"
+                               name="Tallas[${indiceTalla}].Cantidad"
+                               class="form-control"
+                               required />
+                    </td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="eliminarFila(this)">
+                            X
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            tabla.insertAdjacentHTML("beforeend", fila);
+            indiceTalla++;
+        }
+
+        function eliminarFila(boton) {
+            boton.closest("tr").remove();
+            reindexarTallas();
+        }
+
+        function reindexarTallas() {
+            const filas = document.querySelectorAll("#tablaTallas tbody tr");
+
+            filas.forEach((fila, index) => {
+                fila.querySelectorAll("input")[0]
+                    .setAttribute("name", `Tallas[${index}].Numero`);
+
+                fila.querySelectorAll("input")[1]
+                    .setAttribute("name", `Tallas[${index}].Cantidad`);
+            });
+
+            indiceTalla = filas.length;
+        }
+    </script>
+}

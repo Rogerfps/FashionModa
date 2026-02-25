@@ -1,0 +1,136 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Proyectos\\FashionModa\\FashionModa\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Migrations\\20260224195737_InicialInventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FashionModa\\Migrations\\20260224195737_InicialInventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\models\\foto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\models\\foto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\models\\inventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\models\\inventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionmoda\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{410ABC46-DFA7-6278-125D-69AF926E6B90}|FashionModa\\FashionModa.csproj|solutionrelative:fashionmoda\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20260224195737_InicialInventario.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Migrations\\20260224195737_InicialInventario.cs",
+              "RelativeDocumentMoniker": "FashionModa\\Migrations\\20260224195737_InicialInventario.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Migrations\\20260224195737_InicialInventario.cs",
+              "RelativeToolTip": "FashionModa\\Migrations\\20260224195737_InicialInventario.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T19:57:38.08Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "FashionModa\\appsettings.Development.json",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\appsettings.Development.json",
+              "RelativeToolTip": "FashionModa\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-24T19:56:51.604Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Foto.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Models\\Foto.cs",
+              "RelativeDocumentMoniker": "FashionModa\\Models\\Foto.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Models\\Foto.cs",
+              "RelativeToolTip": "FashionModa\\Models\\Foto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T19:40:06.832Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "FashionModa\\Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "FashionModa\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T19:29:36.597Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Inventario.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Models\\Inventario.cs",
+              "RelativeDocumentMoniker": "FashionModa\\Models\\Inventario.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Models\\Inventario.cs",
+              "RelativeToolTip": "FashionModa\\Models\\Inventario.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAkwB0AAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T19:27:47.445Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Program.cs",
+              "RelativeDocumentMoniker": "FashionModa\\Program.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\Program.cs",
+              "RelativeToolTip": "FashionModa\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T19:20:00.18Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\appsettings.json",
+              "RelativeDocumentMoniker": "FashionModa\\appsettings.json",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionModa\\appsettings.json",
+              "RelativeToolTip": "FashionModa\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-24T19:07:16.862Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
