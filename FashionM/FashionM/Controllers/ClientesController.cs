@@ -11,16 +11,18 @@ namespace FashionM.Controllers
     public class ClientesController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _environment;
+
         public ClientesController(AppDbContext context)
         {
             _context = context;
         }
 
+        // ===============================
         // LISTAR
+        // ===============================
         public async Task<IActionResult> Index(string buscar, bool? estado, int page = 1)
         {
-            int pageSize =  25;
+            int pageSize = 25;
             var clientes = _context.Clientes.AsQueryable();
 
             if (!string.IsNullOrEmpty(buscar))
@@ -29,7 +31,8 @@ namespace FashionM.Controllers
                     c.Nombre.Contains(buscar) ||
                     c.Apellidos.Contains(buscar) ||
                     c.Cedula.ToString().Contains(buscar) ||
-                    c.Telefono.ToString().Contains(buscar)
+                    (c.Telefonos != null && c.Telefonos.Contains(buscar)) ||
+                    c.Codigo.Contains(buscar)
                 );
             }
 
@@ -52,35 +55,24 @@ namespace FashionM.Controllers
             return View(lista);
         }
 
-        // CREAR
+        // ===============================
+        // CREATE (GET)
+        // ===============================
         public IActionResult Create()
         {
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-                new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-                new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-                new SelectListItem { Value = "Nite", Text = "NITE" },
-                new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-            };
-
+            CargarTiposIdentificacion();
             return View();
         }
 
+        // ===============================
+        // CREATE (POST)
+        // ===============================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Clientes cliente)
         {
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-                new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-                new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-                new SelectListItem { Value = "Nite", Text = "NITE" },
-                new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-            };
+            CargarTiposIdentificacion();
 
-            // 🔴 VALIDACIÓN SIMPLE DE CÉDULA REPETIDA
             bool existeCedula = await _context.Clientes
                 .AnyAsync(c => c.Cedula == cliente.Cedula);
 
@@ -91,19 +83,18 @@ namespace FashionM.Controllers
 
             if (!ModelState.IsValid)
             {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
                 return View(cliente);
             }
 
-            _context.Add(cliente);
+            _context.Clientes.Add(cliente);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
+        // ===============================
         // DETAILS
+        // ===============================
         public async Task<IActionResult> Details(int id)
         {
             if (id == 0)
@@ -118,9 +109,9 @@ namespace FashionM.Controllers
             return View(cliente);
         }
 
-
-
+        // ===============================
         // EDIT (GET)
+        // ===============================
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0)
@@ -132,30 +123,18 @@ namespace FashionM.Controllers
             if (cliente == null)
                 return NotFound();
 
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-                new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-                new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-                new SelectListItem { Value = "Nite", Text = "NITE" },
-                new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-            };
-
+            CargarTiposIdentificacion();
             return View(cliente);
         }
 
+        // ===============================
+        // EDIT (POST)
+        // ===============================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Clientes cliente)
         {
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-                new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-                new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-                new SelectListItem { Value = "Nite", Text = "NITE" },
-                new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-            };
+            CargarTiposIdentificacion();
 
             if (!ModelState.IsValid)
                 return View(cliente);
@@ -167,7 +146,7 @@ namespace FashionM.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Clientes.Any(e => e.Cedula == cliente.Cedula))
+                if (!_context.Clientes.Any(c => c.Cedula == cliente.Cedula))
                     return NotFound();
 
                 throw;
@@ -176,7 +155,9 @@ namespace FashionM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // ===============================
         // DELETE (GET)
+        // ===============================
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0)
@@ -191,12 +172,15 @@ namespace FashionM.Controllers
             return View(cliente);
         }
 
+        // ===============================
         // DELETE (POST)
+        // ===============================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int Cedula)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.Cedula == Cedula);
 
             if (cliente == null)
                 return NotFound();
@@ -205,6 +189,21 @@ namespace FashionM.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // ===============================
+        // MÉTODO PRIVADO
+        // ===============================
+        private void CargarTiposIdentificacion()
+        {
+            ViewBag.TiposIdentificacion = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
+            new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
+            new SelectListItem { Value = "Dimex", Text = "DIMEX" },
+            new SelectListItem { Value = "Nite", Text = "NITE" },
+            new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
+        };
         }
     }
 }

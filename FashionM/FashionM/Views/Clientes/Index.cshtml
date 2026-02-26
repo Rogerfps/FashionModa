@@ -17,14 +17,10 @@
         <div class="col-md-4">
             <select name="estado" class="form-control">
                 <option value="">-- Todos --</option>
-
-                <option value="true"
-                        selected="@(Context.Request.Query["estado"] == "true")">
+                <option value="true" selected="@(Context.Request.Query["estado"] == "true")">
                     Activos
                 </option>
-
-                <option value="false"
-                        selected="@(Context.Request.Query["estado"] == "false")">
+                <option value="false" selected="@(Context.Request.Query["estado"] == "false")">
                     Inactivos
                 </option>
             </select>
@@ -38,35 +34,45 @@
     </div>
 </form>
 
-
-
-<table class="table mt-3">
+<table class="table table-sm mt-3">
     <thead>
         <tr>
+            <th>Código</th>
+            <th>Agente</th>
             <th>Cédula</th>
+            <th>Transporte</th>
             <th>Nombre</th>
             <th>Correo</th>
-            <th>Teléfono</th>
+            <th>Teléfonos</th>
+            <th>Zona</th>
+            <th>Límite Crédito</th>
             <th>Estado</th>
-            <th>Accion</th>
-
-            <th></th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
+                <td>@item.Codigo</td>
+                <td>@item.Agente</td>
                 <td>@item.Cedula</td>
+                <td>@item.Transporte</td>
                 <td>@item.Nombre @item.Apellidos</td>
                 <td>@item.Correo</td>
-                <td>@item.Telefono</td>
+                <td>@item.Telefonos</td>
+                <td>@item.Zona</td>
+                <td>@item.LimiteCredito.ToString("N2")</td>
                 <td>@(item.Estado ? "Activo" : "Inactivo")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Cedula" class="btn btn-info btn-sm">
+                    <a asp-action="Details"
+                       asp-route-id="@item.Cedula"
+                       class="btn btn-info btn-sm">
                         Detalles
                     </a>
-                    <a asp-action="Edit" asp-route-id="@item.Cedula" class="btn btn-warning btn-sm">
+                    <a asp-action="Edit"
+                       asp-route-id="@item.Cedula"
+                       class="btn btn-warning btn-sm">
                         Editar
                     </a>
                     <a asp-action="Delete"
