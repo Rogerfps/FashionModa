@@ -2,6 +2,7 @@
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260225214944_AddCodigoCabysToInventario")]
+    partial class AddCodigoCabysToInventario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,51 +23,6 @@ namespace FashionM.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("FashionM.Models.Clientes", b =>
-                {
-                    b.Property<int>("Cedula")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cedula"));
-
-                    b.Property<string>("Apellidos")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Comercio")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Correo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Direccion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Estado")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("IDTipo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Telefono")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Cedula");
-
-                    b.ToTable("Clientes");
-                });
 
             modelBuilder.Entity("FashionM.Models.Foto", b =>
                 {

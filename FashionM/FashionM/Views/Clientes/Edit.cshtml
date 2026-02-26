@@ -1,0 +1,63 @@
+﻿@model Clientes
+
+<h2>Editar Cliente</h2>
+<hr />
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Cedula" />
+
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Apellidos"></label>
+        <input asp-for="Apellidos" class="form-control" />
+        <span asp-validation-for="Apellidos" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IDTipo"></label>
+        <select asp-for="IDTipo"
+                asp-items="ViewBag.TiposIdentificacion"
+                class="form-control">
+            <option value="">-- Seleccione tipo --</option>
+        </select>
+        <span asp-validation-for="IDTipo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Correo"></label>
+        <input asp-for="Correo" class="form-control" />
+        <span asp-validation-for="Correo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" class="form-control" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Comercio"></label>
+        <input asp-for="Comercio" class="form-control" />
+        <span asp-validation-for="Comercio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Direccion"></label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mt-2">
+        <input asp-for="Estado" class="form-check-input" />
+        <label asp-for="Estado" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
+</form>

@@ -9,7 +9,7 @@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
 
-    <!-- Código -->
+    <!-- Codigo -->
     <div class="mb-3">
         <label asp-for="Codigo"></label>
         <input asp-for="Codigo" class="form-control" />
@@ -42,6 +42,13 @@
         <label asp-for="SKU"></label>
         <input asp-for="SKU" class="form-control" />
         <span asp-validation-for="SKU" class="text-danger"></span>
+    </div>
+
+    <!-- Codigo cabys -->
+    <div class="mb-3">
+        <label asp-for="CodigoCabys" class="form-label">Código CABYS</label>
+        <input asp-for="CodigoCabys" class="form-control" />
+        <span asp-validation-for="CodigoCabys" class="text-danger"></span>
     </div>
 
     <!-- Precio Costo -->

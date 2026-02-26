@@ -13,6 +13,7 @@ namespace FashionM.Data
         public DbSet<Inventario> Inventarios { get; set; }
         public DbSet<Foto> Fotos { get; set; }
         public DbSet<TallaInventario> TallasInventario { get; set; }
+        public DbSet<Clientes> Clientes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

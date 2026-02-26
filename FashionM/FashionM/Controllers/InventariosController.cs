@@ -181,6 +181,7 @@ namespace FashionM.Controllers
             inventario.Color = model.Color;
             inventario.Detalle = model.Detalle;
             inventario.SKU = model.SKU;
+            inventario.CodigoCabys = model.CodigoCabys;
             inventario.PrecioCosto = model.PrecioCosto;
             inventario.PrecioVenta = model.PrecioVenta;
 
