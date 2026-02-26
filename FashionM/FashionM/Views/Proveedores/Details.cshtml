@@ -1,0 +1,50 @@
+﻿@model Proveedores
+
+<h2>Detalle del Proveedor</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <dl class="row">
+            <dt class="col-sm-3">Cédula</dt>
+            <dd class="col-sm-9">@Model.Cedula</dd>
+
+            <dt class="col-sm-3">Nombre</dt>
+            <dd class="col-sm-9">@Model.Nombre @Model.Apellidos</dd>
+
+            <dt class="col-sm-3">Tipo Identificación</dt>
+            <dd class="col-sm-9">@Model.IDTipo</dd>
+
+            <dt class="col-sm-3">Correo</dt>
+            <dd class="col-sm-9">@Model.Correo</dd>
+
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@Model.Telefono</dd>
+
+            <dt class="col-sm-3">Comercio</dt>
+            <dd class="col-sm-9">@Model.Comercio</dd>
+
+            <dt class="col-sm-3">Dirección</dt>
+            <dd class="col-sm-9">@Model.Direccion</dd>
+
+            <dt class="col-sm-3">Actividad Económica</dt>
+            <dd class="col-sm-9">@Model.Actividad</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">
+                @(Model.Estado ? "Activo" : "Inactivo")
+            </dd>
+        </dl>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.Cedula"
+           class="btn btn-warning">
+            Editar
+        </a>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
+
+    </div>
+</div>

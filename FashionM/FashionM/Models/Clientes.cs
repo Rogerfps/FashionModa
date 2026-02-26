@@ -35,3 +35,14 @@ namespace FashionM.Models
         public string Direccion { get; set; } = string.Empty;
     }
 }
+
+
+/*
+ Codigo
+Agente
+Transporte
+Actividad economica
+Limite de credito
+Zona
+Actualizar telefono para poner varios
+ */
