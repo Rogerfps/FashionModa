@@ -1,114 +1,547 @@
 ﻿@model Clientes
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
+@{
+    ViewData["Title"] = "Nuevo Cliente";
+}
 
-    <!-- Mostrar errores generales -->
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success-color: #27ae60;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --input-border: #E9EEF5;
+        --input-focus: rgba(87, 108, 188, 0.2);
+    }
 
-    <div class="form-group">
-        <label asp-for="Cedula"></label>
-        <input asp-for="Cedula" class="form-control" />
-        <span asp-validation-for="Cedula" class="text-danger"></span>
+    body {
+        background: var(--light-bg);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Header minimalista */
+    .neo-header {
+        background: var(--pure-white);
+        border-bottom: 3px solid var(--deep-blue);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .title-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .title-glow {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.25rem;
+    }
+
+    .back-link {
+        color: var(--deep-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+        .back-link:hover {
+            background: rgba(11, 36, 71, 0.05);
+            color: var(--deep-blue);
+        }
+
+    /* Tarjeta de formulario */
+    .form-card {
+        background: var(--pure-white);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        max-width: 1000px;
+        margin: 0 auto;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    /* Encabezado de creación */
+    .create-header {
+        background: linear-gradient(135deg, rgba(11, 36, 71, 0.02) 0%, rgba(87, 108, 188, 0.02) 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .create-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .create-title {
+        flex: 1;
+    }
+
+        .create-title h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+            margin-bottom: 0.25rem;
+        }
+
+    .create-subtitle {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    /* Grid del formulario */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        background: rgba(245, 249, 255, 0.5);
+        border-radius: 18px;
+        padding: 1.5rem;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
+
+        .form-section.full-width {
+            grid-column: 1 / -1;
+        }
+
+    .section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--deep-blue);
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-title span {
+            font-size: 1.1rem;
+        }
+
+    /* Grupos de formulario */
+    .form-group-modern {
+        margin-bottom: 1.2rem;
+    }
+
+        .form-group-modern label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--deep-blue);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+    .form-control-modern {
+        width: 100%;
+        border: 2px solid var(--input-border);
+        border-radius: 14px;
+        padding: 0.8rem 1.2rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        background: var(--pure-white);
+        color: var(--deep-blue);
+    }
+
+        .form-control-modern:focus {
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 0 4px var(--input-focus);
+            outline: none;
+        }
+
+        .form-control-modern:hover {
+            border-color: var(--electric-blue);
+        }
+
+        .form-control-modern::placeholder {
+            color: #a0b3cc;
+            font-size: 0.85rem;
+        }
+
+    /* Select personalizado */
+    select.form-control-modern {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230B2447' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    /* Checkbox personalizado */
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem;
+        background: rgba(245, 249, 255, 0.5);
+        border-radius: 14px;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
+
+    .checkbox-modern {
+        width: 1.3rem;
+        height: 1.3rem;
+        border: 2px solid var(--deep-blue);
+        border-radius: 6px;
+        cursor: pointer;
+        accent-color: var(--deep-blue);
+    }
+
+    .checkbox-label {
+        font-weight: 600;
+        color: var(--deep-blue);
+        cursor: pointer;
+        flex: 1;
+    }
+
+    /* Mensajes de validación */
+    .validation-summary {
+        background: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        border-radius: 14px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: var(--danger-color);
+        font-size: 0.9rem;
+    }
+
+    .validation-message {
+        font-size: 0.75rem;
+        color: var(--danger-color);
+        margin-top: 0.3rem;
+        display: block;
+        font-weight: 500;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(11, 36, 71, 0.05);
+    }
+
+    .btn-neo {
+        background: var(--deep-blue);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-neo:hover {
+            background: var(--ocean-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .btn-neo-outline {
+        background: transparent;
+        border: 2px solid var(--deep-blue);
+        color: var(--deep-blue);
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+        .btn-neo-outline:hover {
+            background: var(--deep-blue);
+            color: white;
+        }
+
+    .btn-create {
+        background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
+        color: white;
+        padding: 0.8rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            filter: brightness(1.1);
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-neo, .btn-neo-outline, .btn-create {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Animación de entrada */
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-card {
+        animation: slideIn 0.3s ease-out;
+    }
+</style>
+
+<!-- HEADER MINIMALISTA -->
+<div class="neo-header">
+    <div class="title-container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="title-glow">Nuevo Cliente</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Ingresa la información del nuevo cliente</p>
+        </div>
+        <a asp-action="Index" class="back-link">
+            <span>←</span> Volver al listado
+        </a>
     </div>
+</div>
 
-    <!-- ✅ NUEVO -->
-    <div class="form-group">
-        <label asp-for="Codigo"></label>
-        <input asp-for="Codigo" class="form-control" />
-        <span asp-validation-for="Codigo" class="text-danger"></span>
+<div class="container-fluid px-4" style="max-width: 1200px; margin: 0 auto;">
+    <div class="form-card">
+        <!-- Encabezado de creación -->
+        <div class="create-header">
+            <div class="create-icon">
+                ✨
+            </div>
+            <div class="create-title">
+                <h3>Registrar Nuevo Cliente</h3>
+                <div class="create-subtitle">
+                    Completa todos los campos obligatorios para crear un nuevo cliente en el sistema
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- Mostrar errores generales -->
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-grid">
+                <!-- SECCIÓN 1: Identificación -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span>🆔</span> Identificación
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Cedula">Número de Cédula</label>
+                        <input asp-for="Cedula" class="form-control-modern" placeholder="Ej: 1-1234-5678" />
+                        <span asp-validation-for="Cedula" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Codigo">Código de Cliente</label>
+                        <input asp-for="Codigo" class="form-control-modern" placeholder="Ej: CLT001" />
+                        <span asp-validation-for="Codigo" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="IDTipo">Tipo de Identificación</label>
+                        <select asp-for="IDTipo"
+                                asp-items="ViewBag.TiposIdentificacion"
+                                class="form-control-modern">
+                            <option value="">-- Seleccione tipo --</option>
+                        </select>
+                        <span asp-validation-for="IDTipo" class="validation-message"></span>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: Nombre -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span>👤</span> Nombre Completo
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Nombre">Nombre</label>
+                        <input asp-for="Nombre" class="form-control-modern" placeholder="Nombre(s)" />
+                        <span asp-validation-for="Nombre" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Apellidos">Apellidos</label>
+                        <input asp-for="Apellidos" class="form-control-modern" placeholder="Apellido(s)" />
+                        <span asp-validation-for="Apellidos" class="validation-message"></span>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: Contacto -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span>📞</span> Contacto
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Correo">Correo Electrónico</label>
+                        <input asp-for="Correo" class="form-control-modern" type="email" placeholder="cliente@email.com" />
+                        <span asp-validation-for="Correo" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Telefonos">Teléfonos</label>
+                        <input asp-for="Telefonos" class="form-control-modern" placeholder="8888-8888 / 2222-2222" />
+                        <span asp-validation-for="Telefonos" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Direccion">Dirección</label>
+                        <input asp-for="Direccion" class="form-control-modern" placeholder="Dirección exacta" />
+                        <span asp-validation-for="Direccion" class="validation-message"></span>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 4: Comercio -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span>🏢</span> Comercio
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="Comercio">Nombre del Comercio</label>
+                        <input asp-for="Comercio" class="form-control-modern" placeholder="Razón social" />
+                        <span asp-validation-for="Comercio" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label asp-for="ActividadEconomica">Actividad Económica</label>
+                        <input asp-for="ActividadEconomica" class="form-control-modern" placeholder="Actividad principal" />
+                        <span asp-validation-for="ActividadEconomica" class="validation-message"></span>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 5: Información Comercial (full width) -->
+                <div class="form-section full-width">
+                    <div class="section-title">
+                        <span>📊</span> Información Comercial
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div class="form-group-modern">
+                            <label asp-for="Agente">Agente Asignado</label>
+                            <input asp-for="Agente" class="form-control-modern" placeholder="Nombre del agente" />
+                            <span asp-validation-for="Agente" class="validation-message"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label asp-for="Transporte">Transporte</label>
+                            <input asp-for="Transporte" class="form-control-modern" placeholder="Método de transporte" />
+                            <span asp-validation-for="Transporte" class="validation-message"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label asp-for="Zona">Zona Geográfica</label>
+                            <input asp-for="Zona" class="form-control-modern" placeholder="Zona" />
+                            <span asp-validation-for="Zona" class="validation-message"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label asp-for="LimiteCredito">Límite de Crédito (₡)</label>
+                            <input asp-for="LimiteCredito" class="form-control-modern" step="0.01" placeholder="0.00" />
+                            <span asp-validation-for="LimiteCredito" class="validation-message"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 6: Estado -->
+                <div class="form-section full-width">
+                    <div class="checkbox-wrapper">
+                        <input asp-for="Estado" class="checkbox-modern" type="checkbox" checked />
+                        <label asp-for="Estado" class="checkbox-label">
+                            Cliente Activo
+                            <small class="d-block text-muted" style="font-size: 0.75rem; font-weight: normal;">
+                                Los clientes inactivos no aparecerán en búsquedas por defecto. Por defecto, los nuevos clientes están activos.
+                            </small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <a asp-action="Index" class="btn-neo-outline">
+                    <span>←</span> Cancelar
+                </a>
+                <button type="submit" class="btn-create">
+                    <span>💾</span> Guardar Cliente
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Apellidos"></label>
-        <input asp-for="Apellidos" class="form-control" />
-        <span asp-validation-for="Apellidos" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="IDTipo"></label>
-        <select asp-for="IDTipo"
-                asp-items="ViewBag.TiposIdentificacion"
-                class="form-control">
-            <option value="">-- Seleccione tipo de identificación --</option>
-        </select>
-        <span asp-validation-for="IDTipo" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Correo"></label>
-        <input asp-for="Correo" class="form-control" />
-        <span asp-validation-for="Correo" class="text-danger"></span>
-    </div>
-
-    <!-- Teléfonos (ya correcto) -->
-    <div class="form-group">
-        <label asp-for="Telefonos"></label>
-        <input asp-for="Telefonos"
-               class="form-control"
-               placeholder="Ej: 8888-8888 / 2222-2222" />
-        <span asp-validation-for="Telefonos" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Comercio"></label>
-        <input asp-for="Comercio" class="form-control" />
-        <span asp-validation-for="Comercio" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Direccion"></label>
-        <input asp-for="Direccion" class="form-control" />
-        <span asp-validation-for="Direccion" class="text-danger"></span>
-    </div>
-
-    <!-- ✅ NUEVOS -->
-    <div class="form-group">
-        <label asp-for="Agente"></label>
-        <input asp-for="Agente" class="form-control" />
-        <span asp-validation-for="Agente" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Transporte"></label>
-        <input asp-for="Transporte" class="form-control" />
-        <span asp-validation-for="Transporte" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ActividadEconomica"></label>
-        <input asp-for="ActividadEconomica"
-               class="form-control"
-               step="0.01" />
-        <span asp-validation-for="ActividadEconomica" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="LimiteCredito"></label>
-        <input asp-for="LimiteCredito"
-               class="form-control"
-               step="0.01" />
-        <span asp-validation-for="LimiteCredito" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Zona"></label>
-        <input asp-for="Zona" class="form-control" />
-        <span asp-validation-for="Zona" class="text-danger"></span>
-    </div>
-
-    <div class="form-check">
-        <input asp-for="Estado" class="form-check-input" />
-        <label asp-for="Estado" class="form-check-label"></label>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-3">
-        Guardar
-    </button>
-</form>
+</div>

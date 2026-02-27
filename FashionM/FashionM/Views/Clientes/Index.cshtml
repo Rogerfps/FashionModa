@@ -1,107 +1,491 @@
 ﻿@model IEnumerable<Clientes>
 
-<h2>Clientes</h2>
+@{
+    ViewData["Title"] = "Clientes";
+}
 
-<a asp-action="Create" class="btn btn-primary">Nuevo Cliente</a>
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success-glow: #27ae60;
+        --danger-glow: #e74c3c;
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
 
-<form asp-action="Index" method="get" class="mb-3">
-    <div class="row g-2">
-        <div class="col-md-6">
-            <input type="text"
-                   name="buscar"
-                   value="@Context.Request.Query["buscar"]"
-                   class="form-control"
-                   placeholder="Buscar por nombre, cédula o teléfono" />
+    body {
+        background: var(--light-bg);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Header minimalista */
+    .neo-header {
+        background: var(--pure-white);
+        border-bottom: 3px solid var(--deep-blue);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .title-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .title-glow {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.25rem;
+    }
+
+    .btn-neo {
+        background: var(--deep-blue);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-neo:hover {
+            background: var(--ocean-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .btn-neo-outline {
+        background: transparent;
+        border: 2px solid var(--deep-blue);
+        color: var(--deep-blue);
+        padding: 0.6rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .btn-neo-outline:hover {
+            background: var(--deep-blue);
+            color: white;
+        }
+
+    /* Filtros compactos */
+    .filters-container {
+        background: var(--pure-white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
+
+    .filter-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--deep-blue);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-input {
+        border: 2px solid #E9EEF5;
+        border-radius: 12px;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #FAFCFE;
+    }
+
+        .filter-input:focus {
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 0 3px rgba(87, 108, 188, 0.1);
+            outline: none;
+        }
+
+    /* Tabla compacta y moderna */
+    .table-wrapper {
+        background: var(--pure-white);
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .modern-table th {
+            color: var(--deep-blue);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.75rem;
+            background: transparent;
+            border-bottom: 2px solid rgba(11, 36, 71, 0.1);
+        }
+
+        .modern-table td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            font-size: 0.9rem;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.2s;
+        }
+
+            .modern-table tbody tr:hover {
+                background: rgba(87, 108, 188, 0.02);
+            }
+
+    /* Badges ultra compactos */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.6rem;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        border: 1px solid transparent;
+    }
+
+        .status-badge.active {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border-color: rgba(39, 174, 96, 0.2);
+        }
+
+        .status-badge.inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .status-badge::before {
+            content: "●";
+            font-size: 0.5rem;
+            margin-right: 4px;
+            opacity: 0.8;
+        }
+
+    /* Botón de acciones compacto */
+    .action-btn {
+        background: transparent;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--deep-blue);
+        font-size: 1.2rem;
+        transition: all 0.2s;
+    }
+
+        .action-btn:hover {
+            background: rgba(11, 36, 71, 0.05);
+            transform: rotate(90deg);
+        }
+
+    .action-dropdown {
+        border: none;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 0.5rem;
+        min-width: 160px;
+    }
+
+        .action-dropdown .dropdown-item {
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .action-dropdown .dropdown-item:hover {
+                background: rgba(11, 36, 71, 0.05);
+            }
+
+    /* Paginación minimalista */
+    .pagination-modern {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 2rem;
+    }
+
+    .page-item-modern {
+        list-style: none;
+    }
+
+    .page-link-modern {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--pure-white);
+        color: var(--deep-blue);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid rgba(11, 36, 71, 0.1);
+    }
+
+        .page-link-modern:hover {
+            background: var(--deep-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .page-item-modern.active .page-link-modern {
+        background: var(--deep-blue);
+        color: white;
+        border-color: var(--deep-blue);
+    }
+
+    /* Valores numéricos */
+    .credit-value {
+        font-weight: 700;
+        color: var(--deep-blue);
+        font-size: 0.9rem;
+    }
+
+    .code-badge {
+        background: rgba(11, 36, 71, 0.05);
+        padding: 0.3rem 0.8rem;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--deep-blue);
+        display: inline-block;
+    }
+
+    .zona-tag {
+        background: #E9EEF5;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        display: inline-block;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+<!-- HEADER MINIMALISTA -->
+<div class="neo-header">
+    <div class="title-container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="title-glow">Clientes</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Gestiona tu cartera de clientes</p>
         </div>
+        <a asp-action="Create" class="btn-neo">
+            <span>+</span> Nuevo Cliente
+        </a>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <select name="estado" class="form-control">
-                <option value="">-- Todos --</option>
-                <option value="true" selected="@(Context.Request.Query["estado"] == "true")">
-                    Activos
-                </option>
-                <option value="false" selected="@(Context.Request.Query["estado"] == "false")">
-                    Inactivos
-                </option>
-            </select>
-        </div>
+<div class="container-fluid px-4" style="max-width: 1600px; margin: 0 auto;">
+    <!-- FILTROS COMPACTOS -->
+    <div class="filters-container">
+        <form asp-action="Index" method="get">
+            <div class="row g-3">
+                <div class="col-lg-5">
+                    <div class="filter-label">Buscar</div>
+                    <input type="text"
+                           name="buscar"
+                           value="@Context.Request.Query["buscar"]"
+                           class="filter-input w-100"
+                           placeholder="Código, nombre, agente, cédula o teléfono...">
+                </div>
+                <div class="col-lg-2">
+                    <div class="filter-label">Estado</div>
+                    <select name="estado" class="filter-input w-100">
+                        <option value="">Todos</option>
+                        <option value="true" selected="@(Context.Request.Query["estado"] == "true")">Activos</option>
+                        <option value="false" selected="@(Context.Request.Query["estado"] == "false")">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <div class="filter-label">Zona</div>
+                    <select name="zona" class="filter-input w-100">
+                        <option value="">Todas</option>
+                        @if (ViewBag.Zonas != null)
+                        {
+                            foreach (var z in ViewBag.Zonas as List<string>)
+                            {
+                                <option value="@z" selected="@(Context.Request.Query["zona"] == z)">@z</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-2 d-flex align-items-end">
+                    <button type="submit" class="btn-neo-outline w-100">
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">
-                Filtrar
-            </button>
+    <!-- TABLA COMPACTA -->
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Agente</th>
+                        <th>Cédula</th>
+                        <th>Transporte</th>
+                        <th>Cliente</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Zona</th>
+                        <th>Crédito</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📋</div>
+                                    <h5 style="color: var(--deep-blue);">No hay clientes registrados</h5>
+                                    <p class="text-muted">Comienza agregando tu primer cliente</p>
+                                    <a asp-action="Create" class="btn-neo mt-3" style="padding: 0.6rem 2rem;">
+                                        + Agregar Cliente
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="code-badge">@item.Codigo</span>
+                                </td>
+                                <td class="fw-500">@item.Agente</td>
+                                <td>@item.Cedula</td>
+                                <td>@item.Transporte</td>
+                                <td>
+                                    <div class="fw-bold" style="color: var(--deep-blue);">
+                                        @item.Nombre @item.Apellidos
+                                    </div>
+                                </td>
+                                <td style="font-size: 0.85rem;">@item.Correo</td>
+                                <td style="font-size: 0.85rem;">@item.Telefonos</td>
+                                <td>
+                                    <span class="zona-tag">@item.Zona</span>
+                                </td>
+                                <td>
+                                    <span class="credit-value">₡@item.LimiteCredito.ToString("N0")</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge @(item.Estado ? "active" : "inactive")">
+                                        @(item.Estado ? "Activo" : "Inactivo")
+                                    </span>
+                                </td>
+                                <td style="width: 40px;">
+                                    <div class="dropdown">
+                                        <button class="action-btn" data-bs-toggle="dropdown">
+                                            ⋮
+                                        </button>
+                                        <ul class="dropdown-menu action-dropdown dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Cedula">
+                                                    <span>👁️</span> Detalles
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Cedula">
+                                                    <span>✏️</span> Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Cedula">
+                                                    <span>🗑️</span> Eliminar
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-</form>
 
-<table class="table table-sm mt-3">
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Agente</th>
-            <th>Cédula</th>
-            <th>Transporte</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Teléfonos</th>
-            <th>Zona</th>
-            <th>Límite Crédito</th>
-            <th>Estado</th>
-            <th>Acción</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Codigo</td>
-                <td>@item.Agente</td>
-                <td>@item.Cedula</td>
-                <td>@item.Transporte</td>
-                <td>@item.Nombre @item.Apellidos</td>
-                <td>@item.Correo</td>
-                <td>@item.Telefonos</td>
-                <td>@item.Zona</td>
-                <td>@item.LimiteCredito.ToString("N2")</td>
-                <td>@(item.Estado ? "Activo" : "Inactivo")</td>
-                <td>
-                    <a asp-action="Details"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-info btn-sm">
-                        Detalles
-                    </a>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-                    <a asp-action="Delete"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-danger btn-sm">
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@if (ViewBag.TotalPaginas > 1)
-{
-    <nav>
-        <ul class="pagination">
+    <!-- PAGINACIÓN COMPACTA -->
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        <ul class="pagination-modern">
             @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
             {
-                <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
-                    <a class="page-link"
+                <li class="page-item-modern @(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a class="page-link-modern"
                        asp-action="Index"
                        asp-route-page="@i"
                        asp-route-buscar="@Context.Request.Query["buscar"]"
-                       asp-route-estado="@Context.Request.Query["estado"]">
+                       asp-route-estado="@Context.Request.Query["estado"]"
+                       asp-route-zona="@Context.Request.Query["zona"]">
                         @i
                     </a>
                 </li>
             }
         </ul>
-    </nav>
-}
+    }
+</div>

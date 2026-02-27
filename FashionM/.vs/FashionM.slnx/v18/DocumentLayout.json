@@ -3,76 +3,40 @@
   "WorkspaceRootPath": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\models\\clientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\models\\clientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\proveedores\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\proveedores\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\proveedores\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\proveedores\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\proveedores\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\proveedores\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\proveedores\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\proveedores\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\controllers\\proveedorescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\controllers\\proveedorescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\models\\clientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\models\\clientes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\clientes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\clientes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\proveedores\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\proveedores\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\models\\proveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\models\\proveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\migrations\\20260226175116_creartablaproveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\migrations\\20260226175116_creartablaproveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -82,45 +46,58 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "20260226195422_AgregarCamposClientes.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs",
-              "RelativeDocumentMoniker": "FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs",
-              "RelativeToolTip": "FashionM\\Migrations\\20260226195422_AgregarCamposClientes.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T19:54:23.137Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Delete.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Delete.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Delete.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Delete.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Clientes\\Delete.cshtml",
-              "ViewState": "AgIAACQAAAAAAAAAAAAmwD4AAAAHAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Create.cshtml",
+              "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Create.cshtml",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Create.cshtml",
+              "RelativeToolTip": "FashionM\\Views\\Clientes\\Create.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACICAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T19:48:01.976Z",
+              "WhenOpened": "2026-02-26T22:06:38.415Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Create.cshtml",
+              "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Create.cshtml",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Create.cshtml",
+              "RelativeToolTip": "FashionM\\Views\\Proveedores\\Create.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-27T13:42:34.658Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Edit.cshtml",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Edit.cshtml",
               "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Edit.cshtml",
               "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Edit.cshtml",
               "RelativeToolTip": "FashionM\\Views\\Clientes\\Edit.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG0AAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAKcBAAAAAAAAAAAAAP8BAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T19:36:05.227Z",
+              "WhenOpened": "2026-02-26T22:18:00.023Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Clientes.cs",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Clientes.cs",
+              "RelativeDocumentMoniker": "FashionM\\Models\\Clientes.cs",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Clientes.cs",
+              "RelativeToolTip": "FashionM\\Models\\Clientes.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAA/wAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-26T22:12:22.866Z",
               "EditorCaption": ""
             },
             {
@@ -131,145 +108,49 @@
               "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Details.cshtml",
               "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Details.cshtml",
               "RelativeToolTip": "FashionM\\Views\\Clientes\\Details.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEAAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAK0BAAAAAAAAAAAmwMcBAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T19:36:12.496Z",
+              "WhenOpened": "2026-02-26T22:06:39.485Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Create.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Create.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Create.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Clientes\\Create.cshtml",
-              "ViewState": "AgIAAFcAAAAAAAAAAAAmwHEAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T19:34:33.396Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Index.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Index.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Index.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Clientes\\Index.cshtml",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAACkAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T19:32:07.177Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Clientes.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Clientes.cs",
-              "RelativeDocumentMoniker": "FashionM\\Models\\Clientes.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Clientes.cs",
-              "RelativeToolTip": "FashionM\\Models\\Clientes.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T19:12:52.396Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Delete.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Delete.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Delete.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Delete.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Proveedores\\Delete.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADIAAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T18:37:10.708Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Edit.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Edit.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Edit.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Edit.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Proveedores\\Edit.cshtml",
-              "ViewState": "AgIAABsAAAAAAAAAAAAuwE0AAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T17:58:14.058Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Details.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Details.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Details.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Proveedores\\Details.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T17:53:26.416Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "20260226175116_CrearTablaProveedores.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260226175116_CrearTablaProveedores.cs",
-              "RelativeDocumentMoniker": "FashionM\\Migrations\\20260226175116_CrearTablaProveedores.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260226175116_CrearTablaProveedores.cs",
-              "RelativeToolTip": "FashionM\\Migrations\\20260226175116_CrearTablaProveedores.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T17:51:16.399Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T17:48:50.386Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Create.cshtml",
-              "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Create.cshtml",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Create.cshtml",
-              "RelativeToolTip": "FashionM\\Views\\Proveedores\\Create.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T17:47:13.723Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Index.cshtml",
               "RelativeDocumentMoniker": "FashionM\\Views\\Proveedores\\Index.cshtml",
               "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Proveedores\\Index.cshtml",
               "RelativeToolTip": "FashionM\\Views\\Proveedores\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGQAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-26T17:43:43.627Z"
+              "WhenOpened": "2026-02-26T22:04:52.207Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Data\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "FashionM\\Data\\AppDbContext.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Data\\AppDbContext.cs",
-              "RelativeToolTip": "FashionM\\Data\\AppDbContext.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAxwBAAAAA7AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T17:41:42.948Z"
+              "DocumentIndex": 8,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "FashionM\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "FashionM\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-02-26T21:08:19.772Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Index.cshtml",
+              "RelativeDocumentMoniker": "FashionM\\Views\\Clientes\\Index.cshtml",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Clientes\\Index.cshtml",
+              "RelativeToolTip": "FashionM\\Views\\Clientes\\Index.cshtml",
+              "ViewState": "AgIAAM0BAAAAAAAAAAAmwOoBAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-26T20:55:00.313Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -279,34 +160,10 @@
               "RelativeDocumentMoniker": "FashionM\\Controllers\\ClientesController.cs",
               "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\ClientesController.cs",
               "RelativeToolTip": "FashionM\\Controllers\\ClientesController.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAADgvy0AAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwBcAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-26T17:31:08.21Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "ProveedoresController.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\ProveedoresController.cs",
-              "RelativeDocumentMoniker": "FashionM\\Controllers\\ProveedoresController.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\ProveedoresController.cs",
-              "RelativeToolTip": "FashionM\\Controllers\\ProveedoresController.cs",
-              "ViewState": "AgIAAIYAAAAAAAAAAAASwCgAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T17:30:21.916Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "Proveedores.cs",
-              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Proveedores.cs",
-              "RelativeDocumentMoniker": "FashionM\\Models\\Proveedores.cs",
-              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Proveedores.cs",
-              "RelativeToolTip": "FashionM\\Models\\Proveedores.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAkwCgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-26T17:27:34.252Z"
             }
           ]
         }

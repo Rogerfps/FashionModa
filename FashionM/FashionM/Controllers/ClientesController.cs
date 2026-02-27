@@ -20,37 +20,58 @@ namespace FashionM.Controllers
         // ===============================
         // LISTAR
         // ===============================
-        public async Task<IActionResult> Index(string buscar, bool? estado, int page = 1)
+        public async Task<IActionResult> Index(
+            string buscar,
+            bool? estado,
+            string zona,
+            int page = 1)
         {
             int pageSize = 25;
             var clientes = _context.Clientes.AsQueryable();
 
-            if (!string.IsNullOrEmpty(buscar))
+            // 🔍 BÚSQUEDA GENERAL
+            if (!string.IsNullOrWhiteSpace(buscar))
             {
                 clientes = clientes.Where(c =>
+                    c.Codigo.Contains(buscar) ||
                     c.Nombre.Contains(buscar) ||
                     c.Apellidos.Contains(buscar) ||
+                    c.Agente.Contains(buscar) ||
                     c.Cedula.ToString().Contains(buscar) ||
-                    (c.Telefonos != null && c.Telefonos.Contains(buscar)) ||
-                    c.Codigo.Contains(buscar)
+                    (c.Telefonos != null && c.Telefonos.Contains(buscar))
                 );
             }
 
+            // 🔘 FILTRO POR ESTADO
             if (estado.HasValue)
             {
                 clientes = clientes.Where(c => c.Estado == estado.Value);
             }
 
+            // 🔽 FILTRO POR ZONA
+            if (!string.IsNullOrWhiteSpace(zona))
+            {
+                clientes = clientes.Where(c => c.Zona == zona);
+            }
+
             int totalRegistros = await clientes.CountAsync();
 
             var lista = await clientes
-                .OrderBy(c => c.Cedula)
+                .OrderBy(c => c.Codigo)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
             ViewBag.PaginaActual = page;
+
+            // 🔽 CARGAR ZONAS PARA EL SELECT
+            ViewBag.Zonas = await _context.Clientes
+                .Where(c => c.Zona != null && c.Zona != "")
+                .Select(c => c.Zona)
+                .Distinct()
+                .OrderBy(z => z)
+                .ToListAsync();
 
             return View(lista);
         }

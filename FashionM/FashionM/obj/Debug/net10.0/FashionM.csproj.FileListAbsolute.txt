@@ -112,7 +112,6 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\rjsmcsh
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\scopedcss\bundle\FashionM.styles.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\scopedcss\projectbundle\FashionM.bundle.scp.css
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\7mvygr1q21-{0}-b9sayid5wm-b9sayid5wm.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\k9orfun8co-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\d2tvivncwx-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\t41khwguj0-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -188,3 +187,4 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\refint\
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\FashionM.pdb
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\FashionM.genruntimeconfig.cache
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\ref\FashionM.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\7mvygr1q21-{0}-ktkj6bz9j4-ktkj6bz9j4.gz

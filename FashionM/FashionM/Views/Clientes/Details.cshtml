@@ -1,65 +1,456 @@
 ﻿@model Clientes
 
-<h2>Detalle del Cliente</h2>
-<hr />
+@{
+    ViewData["Title"] = "Detalle del Cliente";
+}
 
-<dl class="row">
-    <dt class="col-sm-3">Cédula</dt>
-    <dd class="col-sm-9">@Model.Cedula</dd>
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success-color: #27ae60;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
 
-    <!-- ✅ NUEVO -->
-    <dt class="col-sm-3">Código</dt>
-    <dd class="col-sm-9">@Model.Codigo</dd>
+    body {
+        background: var(--light-bg);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
 
-    <dt class="col-sm-3">Nombre</dt>
-    <dd class="col-sm-9">@Model.Nombre</dd>
+    /* Header minimalista (mismo estilo) */
+    .neo-header {
+        background: var(--pure-white);
+        border-bottom: 3px solid var(--deep-blue);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
 
-    <dt class="col-sm-3">Apellidos</dt>
-    <dd class="col-sm-9">@Model.Apellidos</dd>
+    .title-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
 
-    <dt class="col-sm-3">Tipo Identificación</dt>
-    <dd class="col-sm-9">@Model.IDTipo</dd>
+    .title-glow {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.25rem;
+    }
 
-    <dt class="col-sm-3">Correo</dt>
-    <dd class="col-sm-9">@Model.Correo</dd>
+    .back-link {
+        color: var(--deep-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
 
-    <dt class="col-sm-3">Teléfonos</dt>
-    <dd class="col-sm-9">@Model.Telefonos</dd>
+        .back-link:hover {
+            background: rgba(11, 36, 71, 0.05);
+            color: var(--deep-blue);
+        }
 
-    <dt class="col-sm-3">Comercio</dt>
-    <dd class="col-sm-9">@Model.Comercio</dd>
+    /* Tarjeta de detalle */
+    .detail-card {
+        background: var(--pure-white);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        max-width: 1200px;
+        margin: 0 auto;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
 
-    <dt class="col-sm-3">Dirección</dt>
-    <dd class="col-sm-9">@Model.Direccion</dd>
+    /* Encabezado del cliente */
+    .client-header {
+        background: linear-gradient(135deg, rgba(11, 36, 71, 0.02) 0%, rgba(87, 108, 188, 0.02) 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 
-    <!-- ✅ NUEVOS -->
-    <dt class="col-sm-3">Agente</dt>
-    <dd class="col-sm-9">@Model.Agente</dd>
+    .client-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        box-shadow: var(--shadow-md);
+    }
 
-    <dt class="col-sm-3">Transporte</dt>
-    <dd class="col-sm-9">@Model.Transporte</dd>
+    .client-title {
+        flex: 1;
+    }
 
-    <dt class="col-sm-3">Actividad Económica</dt>
-    <dd class="col-sm-9">@Model.ActividadEconomica</dd>
+    .client-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--deep-blue);
+        margin-bottom: 0.25rem;
+    }
 
-    <dt class="col-sm-3">Límite de Crédito</dt>
-    <dd class="col-sm-9">@Model.LimiteCredito.ToString("N2")</dd>
+    .client-code {
+        display: inline-block;
+        background: rgba(11, 36, 71, 0.05);
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+    }
 
-    <dt class="col-sm-3">Zona</dt>
-    <dd class="col-sm-9">@Model.Zona</dd>
+    .status-badge-large {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1.2rem;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid transparent;
+        background: @(Model.Estado ? "rgba(39, 174, 96, 0.1)" : "rgba(231, 76, 60, 0.1)");
+        color: @(Model.Estado ? "#27ae60" : "#e74c3c");
+        border-color: @(Model.Estado ? "rgba(39, 174, 96, 0.2)" : "rgba(231, 76, 60, 0.2)");
+    }
 
-    <dt class="col-sm-3">Estado</dt>
-    <dd class="col-sm-9">
-        @(Model.Estado ? "Activo" : "Inactivo")
-    </dd>
-</dl>
+        .status-badge-large::before {
+            content: "●";
+            font-size: 0.8rem;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
 
-<a asp-action="Edit"
-   asp-route-id="@Model.Cedula"
-   class="btn btn-warning">
-    Editar
-</a>
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Volver
-</a>
+    /* Grid de información */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-section {
+        background: rgba(245, 249, 255, 0.5);
+        border-radius: 18px;
+        padding: 1.5rem;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--deep-blue);
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-title span {
+            font-size: 1.1rem;
+        }
+
+    .info-row {
+        display: flex;
+        padding: 0.8rem 0;
+        border-bottom: 1px dashed rgba(11, 36, 71, 0.1);
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        width: 140px;
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .info-value {
+        flex: 1;
+        font-weight: 600;
+        color: var(--deep-blue);
+    }
+
+        .info-value.highlight {
+            color: var(--electric-blue);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+    /* Badges para campos especiales */
+    .zona-badge {
+        background: #E9EEF5;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        display: inline-block;
+    }
+
+    .agente-tag {
+        background: rgba(87, 108, 188, 0.1);
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--electric-blue);
+        display: inline-block;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(11, 36, 71, 0.05);
+    }
+
+    .btn-neo {
+        background: var(--deep-blue);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-neo:hover {
+            background: var(--ocean-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .btn-neo-outline {
+        background: transparent;
+        border: 2px solid var(--deep-blue);
+        color: var(--deep-blue);
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-neo-outline:hover {
+            background: var(--deep-blue);
+            color: white;
+        }
+
+    .btn-warning-neo {
+        background: #f39c12;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-warning-neo:hover {
+            background: #e67e22;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .client-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-neo, .btn-neo-outline, .btn-warning-neo {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .info-row {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .info-label {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- HEADER MINIMALISTA (mismo estilo) -->
+<div class="neo-header">
+    <div class="title-container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="title-glow">Detalle del Cliente</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Información completa del cliente</p>
+        </div>
+        <a asp-action="Index" class="back-link">
+            <span>←</span> Volver al listado
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-4" style="max-width: 1400px; margin: 0 auto;">
+    <div class="detail-card">
+        <!-- Encabezado del cliente con avatar -->
+        <div class="client-header">
+            <div class="client-avatar">
+                @Model.Nombre.Substring(0, 1)@Model.Apellidos.Substring(0, 1)
+            </div>
+            <div class="client-title">
+                <div class="client-name">@Model.Nombre @Model.Apellidos</div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="client-code">Código: @Model.Codigo</span>
+                    <span class="client-code">Cédula: @Model.Cedula</span>
+                </div>
+            </div>
+            <div class="status-badge-large @(Model.Estado ? "active" : "inactive")">
+                @(Model.Estado ? "Activo" : "Inactivo")
+            </div>
+        </div>
+
+        <!-- Grid de información -->
+        <div class="info-grid">
+            <!-- Columna 1: Información Personal -->
+            <div class="info-section">
+                <div class="section-title">
+                    <span>👤</span> Información Personal
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Tipo ID:</div>
+                    <div class="info-value">@Model.IDTipo</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Correo:</div>
+                    <div class="info-value">@Model.Correo</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Teléfonos:</div>
+                    <div class="info-value">@Model.Telefonos</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Dirección:</div>
+                    <div class="info-value">@Model.Direccion</div>
+                </div>
+            </div>
+
+            <!-- Columna 2: Información Comercial -->
+            <div class="info-section">
+                <div class="section-title">
+                    <span>🏢</span> Información Comercial
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Comercio:</div>
+                    <div class="info-value">@Model.Comercio</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Actividad Económica:</div>
+                    <div class="info-value">@Model.ActividadEconomica</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Agente:</div>
+                    <div class="info-value">
+                        <span class="agente-tag">@Model.Agente</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Transporte:</div>
+                    <div class="info-value">@Model.Transporte</div>
+                </div>
+            </div>
+
+            <!-- Columna 3: Ubicación (se extiende a 2 columnas si es necesario) -->
+            <div class="info-section">
+                <div class="section-title">
+                    <span>📍</span> Ubicación y Zona
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Zona:</div>
+                    <div class="info-value">
+                        <span class="zona-badge">@Model.Zona</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 4: Crédito -->
+            <div class="info-section">
+                <div class="section-title">
+                    <span>💳</span> Límite de Crédito
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Monto:</div>
+                    <div class="info-value highlight">
+                        ₡ @Model.LimiteCredito.ToString("N2")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn-neo-outline">
+                <span>←</span> Volver
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn-warning-neo">
+                <span>✏️</span> Editar Cliente
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Cedula" class="btn-neo" style="background: #e74c3c;">
+                <span>🗑️</span> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
