@@ -15,6 +15,8 @@ namespace FashionM.Data
         public DbSet<TallaInventario> TallasInventario { get; set; }
         public DbSet<Clientes> Clientes { get; set; }
         public DbSet<Proveedores> Proveedores { get; set; }
+        public DbSet<PedidoCliente> PedidosCliente { get; set; }
+        public DbSet<PedidoClienteDetalle> PedidoClienteDetalles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +34,18 @@ namespace FashionM.Data
                 .HasOne(t => t.Inventario)
                 .WithMany(i => i.Tallas)
                 .HasForeignKey(t => t.InventarioCodigo)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Pedido
+            modelBuilder.Entity<PedidoCliente>()
+                .HasOne(p => p.Cliente)
+                .WithMany()
+                .HasForeignKey(p => p.ClienteCedula);
+            // Pedido -> Detalles
+            modelBuilder.Entity<PedidoClienteDetalle>()
+                .HasOne(d => d.PedidoCliente)
+                .WithMany(p => p.Detalles)
+                .HasForeignKey(d => d.PedidoClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

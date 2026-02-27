@@ -516,6 +516,13 @@
                             <input asp-for="LimiteCredito" class="form-control-modern" step="0.01" placeholder="0.00" />
                             <span asp-validation-for="LimiteCredito" class="validation-message"></span>
                         </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Empresa" class="form-label"></label>
+                            <input asp-for="Empresa" class="form-control" />
+                            <span asp-validation-for="Empresa" class="text-danger"></span>
+                        </div>
+
                     </div>
                 </div>
 
@@ -532,6 +539,8 @@
                     </div>
                 </div>
             </div>
+
+            
 
             <!-- Botones de acción -->
             <div class="action-buttons">

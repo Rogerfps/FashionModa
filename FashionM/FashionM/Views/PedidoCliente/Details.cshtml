@@ -1,0 +1,143 @@
+﻿@model PedidoCliente
+
+@{
+    ViewData["Title"] = "Detalle del Pedido";
+}
+
+<h2>Detalle del Pedido #@Model.Id</h2>
+
+<hr />
+
+<!-- =========================
+     DATOS GENERALES
+========================== -->
+<div class="row">
+    <div class="col-md-6">
+        <h4>Cliente</h4>
+        <p>
+            <strong>Nombre:</strong> @Model.Cliente.Nombre @Model.Cliente.Apellidos <br />
+            <strong>Cédula:</strong> @Model.Cliente.Cedula <br />
+            <strong>Codigo:</strong> @Model.Cliente.Codigo <br />
+            <strong>Dirección:</strong> @Model.Cliente.Direccion <br />
+            <strong>Correo:</strong> @Model.Cliente.Correo <br />
+            <strong>Teléfono:</strong> @Model.Cliente.Telefonos <br />
+            <strong>Transporte:</strong> @Model.Cliente.Transporte
+        </p>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Pedido</h4>
+        <p>
+            <strong>Fecha Pedido:</strong> @Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy") <br />
+            <strong>Fecha Entrega:</strong> @Model.FechaEntrega.ToLocalTime().ToString("dd/MM/yyyy") <br />
+            <strong>Vendedor:</strong> @Model.Vendedor <br />
+            <strong>Observaciones:</strong> @Model.Observaciones
+        </p>
+    </div>
+</div>
+
+<hr />
+
+<!-- =========================
+     DETALLE DEL PEDIDO
+========================== -->
+<h4>Detalle del Pedido</h4>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Codigo</th>
+            <th>Color</th>
+            <th>Talla</th>
+            <th>Cantidad</th>
+            <th>Precio Unit.</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.Detalles)
+        {
+            <tr>
+                <td>@d.CodigoProducto</td>
+                <td>@d.Color</td>
+                <td>@d.Talla</td>
+                <td>@d.Cantidad</td>
+                <td>@d.PrecioUnitario.ToString("N2")</td>
+                <td>@d.SubTotal.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<!-- =========================
+     TOTALES Y ESTADOS
+========================== -->
+<div class="row">
+    <div class="col-md-6">
+        <h4>Total</h4>
+        <h3>₡ @Model.Total.ToString("N2")</h3>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Estado</h4>
+
+        <p>
+            <strong>Crédito:</strong>
+            @if (Model.FirmaCredito)
+            {
+                <span class="badge bg-success">Aprobado</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">Pendiente</span>
+            }
+        </p>
+
+        <p>
+            <strong>Bodega:</strong>
+            @if (Model.FirmaBodega)
+            {
+                <span class="badge bg-success">Despachado</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Pendiente</span>
+            }
+        </p>
+    </div>
+</div>
+
+<hr />
+
+<!-- =========================
+     ACCIONES
+========================== -->
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
+    @if (!Model.FirmaCredito)
+    {
+        <form asp-action="FirmarCredito"
+              asp-route-id="@Model.Id"
+              method="post"
+              style="display:inline">
+            <button type="submit" class="btn btn-success">
+                Aprobar Crédito
+            </button>
+        </form>
+    }
+
+    @if (Model.FirmaCredito && !Model.FirmaBodega)
+    {
+        <form asp-action="FirmarBodega"
+              asp-route-id="@Model.Id"
+              method="post"
+              style="display:inline">
+            <button type="submit" class="btn btn-primary">
+                Aprobar Bodega
+            </button>
+        </form>
+    }
+</div>

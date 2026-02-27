@@ -74,7 +74,6 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\LICENSE.txt
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\jquery.slim.js
@@ -136,3 +135,4 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\bootstrap\dis
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\js\site.js
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\favicon.ico
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\site.css
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\LICENSE.txt

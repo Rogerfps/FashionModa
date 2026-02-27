@@ -331,7 +331,7 @@
     }
 </style>
 
-<!-- HEADER MINIMALISTA (mismo estilo) -->
+<!-- HEADER MINIMALISTA  -->
 <div class="neo-header">
     <div class="title-container d-flex justify-content-between align-items-center">
         <div>
@@ -388,7 +388,7 @@
                 </div>
             </div>
 
-            <!-- Columna 2: Información Comercial -->
+            <!-- Columna 2: Informacion Comercial -->
             <div class="info-section">
                 <div class="section-title">
                     <span>🏢</span> Información Comercial
@@ -411,9 +411,13 @@
                     <div class="info-label">Transporte:</div>
                     <div class="info-value">@Model.Transporte</div>
                 </div>
+                <div class="info-row">
+                    <div class="info-label">Empresa:</div>
+                    <div class="info-value">@Model.Empresa</div>
+                </div>
             </div>
 
-            <!-- Columna 3: Ubicación (se extiende a 2 columnas si es necesario) -->
+            <!-- Columna 3: Ubicacion (se extiende a 2 columnas si es necesario) -->
             <div class="info-section">
                 <div class="section-title">
                     <span>📍</span> Ubicación y Zona
@@ -426,7 +430,7 @@
                 </div>
             </div>
 
-            <!-- Columna 4: Crédito -->
+            <!-- Columna 4: Credito -->
             <div class="info-section">
                 <div class="section-title">
                     <span>💳</span> Límite de Crédito
@@ -440,7 +444,7 @@
             </div>
         </div>
 
-        <!-- Botones de acción -->
+        <!-- Botones de accion -->
         <div class="action-buttons">
             <a asp-action="Index" class="btn-neo-outline">
                 <span>←</span> Volver

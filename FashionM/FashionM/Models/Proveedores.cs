@@ -39,3 +39,15 @@ namespace FashionM.Models
     }
 }
 
+/*
+ Cedula lleva letras porque tiene que ser como un codigo
+ Quitar apellido
+ Color
+ Orden de proveedor numerica
+ Numero de proveedor
+ 
+
+ 
+ 
+ 
+ */

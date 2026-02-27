@@ -1,0 +1,89 @@
+﻿@model IEnumerable<PedidoCliente>
+
+@{
+    ViewData["Title"] = "Pedidos de Clientes";
+}
+
+<h2>Pedidos de Clientes</h2>
+
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Actualizar</a>
+</p>
+<a asp-action="Create" class="btn btn-primary">
+    ➕ Crear Pedido
+</a>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Transporte</th>
+            <th>Total</th>
+            <th>Crédito</th>
+            <th>Bodega</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @item.Cliente.Nombre @item.Cliente.Apellidos<br />
+                    <small>@item.Cliente.Cedula</small>
+                </td>
+                <td>@item.Cliente.Transporte</td>
+                <td>₡ @item.Total.ToString("N2")</td>
+
+                <!-- ESTADO CRÉDITO -->
+                <td>
+                    @if (item.FirmaCredito)
+                    {
+                        <span class="badge bg-success">Aprobado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                </td>
+
+                <!-- ESTADO BODEGA -->
+                <td>
+                    @if (item.FirmaBodega)
+                    {
+                        <span class="badge bg-success">Despachado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Pendiente</span>
+                    }
+                </td>
+
+                <!-- ACCIONES -->
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Ver</a>
+
+                    @if (!item.FirmaCredito)
+                    {
+                        <form asp-action="FirmarCredito" asp-route-id="@item.Id" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-success">Crédito</button>
+                        </form>
+                    }
+
+                    @if (item.FirmaCredito && !item.FirmaBodega)
+                    {
+                        <form asp-action="FirmarBodega" asp-route-id="@item.Id" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-primary">Bodega</button>
+                        </form>
+                    }
+
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

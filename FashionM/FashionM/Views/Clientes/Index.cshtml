@@ -314,12 +314,14 @@
     }
 </style>
 
-<!-- HEADER MINIMALISTA -->
+<!-- ===================== HEADER ===================== -->
 <div class="neo-header">
     <div class="title-container d-flex justify-content-between align-items-center">
         <div>
             <h1 class="title-glow">Clientes</h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Gestiona tu cartera de clientes</p>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                Gestiona tu cartera de clientes
+            </p>
         </div>
         <a asp-action="Create" class="btn-neo">
             <span>+</span> Nuevo Cliente
@@ -328,18 +330,23 @@
 </div>
 
 <div class="container-fluid px-4" style="max-width: 1600px; margin: 0 auto;">
-    <!-- FILTROS COMPACTOS -->
+
+    <!-- ===================== FILTROS ===================== -->
     <div class="filters-container">
         <form asp-action="Index" method="get">
             <div class="row g-3">
-                <div class="col-lg-5">
+
+                <!-- BUSCAR -->
+                <div class="col-lg-4">
                     <div class="filter-label">Buscar</div>
                     <input type="text"
                            name="buscar"
                            value="@Context.Request.Query["buscar"]"
                            class="filter-input w-100"
-                           placeholder="Código, nombre, agente, cédula o teléfono...">
+                           placeholder="Código, nombre, agente, cédula o teléfono" />
                 </div>
+
+                <!-- ESTADO -->
                 <div class="col-lg-2">
                     <div class="filter-label">Estado</div>
                     <select name="estado" class="filter-input w-100">
@@ -348,38 +355,56 @@
                         <option value="false" selected="@(Context.Request.Query["estado"] == "false")">Inactivos</option>
                     </select>
                 </div>
+
+                <!-- ZONA -->
                 <div class="col-lg-3">
                     <div class="filter-label">Zona</div>
                     <select name="zona" class="filter-input w-100">
                         <option value="">Todas</option>
-                        @if (ViewBag.Zonas != null)
+                        @foreach (var z in ViewBag.Zonas as List<string>)
                         {
-                            foreach (var z in ViewBag.Zonas as List<string>)
-                            {
-                                <option value="@z" selected="@(Context.Request.Query["zona"] == z)">@z</option>
-                            }
+                            <option value="@z" selected="@(Context.Request.Query["zona"] == z)">
+                                @z
+                            </option>
                         }
                     </select>
                 </div>
+
+                <!-- EMPRESA -->
+                <div class="col-lg-3">
+                    <div class="filter-label">Empresa</div>
+                    <select name="empresa" class="filter-input w-100">
+                        <option value="">Todas</option>
+                        @foreach (var e in ViewBag.Empresas as List<string>)
+                        {
+                            <option value="@e" selected="@(Context.Request.Query["empresa"] == e)">
+                                @e
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- BOTÓN -->
                 <div class="col-lg-2 d-flex align-items-end">
                     <button type="submit" class="btn-neo-outline w-100">
                         Filtrar
                     </button>
                 </div>
+
             </div>
         </form>
     </div>
 
-    <!-- TABLA COMPACTA -->
+    <!-- ===================== TABLA ===================== -->
     <div class="table-wrapper">
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
                     <tr>
                         <th>Código</th>
+                        <th>Empresa</th>
                         <th>Agente</th>
                         <th>Cédula</th>
-                        <th>Transporte</th>
                         <th>Cliente</th>
                         <th>Correo</th>
                         <th>Teléfono</th>
@@ -390,17 +415,15 @@
                     </tr>
                 </thead>
                 <tbody>
+
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="11">
+                            <td colspan="11" class="text-center py-5">
                                 <div class="empty-state">
                                     <div class="empty-state-icon">📋</div>
-                                    <h5 style="color: var(--deep-blue);">No hay clientes registrados</h5>
-                                    <p class="text-muted">Comienza agregando tu primer cliente</p>
-                                    <a asp-action="Create" class="btn-neo mt-3" style="padding: 0.6rem 2rem;">
-                                        + Agregar Cliente
-                                    </a>
+                                    <h5>No hay clientes</h5>
+                                    <p class="text-muted">Agrega tu primer cliente</p>
                                 </div>
                             </td>
                         </tr>
@@ -410,53 +433,33 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td>
-                                    <span class="code-badge">@item.Codigo</span>
-                                </td>
-                                <td class="fw-500">@item.Agente</td>
+                                <td><span class="code-badge">@item.Codigo</span></td>
+                                <td>@item.Empresa</td>
+                                <td>@item.Agente</td>
                                 <td>@item.Cedula</td>
-                                <td>@item.Transporte</td>
-                                <td>
-                                    <div class="fw-bold" style="color: var(--deep-blue);">
-                                        @item.Nombre @item.Apellidos
-                                    </div>
-                                </td>
-                                <td style="font-size: 0.85rem;">@item.Correo</td>
-                                <td style="font-size: 0.85rem;">@item.Telefonos</td>
-                                <td>
-                                    <span class="zona-tag">@item.Zona</span>
-                                </td>
-                                <td>
-                                    <span class="credit-value">₡@item.LimiteCredito.ToString("N0")</span>
-                                </td>
+                                <td class="fw-bold">@item.Nombre @item.Apellidos</td>
+                                <td>@item.Correo</td>
+                                <td>@item.Telefonos</td>
+                                <td><span class="zona-tag">@item.Zona</span></td>
+                                <td class="credit-value">₡@item.LimiteCredito.ToString("N0")</td>
                                 <td>
                                     <span class="status-badge @(item.Estado ? "active" : "inactive")">
                                         @(item.Estado ? "Activo" : "Inactivo")
                                     </span>
                                 </td>
-                                <td style="width: 40px;">
+                                <td>
                                     <div class="dropdown">
-                                        <button class="action-btn" data-bs-toggle="dropdown">
-                                            ⋮
-                                        </button>
+                                        <button class="action-btn" data-bs-toggle="dropdown">⋮</button>
                                         <ul class="dropdown-menu action-dropdown dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Cedula">
-                                                    <span>👁️</span> Detalles
-                                                </a>
+                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Cedula">👁️ Detalles</a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Cedula">
-                                                    <span>✏️</span> Editar
-                                                </a>
+                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Cedula">✏️ Editar</a>
                                             </li>
+                                            <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Cedula">
-                                                    <span>🗑️</span> Eliminar
-                                                </a>
+                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Cedula">🗑️ Eliminar</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -464,12 +467,13 @@
                             </tr>
                         }
                     }
+
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- PAGINACIÓN COMPACTA -->
+    <!-- ===================== PAGINACIÓN ===================== -->
     @if (ViewBag.TotalPaginas > 1)
     {
         <ul class="pagination-modern">
@@ -481,7 +485,8 @@
                        asp-route-page="@i"
                        asp-route-buscar="@Context.Request.Query["buscar"]"
                        asp-route-estado="@Context.Request.Query["estado"]"
-                       asp-route-zona="@Context.Request.Query["zona"]">
+                       asp-route-zona="@Context.Request.Query["zona"]"
+                       asp-route-empresa="@Context.Request.Query["empresa"]">
                         @i
                     </a>
                 </li>

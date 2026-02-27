@@ -24,6 +24,7 @@ namespace FashionM.Controllers
             string buscar,
             bool? estado,
             string zona,
+            string empresa,
             int page = 1)
         {
             int pageSize = 25;
@@ -37,6 +38,7 @@ namespace FashionM.Controllers
                     c.Nombre.Contains(buscar) ||
                     c.Apellidos.Contains(buscar) ||
                     c.Agente.Contains(buscar) ||
+                    c.Empresa.Contains(buscar) || // ✅ Empresa incluida en búsqueda
                     c.Cedula.ToString().Contains(buscar) ||
                     (c.Telefonos != null && c.Telefonos.Contains(buscar))
                 );
@@ -54,6 +56,12 @@ namespace FashionM.Controllers
                 clientes = clientes.Where(c => c.Zona == zona);
             }
 
+            // 🏢 FILTRO POR EMPRESA
+            if (!string.IsNullOrWhiteSpace(empresa))
+            {
+                clientes = clientes.Where(c => c.Empresa == empresa);
+            }
+
             int totalRegistros = await clientes.CountAsync();
 
             var lista = await clientes
@@ -65,12 +73,20 @@ namespace FashionM.Controllers
             ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
             ViewBag.PaginaActual = page;
 
-            // 🔽 CARGAR ZONAS PARA EL SELECT
+            // 🔽 CARGAR ZONAS
             ViewBag.Zonas = await _context.Clientes
-                .Where(c => c.Zona != null && c.Zona != "")
+                .Where(c => !string.IsNullOrEmpty(c.Zona))
                 .Select(c => c.Zona)
                 .Distinct()
                 .OrderBy(z => z)
+                .ToListAsync();
+
+            // 🏢 CARGAR EMPRESAS
+            ViewBag.Empresas = await _context.Clientes
+                .Where(c => !string.IsNullOrEmpty(c.Empresa))
+                .Select(c => c.Empresa)
+                .Distinct()
+                .OrderBy(e => e)
                 .ToListAsync();
 
             return View(lista);

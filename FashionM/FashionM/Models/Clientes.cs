@@ -54,6 +54,9 @@ namespace FashionM.Models
 
         [StringLength(50)]
         public string Zona { get; set; } = string.Empty;
+
+        [StringLength(50)]
+        public string Empresa { get; set; } = string.Empty;
     }
 }
 
@@ -66,4 +69,7 @@ Actividad economica
 Limite de credito
 Zona
 Actualizar telefono para poner varios
+
+[StringLength(50)]
+        public string Empresa { get; set; } = string.Empty;
  */
