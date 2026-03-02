@@ -1,0 +1,48 @@
+﻿@model Zapato
+
+<h2>Editar Zapato</h2>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- PK -->
+    <input type="hidden" asp-for="Id" />
+
+    <!-- FK PROVEEDOR -->
+    <input type="hidden" asp-for="ProveedorCedula" />
+
+    <div class="form-group">
+        <label asp-for="Codigo"></label>
+        <input asp-for="Codigo" class="form-control" />
+        <span asp-validation-for="Codigo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Color"></label>
+        <input asp-for="Color" class="form-control" />
+        <span asp-validation-for="Color" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Suela"></label>
+        <input asp-for="Suela" class="form-control" />
+        <span asp-validation-for="Suela" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">
+        Guardar Cambios
+    </button>
+
+    <a asp-controller="Proveedores"
+       asp-action="Details"
+       asp-route-id="@Model.ProveedorCedula"
+       class="btn btn-secondary mt-3 ms-2">
+        Cancelar
+    </a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

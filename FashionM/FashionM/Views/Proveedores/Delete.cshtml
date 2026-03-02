@@ -4,13 +4,14 @@
 
 <div class="alert alert-danger">
     <strong>Atención:</strong> Esta acción no se puede deshacer.
-    @if (Model.Codigos != null && Model.Codigos.Any())
+
+    @if (Model.Zapatos != null && Model.Zapatos.Any())
     {
         <br />
         <strong>
-            Este proveedor tiene @Model.Codigos.Count código(s) asociados.
+            Este proveedor tiene @Model.Zapatos.Count zapato(s) asociados.
         </strong>
-        }
+    }
 </div>
 
 <div class="card">

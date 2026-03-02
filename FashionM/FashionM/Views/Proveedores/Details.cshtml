@@ -7,7 +7,6 @@
 ========================== -->
 <div class="card mb-4">
     <div class="card-body">
-
         <dl class="row">
             <dt class="col-sm-3">Cédula</dt>
             <dd class="col-sm-9">@Model.Cedula</dd>
@@ -41,12 +40,9 @@
             </dd>
         </dl>
 
-        <a asp-action="Edit"
-           asp-route-id="@Model.Cedula"
-           class="btn btn-warning">
+        <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn btn-warning">
             Editar
         </a>
-
         <a asp-action="Index" class="btn btn-secondary ms-2">
             Volver
         </a>
@@ -56,66 +52,62 @@
 <!-- =========================
      CÓDIGOS / COLORES / SUELAS
 ========================== -->
-<div class="card">
-    <div class="card-header">
-        <strong>Códigos del Proveedor</strong>
-    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Zapatos del Proveedor</strong>
 
-    <div class="card-body">
+            <a asp-controller="Zapatos"
+               asp-action="Create"
+               asp-route-proveedorCedula="@Model.Cedula"
+               class="btn btn-sm btn-primary">
+                + Nuevo Zapato
+            </a>
+        </div>
 
-        @if (Model.Codigos != null && Model.Codigos.Any())
-        {
-            foreach (var codigo in Model.Codigos)
+        <div class="card-body">
+
+            @if (Model.Zapatos != null && Model.Zapatos.Any())
             {
-                <div class="border rounded p-3 mb-3">
-
-                    <h5>Código: @codigo.NombreCodigo</h5>
-
-                    @if (codigo.Colores != null && codigo.Colores.Any())
-                    {
-                        <ul>
-                            @foreach (var color in codigo.Colores)
-                            {
-                                <li>
-                                    <strong>Color:</strong> @color.NombreColor
-
-                                    @if (color.Suelas != null && color.Suelas.Any())
-                                    {
-                                        <ul>
-                                            @foreach (var suela in color.Suelas)
-                                            {
-                                                <li>
-                                                    Suela: @suela.TipoSuela
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            (Sin suelas registradas)
-                                        </span>
-                                    }
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-muted">
-                            Este código no tiene colores registrados.
-                        </p>
-                    }
-
-                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Color</th>
+                            <th>Suela</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var zapato in Model.Zapatos)
+                        {
+                            <tr>
+                                <td>@zapato.Codigo</td>
+                                <td>@zapato.Color</td>
+                                <td>@zapato.Suela</td>
+                                <td>
+                                    <a asp-controller="Zapatos"
+                                       asp-action="Edit"
+                                       asp-route-id="@zapato.Id"
+                                       class="btn btn-sm btn-warning">
+                                        Editar
+                                    </a>
+                                    <a asp-controller="Zapatos"
+                                       asp-action="Delete"
+                                       asp-route-id="@zapato.Id"
+                                       class="btn btn-sm btn-danger ms-1">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-        }
-        else
-        {
-            <p class="text-muted">
-                Este proveedor no tiene códigos registrados.
-            </p>
-        }
-
+            else
+            {
+                <p class="text-muted">
+                    Este proveedor no tiene zapatos registrados.
+                </p>
+            }
+        </div>
     </div>
-</div>

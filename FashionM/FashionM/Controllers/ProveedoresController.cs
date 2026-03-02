@@ -84,10 +84,8 @@ namespace FashionM.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var proveedor = await _context.Proveedores
-                .Include(p => p.Codigos)
-                .ThenInclude(codigo => codigo.Colores)
-                .ThenInclude(color => color.Suelas)
-                .FirstOrDefaultAsync(p => p.Cedula == id);
+        .Include(p => p.Zapatos)
+        .FirstOrDefaultAsync(p => p.Cedula == id);
 
             if (proveedor == null)
                 return NotFound();
@@ -130,11 +128,12 @@ namespace FashionM.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var proveedor = await _context.Proveedores
-                .Include(p => p.Codigos)
+                .Include(p => p.Zapatos)
                 .FirstOrDefaultAsync(p => p.Cedula == id);
 
             if (proveedor == null)
                 return NotFound();
+
 
             return View(proveedor);
         }
@@ -144,8 +143,8 @@ namespace FashionM.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var proveedor = await _context.Proveedores
-                .Include(p => p.Codigos)
-                .FirstOrDefaultAsync(p => p.Cedula == id);
+        .Include(p => p.Zapatos)
+        .FirstOrDefaultAsync(p => p.Cedula == id);
 
             if (proveedor == null)
                 return NotFound();

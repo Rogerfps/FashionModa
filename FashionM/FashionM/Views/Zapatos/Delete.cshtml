@@ -1,0 +1,44 @@
+﻿@model Zapato
+
+<h2 class="mb-4 text-danger">Eliminar Zapato</h2>
+
+<div class="alert alert-danger">
+    <strong>Atención:</strong> Esta acción no se puede deshacer.
+</div>
+
+<div class="card">
+    <div class="card-body">
+
+        <dl class="row">
+            <dt class="col-sm-3">Código</dt>
+            <dd class="col-sm-9">@Model.Codigo</dd>
+
+            <dt class="col-sm-3">Color</dt>
+            <dd class="col-sm-9">@Model.Color</dd>
+
+            <dt class="col-sm-3">Suela</dt>
+            <dd class="col-sm-9">@Model.Suela</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- PK -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-danger">
+                    Eliminar
+                </button>
+
+                <a asp-controller="Proveedores"
+                   asp-action="Details"
+                   asp-route-id="@Model.ProveedorCedula"
+                   class="btn btn-secondary ms-2">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>

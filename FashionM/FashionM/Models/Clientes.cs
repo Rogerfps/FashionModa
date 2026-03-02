@@ -59,26 +59,3 @@ namespace FashionM.Models
         public string Empresa { get; set; } = string.Empty;
     }
 }
-
-
-/*
-Codigo
-Agente
-Transporte
-Actividad economica
-Limite de credito
-Zona
-Actualizar telefono para poner varios
-
-[StringLength(50)]
-        public string Empresa { get; set; } = string.Empty;
- */
-
-/*
- Funciona bien pero en el filtro se agregaron campos asi Cocalza|Fashion lo que no deberia pasar solo deberias a ver 4 empresas
- para seleccionar
-Cocalza
-Fashion
-Jade
-Maxiplus
- */

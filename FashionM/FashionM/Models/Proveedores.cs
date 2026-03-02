@@ -34,7 +34,7 @@ namespace FashionM.Models
         public decimal Actividad { get; set; }
 
         // 🔗 Relación
-        public ICollection<Codigo> Codigos { get; set; } = new List<Codigo>();
+        public ICollection<Zapato> Zapatos { get; set; } = new List<Zapato>();
     }
 }
 
