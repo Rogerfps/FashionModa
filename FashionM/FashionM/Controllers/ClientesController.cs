@@ -59,7 +59,15 @@ namespace FashionM.Controllers
             // 🏢 FILTRO POR EMPRESA
             if (!string.IsNullOrWhiteSpace(empresa))
             {
-                clientes = clientes.Where(c => c.Empresa == empresa);
+                clientes = clientes.Where(c =>
+                    c.Empresa != null &&
+                    (
+                        c.Empresa == empresa ||
+                        c.Empresa.StartsWith(empresa + "|") ||
+                        c.Empresa.EndsWith("|" + empresa) ||
+                        c.Empresa.Contains("|" + empresa + "|")
+                    )
+                );
             }
 
             int totalRegistros = await clientes.CountAsync();
@@ -73,6 +81,7 @@ namespace FashionM.Controllers
             ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
             ViewBag.PaginaActual = page;
 
+
             // 🔽 CARGAR ZONAS
             ViewBag.Zonas = await _context.Clientes
                 .Where(c => !string.IsNullOrEmpty(c.Zona))
@@ -82,12 +91,14 @@ namespace FashionM.Controllers
                 .ToListAsync();
 
             // 🏢 CARGAR EMPRESAS
-            ViewBag.Empresas = await _context.Clientes
+            ViewBag.Empresas = _context.Clientes
                 .Where(c => !string.IsNullOrEmpty(c.Empresa))
-                .Select(c => c.Empresa)
+                .AsEnumerable() 
+                .SelectMany(c => c.Empresa.Split('|', StringSplitOptions.RemoveEmptyEntries))
+                .Select(e => e.Trim())
                 .Distinct()
                 .OrderBy(e => e)
-                .ToListAsync();
+                .ToList();
 
             return View(lista);
         }

@@ -357,29 +357,35 @@
                 </div>
 
                 <!-- ZONA -->
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="filter-label">Zona</div>
                     <select name="zona" class="filter-input w-100">
                         <option value="">Todas</option>
-                        @foreach (var z in ViewBag.Zonas as List<string>)
+                        @if (ViewBag.Zonas != null)
                         {
-                            <option value="@z" selected="@(Context.Request.Query["zona"] == z)">
-                                @z
-                            </option>
+                            foreach (var z in ViewBag.Zonas as List<string>)
+                            {
+                                <option value="@z" selected="@(Context.Request.Query["zona"] == z)">
+                                    @z
+                                </option>
+                            }
                         }
                     </select>
                 </div>
 
                 <!-- EMPRESA -->
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="filter-label">Empresa</div>
                     <select name="empresa" class="filter-input w-100">
                         <option value="">Todas</option>
-                        @foreach (var e in ViewBag.Empresas as List<string>)
+                        @if (ViewBag.Empresas != null)
                         {
-                            <option value="@e" selected="@(Context.Request.Query["empresa"] == e)">
-                                @e
-                            </option>
+                            foreach (var e in ViewBag.Empresas as List<string>)
+                            {
+                                <option value="@e" selected="@(Context.Request.Query["empresa"] == e)">
+                                    @e
+                                </option>
+                            }
                         }
                     </select>
                 </div>
@@ -402,7 +408,7 @@
                 <thead>
                     <tr>
                         <th>Código</th>
-                        <th>Empresa</th>
+                        <th>Empresas</th>
                         <th>Agente</th>
                         <th>Cédula</th>
                         <th>Cliente</th>
@@ -433,14 +439,29 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td><span class="code-badge">@item.Codigo</span></td>
-                                <td>@item.Empresa</td>
+                                <td>
+                                    <span class="code-badge">@item.Codigo</span>
+                                </td>
+
+                                <!-- EMPRESAS MULTI -->
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.Empresa))
+                                    {
+                                        foreach (var emp in item.Empresa.Split('|'))
+                                        {
+                                            <span class="zona-tag me-1">@emp</span>
+                                        }
+                                    }
+                                </td>
+
                                 <td>@item.Agente</td>
                                 <td>@item.Cedula</td>
                                 <td class="fw-bold">@item.Nombre @item.Apellidos</td>
                                 <td>@item.Correo</td>
                                 <td>@item.Telefonos</td>
-                                <td><span class="zona-tag">@item.Zona</span></td>
+                                <td>
+                                    <span class="zona-tag">@item.Zona</span>
+                                </td>
                                 <td class="credit-value">₡@item.LimiteCredito.ToString("N0")</td>
                                 <td>
                                     <span class="status-badge @(item.Estado ? "active" : "inactive")">
@@ -452,14 +473,20 @@
                                         <button class="action-btn" data-bs-toggle="dropdown">⋮</button>
                                         <ul class="dropdown-menu action-dropdown dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Cedula">👁️ Detalles</a>
+                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Cedula">
+                                                    👁️ Detalles
+                                                </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Cedula">✏️ Editar</a>
+                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Cedula">
+                                                    ✏️ Editar
+                                                </a>
                                             </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Cedula">🗑️ Eliminar</a>
+                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Cedula">
+                                                    🗑️ Eliminar
+                                                </a>
                                             </li>
                                         </ul>
                                     </div>

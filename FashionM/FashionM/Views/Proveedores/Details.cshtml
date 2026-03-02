@@ -1,8 +1,11 @@
-﻿@model Proveedores
+﻿@model Proveedor
 
-<h2>Detalle del Proveedor</h2>
+<h2 class="mb-4">Detalle del Proveedor</h2>
 
-<div class="card">
+<!-- =========================
+     DATOS DEL PROVEEDOR
+========================== -->
+<div class="card mb-4">
     <div class="card-body">
 
         <dl class="row">
@@ -32,7 +35,9 @@
 
             <dt class="col-sm-3">Estado</dt>
             <dd class="col-sm-9">
-                @(Model.Estado ? "Activo" : "Inactivo")
+                <span class="badge @(Model.Estado ? "bg-success" : "bg-secondary")">
+                    @(Model.Estado ? "Activo" : "Inactivo")
+                </span>
             </dd>
         </dl>
 
@@ -42,9 +47,75 @@
             Editar
         </a>
 
-        <a asp-action="Index" class="btn btn-secondary">
+        <a asp-action="Index" class="btn btn-secondary ms-2">
             Volver
         </a>
+    </div>
+</div>
+
+<!-- =========================
+     CÓDIGOS / COLORES / SUELAS
+========================== -->
+<div class="card">
+    <div class="card-header">
+        <strong>Códigos del Proveedor</strong>
+    </div>
+
+    <div class="card-body">
+
+        @if (Model.Codigos != null && Model.Codigos.Any())
+        {
+            foreach (var codigo in Model.Codigos)
+            {
+                <div class="border rounded p-3 mb-3">
+
+                    <h5>Código: @codigo.NombreCodigo</h5>
+
+                    @if (codigo.Colores != null && codigo.Colores.Any())
+                    {
+                        <ul>
+                            @foreach (var color in codigo.Colores)
+                            {
+                                <li>
+                                    <strong>Color:</strong> @color.NombreColor
+
+                                    @if (color.Suelas != null && color.Suelas.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var suela in color.Suelas)
+                                            {
+                                                <li>
+                                                    Suela: @suela.TipoSuela
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            (Sin suelas registradas)
+                                        </span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            Este código no tiene colores registrados.
+                        </p>
+                    }
+
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">
+                Este proveedor no tiene códigos registrados.
+            </p>
+        }
 
     </div>
 </div>

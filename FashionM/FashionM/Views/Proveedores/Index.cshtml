@@ -1,10 +1,10 @@
-﻿@model IEnumerable<Proveedores>
+﻿@model IEnumerable<Proveedor>
 
+<h2 class="mb-4">Proveedores</h2>
 
-
-<h2>Proveedores</h2>
-
-<a asp-action="Create" class="btn btn-primary mb-3">Nuevo Proveedor</a>
+<a asp-action="Create" class="btn btn-primary mb-3">
+    Nuevo Proveedor
+</a>
 
 <form asp-action="Index" method="get" class="mb-3">
     <div class="row g-2">
@@ -17,7 +17,7 @@
         </div>
 
         <div class="col-md-4">
-            <select name="estado" class="form-control">
+            <select name="estado" class="form-select">
                 <option value="">-- Todos --</option>
                 <option value="true"
                         selected="@(Context.Request.Query["estado"] == "true")">
@@ -39,7 +39,7 @@
 </form>
 
 <table class="table table-bordered table-striped">
-    <thead>
+    <thead class="table-light">
         <tr>
             <th>Cédula</th>
             <th>Nombre</th>
@@ -47,35 +47,50 @@
             <th>Teléfono</th>
             <th>Actividad</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            <th style="width:220px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Cedula</td>
+                    <td>@item.Nombre @item.Apellidos</td>
+                    <td>@item.Correo</td>
+                    <td>@item.Telefono</td>
+                    <td>@item.Actividad</td>
+                    <td>
+                        <span class="badge @(item.Estado ? "bg-success" : "bg-secondary")">
+                            @(item.Estado ? "Activo" : "Inactivo")
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-action="Details"
+                           asp-route-id="@item.Cedula"
+                           class="btn btn-info btn-sm">
+                            Detalles
+                        </a>
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Cedula"
+                           class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Cedula"
+                           class="btn btn-danger btn-sm">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@item.Cedula</td>
-                <td>@item.Nombre @item.Apellidos</td>
-                <td>@item.Correo</td>
-                <td>@item.Telefono</td>
-                <td>@item.Actividad</td>
-                <td>@(item.Estado ? "Activo" : "Inactivo")</td>
-                <td>
-                    <a asp-action="Details"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-info btn-sm">
-                        Detalles
-                    </a>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-                    <a asp-action="Delete"
-                       asp-route-id="@item.Cedula"
-                       class="btn btn-danger btn-sm">
-                        Eliminar
-                    </a>
+                <td colspan="7" class="text-center text-muted">
+                    No hay proveedores registrados.
                 </td>
             </tr>
         }

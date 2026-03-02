@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260302134939_Empresa")]
+    partial class Empresa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,50 +100,6 @@ namespace FashionM.Migrations
                     b.HasKey("Cedula");
 
                     b.ToTable("Clientes");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Codigo", b =>
-                {
-                    b.Property<int>("IdCodigo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdCodigo"));
-
-                    b.Property<string>("NombreCodigo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProveedorCedula")
-                        .HasColumnType("integer");
-
-                    b.HasKey("IdCodigo");
-
-                    b.HasIndex("ProveedorCedula");
-
-                    b.ToTable("Codigos");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Color", b =>
-                {
-                    b.Property<int>("IdColor")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdColor"));
-
-                    b.Property<int>("CodigoId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("NombreColor")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("IdColor");
-
-                    b.HasIndex("CodigoId");
-
-                    b.ToTable("Colores");
                 });
 
             modelBuilder.Entity("FashionM.Models.Foto", b =>
@@ -277,7 +236,7 @@ namespace FashionM.Migrations
                     b.ToTable("PedidoClienteDetalles");
                 });
 
-            modelBuilder.Entity("FashionM.Models.Proveedor", b =>
+            modelBuilder.Entity("FashionM.Models.Proveedores", b =>
                 {
                     b.Property<int>("Cedula")
                         .ValueGeneratedOnAdd()
@@ -325,28 +284,6 @@ namespace FashionM.Migrations
                     b.ToTable("Proveedores");
                 });
 
-            modelBuilder.Entity("FashionM.Models.Suela", b =>
-                {
-                    b.Property<int>("IdSuela")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdSuela"));
-
-                    b.Property<int>("ColorId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TipoSuela")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("IdSuela");
-
-                    b.HasIndex("ColorId");
-
-                    b.ToTable("Suelas");
-                });
-
             modelBuilder.Entity("FashionM.Models.TallaInventario", b =>
                 {
                     b.Property<int>("Id")
@@ -369,28 +306,6 @@ namespace FashionM.Migrations
                     b.HasIndex("InventarioCodigo");
 
                     b.ToTable("TallasInventario");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Codigo", b =>
-                {
-                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
-                        .WithMany("Codigos")
-                        .HasForeignKey("ProveedorCedula")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Proveedor");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Color", b =>
-                {
-                    b.HasOne("FashionM.Models.Codigo", "Codigo")
-                        .WithMany("Colores")
-                        .HasForeignKey("CodigoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Codigo");
                 });
 
             modelBuilder.Entity("FashionM.Models.Foto", b =>
@@ -426,17 +341,6 @@ namespace FashionM.Migrations
                     b.Navigation("PedidoCliente");
                 });
 
-            modelBuilder.Entity("FashionM.Models.Suela", b =>
-                {
-                    b.HasOne("FashionM.Models.Color", "Color")
-                        .WithMany("Suelas")
-                        .HasForeignKey("ColorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Color");
-                });
-
             modelBuilder.Entity("FashionM.Models.TallaInventario", b =>
                 {
                     b.HasOne("FashionM.Models.Inventario", "Inventario")
@@ -446,16 +350,6 @@ namespace FashionM.Migrations
                         .IsRequired();
 
                     b.Navigation("Inventario");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Codigo", b =>
-                {
-                    b.Navigation("Colores");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Color", b =>
-                {
-                    b.Navigation("Suelas");
                 });
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
@@ -468,11 +362,6 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
                 {
                     b.Navigation("Detalles");
-                });
-
-            modelBuilder.Entity("FashionM.Models.Proveedor", b =>
-                {
-                    b.Navigation("Codigos");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,9 +1,16 @@
-﻿@model Proveedores
+﻿@model Proveedor
 
-<h2>Eliminar Proveedor</h2>
+<h2 class="mb-4 text-danger">Eliminar Proveedor</h2>
 
 <div class="alert alert-danger">
     <strong>Atención:</strong> Esta acción no se puede deshacer.
+    @if (Model.Codigos != null && Model.Codigos.Any())
+    {
+        <br />
+        <strong>
+            Este proveedor tiene @Model.Codigos.Count código(s) asociados.
+        </strong>
+        }
 </div>
 
 <div class="card">
@@ -38,13 +45,14 @@
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Cedula" />
 
-            <button type="submit" class="btn btn-danger">
-                Eliminar
-            </button>
-
-            <a asp-action="Index" class="btn btn-secondary">
-                Cancelar
-            </a>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-danger">
+                    Eliminar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">
+                    Cancelar
+                </a>
+            </div>
         </form>
 
     </div>

@@ -16,7 +16,9 @@ namespace FashionM.Controllers
             _context = context;
         }
 
+        // =========================
         // LISTAR
+        // =========================
         public async Task<IActionResult> Index(string buscar, bool? estado, int page = 1)
         {
             int pageSize = 5;
@@ -52,85 +54,88 @@ namespace FashionM.Controllers
             return View(lista);
         }
 
+        // =========================
         // CREATE
+        // =========================
         public IActionResult Create()
         {
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-            new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-            new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-            new SelectListItem { Value = "Nite", Text = "NITE" },
-            new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-        };
-
+            CargarTiposIdentificacion();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Proveedores proveedor)
+        public async Task<IActionResult> Create(Proveedor proveedor)
         {
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-            new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-            new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-            new SelectListItem { Value = "Nite", Text = "NITE" },
-            new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-        };
+            CargarTiposIdentificacion();
 
             if (!ModelState.IsValid)
                 return View(proveedor);
 
-            _context.Add(proveedor);
+            _context.Proveedores.Add(proveedor);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-        // DETAILS
+        // =========================
+        // DETAILS (con relaciones)
+        // =========================
         public async Task<IActionResult> Details(int id)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
-            if (proveedor == null) return NotFound();
+            var proveedor = await _context.Proveedores
+                .Include(p => p.Codigos)
+                .ThenInclude(codigo => codigo.Colores)
+                .ThenInclude(color => color.Suelas)
+                .FirstOrDefaultAsync(p => p.Cedula == id);
+
+            if (proveedor == null)
+                return NotFound();
+
             return View(proveedor);
         }
 
+        // =========================
         // EDIT
+        // =========================
         public async Task<IActionResult> Edit(int id)
         {
             var proveedor = await _context.Proveedores.FindAsync(id);
-            if (proveedor == null) return NotFound();
+            if (proveedor == null)
+                return NotFound();
 
-            ViewBag.TiposIdentificacion = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
-            new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
-            new SelectListItem { Value = "Dimex", Text = "DIMEX" },
-            new SelectListItem { Value = "Nite", Text = "NITE" },
-            new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
-        };
-
+            CargarTiposIdentificacion();
             return View(proveedor);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Proveedores proveedor)
+        public async Task<IActionResult> Edit(Proveedor proveedor)
         {
             if (!ModelState.IsValid)
+            {
+                CargarTiposIdentificacion();
                 return View(proveedor);
+            }
 
             _context.Update(proveedor);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
+        // =========================
         // DELETE
+        // =========================
         public async Task<IActionResult> Delete(int id)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
-            if (proveedor == null) return NotFound();
+            var proveedor = await _context.Proveedores
+                .Include(p => p.Codigos)
+                .FirstOrDefaultAsync(p => p.Cedula == id);
+
+            if (proveedor == null)
+                return NotFound();
+
             return View(proveedor);
         }
 
@@ -138,10 +143,32 @@ namespace FashionM.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
+            var proveedor = await _context.Proveedores
+                .Include(p => p.Codigos)
+                .FirstOrDefaultAsync(p => p.Cedula == id);
+
+            if (proveedor == null)
+                return NotFound();
+
             _context.Proveedores.Remove(proveedor);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
+        }
+
+        // =========================
+        // MÉTODO AUXILIAR
+        // =========================
+        private void CargarTiposIdentificacion()
+        {
+            ViewBag.TiposIdentificacion = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Cedula Fisica", Text = "Cédula Física" },
+            new SelectListItem { Value = "Cedula Juridica", Text = "Cédula Jurídica" },
+            new SelectListItem { Value = "Dimex", Text = "DIMEX" },
+            new SelectListItem { Value = "Nite", Text = "NITE" },
+            new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
+        };
         }
     }
 }

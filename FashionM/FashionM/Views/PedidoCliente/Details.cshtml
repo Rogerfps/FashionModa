@@ -1,4 +1,5 @@
-﻿@model PedidoCliente
+﻿@using FashionM.Enums
+@model PedidoCliente
 
 @{
     ViewData["Title"] = "Detalle del Pedido";
@@ -17,7 +18,7 @@
         <p>
             <strong>Nombre:</strong> @Model.Cliente.Nombre @Model.Cliente.Apellidos <br />
             <strong>Cédula:</strong> @Model.Cliente.Cedula <br />
-            <strong>Codigo:</strong> @Model.Cliente.Codigo <br />
+            <strong>Código:</strong> @Model.Cliente.Codigo <br />
             <strong>Dirección:</strong> @Model.Cliente.Direccion <br />
             <strong>Correo:</strong> @Model.Cliente.Correo <br />
             <strong>Teléfono:</strong> @Model.Cliente.Telefonos <br />
@@ -30,8 +31,8 @@
         <p>
             <strong>Fecha Pedido:</strong> @Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy") <br />
             <strong>Fecha Entrega:</strong> @Model.FechaEntrega.ToLocalTime().ToString("dd/MM/yyyy") <br />
-            <strong>Vendedor:</strong> @Model.Vendedor <br />
-            <strong>Observaciones:</strong> @Model.Observaciones
+            <strong>Observaciones:</strong> @Model.Observaciones <br />
+            <strong>Agente:</strong> @Model.Cliente.Agente
         </p>
     </div>
 </div>
@@ -46,7 +47,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Codigo</th>
+            <th>Código</th>
             <th>Color</th>
             <th>Talla</th>
             <th>Cantidad</th>
@@ -85,13 +86,20 @@
 
         <p>
             <strong>Crédito:</strong>
-            @if (Model.FirmaCredito)
+            @switch (Model.EstadoCredito)
             {
-                <span class="badge bg-success">Aprobado</span>
-            }
-            else
-            {
-                <span class="badge bg-warning text-dark">Pendiente</span>
+                case EstadoCredito.Aprobado:
+                    <span class="badge bg-success">Aprobado</span>
+                    break;
+                case EstadoCredito.Rechazado:
+                    <span class="badge bg-danger">Rechazado</span>
+                    break;
+                case EstadoCredito.Retenido:
+                    <span class="badge bg-warning text-dark">Retenido</span>
+                    break;
+                default:
+                    <span class="badge bg-secondary">Pendiente</span>
+                    break;
             }
         </p>
 
@@ -117,9 +125,10 @@
 <div>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 
-    @if (!Model.FirmaCredito)
+    @* Acciones de Crédito *@
+    @if (Model.EstadoCredito == EstadoCredito.Pendiente || Model.EstadoCredito == EstadoCredito.Retenido)
     {
-        <form asp-action="FirmarCredito"
+        <form asp-action="AprobarCredito"
               asp-route-id="@Model.Id"
               method="post"
               style="display:inline">
@@ -127,9 +136,28 @@
                 Aprobar Crédito
             </button>
         </form>
+
+        <form asp-action="RechazarCredito"
+              asp-route-id="@Model.Id"
+              method="post"
+              style="display:inline">
+            <button type="submit" class="btn btn-danger">
+                Rechazar Crédito
+            </button>
+        </form>
+
+        <form asp-action="RetenerCredito"
+              asp-route-id="@Model.Id"
+              method="post"
+              style="display:inline">
+            <button type="submit" class="btn btn-warning">
+                Retener Crédito
+            </button>
+        </form>
     }
 
-    @if (Model.FirmaCredito && !Model.FirmaBodega)
+    @* Acción de Bodega *@
+    @if (Model.EstadoCredito == EstadoCredito.Aprobado && !Model.FirmaBodega)
     {
         <form asp-action="FirmarBodega"
               asp-route-id="@Model.Id"

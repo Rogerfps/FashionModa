@@ -14,9 +14,13 @@ namespace FashionM.Data
         public DbSet<Foto> Fotos { get; set; }
         public DbSet<TallaInventario> TallasInventario { get; set; }
         public DbSet<Clientes> Clientes { get; set; }
-        public DbSet<Proveedores> Proveedores { get; set; }
+        public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<PedidoCliente> PedidosCliente { get; set; }
         public DbSet<PedidoClienteDetalle> PedidoClienteDetalles { get; set; }
+        public DbSet<Codigo> Codigos { get; set; }
+        public DbSet<Color> Colores { get; set; }
+        public DbSet<Suela> Suelas { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +51,21 @@ namespace FashionM.Data
                 .WithMany(p => p.Detalles)
                 .HasForeignKey(d => d.PedidoClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Codigo>()
+            .HasOne(c => c.Proveedor)
+            .WithMany(p => p.Codigos)
+            .HasForeignKey(c => c.ProveedorCedula);
+
+            modelBuilder.Entity<Color>()
+                .HasOne(c => c.Codigo)
+                .WithMany(cod => cod.Colores)
+                .HasForeignKey(c => c.CodigoId);
+
+            modelBuilder.Entity<Suela>()
+                .HasOne(s => s.Color)
+                .WithMany(c => c.Suelas)
+                .HasForeignKey(s => s.ColorId);
         }
     }
 }

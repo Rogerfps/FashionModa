@@ -2,25 +2,21 @@
 
 namespace FashionM.Models
 {
-    public class Proveedores
+    public class Proveedor
     {
         [Key]
-        [Required]
         public int Cedula { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         public string Nombre { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         public string Apellidos { get; set; } = string.Empty;
 
         [Required]
         public string IDTipo { get; set; } = string.Empty;
 
-        [Required]
-        [EmailAddress]
+        [Required, EmailAddress]
         public string Correo { get; set; } = string.Empty;
 
         [Required]
@@ -36,18 +32,15 @@ namespace FashionM.Models
 
         [Required]
         public decimal Actividad { get; set; }
+
+        // 🔗 Relación
+        public ICollection<Codigo> Codigos { get; set; } = new List<Codigo>();
     }
 }
 
 /*
- Cedula lleva letras porque tiene que ser como un codigo
- Quitar apellido
- Color
- Orden de proveedor numerica
- Numero de proveedor
  
+ Necesito actualizar un modulo de un sistema en .netcore con para que funcione con el modulo de pedidos
+ Un provedor puede tener varios codigos y varios codigos puden tener varios colores y suelas
 
- 
- 
- 
  */

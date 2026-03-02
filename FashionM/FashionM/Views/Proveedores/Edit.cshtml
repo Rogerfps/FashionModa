@@ -1,80 +1,87 @@
-﻿@model Proveedores
+﻿@model Proveedor
 
-<h2>Editar Proveedor</h2>
+<h2 class="mb-4">Editar Proveedor</h2>
 
 <form asp-action="Edit" method="post">
     @Html.AntiForgeryToken()
 
     <!-- CÉDULA (PK) -->
-    <div class="form-group">
-        <label asp-for="Cedula"></label>
+    <div class="mb-3">
+        <label asp-for="Cedula" class="form-label"></label>
         <input asp-for="Cedula" class="form-control" readonly />
     </div>
 
-    <div class="form-group">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="IDTipo" class="form-label"></label>
+            <select asp-for="IDTipo"
+                    asp-items="ViewBag.TiposIdentificacion"
+                    class="form-select">
+                <option value="">-- Seleccione tipo de identificación --</option>
+            </select>
+            <span asp-validation-for="IDTipo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Nombre" class="form-label"></label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Apellidos" class="form-label"></label>
+            <input asp-for="Apellidos" class="form-control" />
+            <span asp-validation-for="Apellidos" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Correo" class="form-label"></label>
+            <input asp-for="Correo" type="email" class="form-control" />
+            <span asp-validation-for="Correo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Telefono" class="form-label"></label>
+            <input asp-for="Telefono" type="number" class="form-control" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Comercio" class="form-label"></label>
+            <input asp-for="Comercio" class="form-control" />
+            <span asp-validation-for="Comercio" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Direccion" class="form-label"></label>
+            <input asp-for="Direccion" class="form-control" />
+            <span asp-validation-for="Direccion" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Actividad" class="form-label"></label>
+            <input asp-for="Actividad" type="number" step="0.01" class="form-control" />
+            <span asp-validation-for="Actividad" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3 d-flex align-items-center">
+            <div class="form-check mt-4">
+                <input asp-for="Estado" class="form-check-input" />
+                <label asp-for="Estado" class="form-check-label"></label>
+            </div>
+        </div>
+
     </div>
 
-    <div class="form-group">
-        <label asp-for="Apellidos"></label>
-        <input asp-for="Apellidos" class="form-control" />
-        <span asp-validation-for="Apellidos" class="text-danger"></span>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">
+            Guardar Cambios
+        </button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">
+            Volver
+        </a>
     </div>
-
-    <div class="form-group">
-        <label asp-for="IDTipo"></label>
-        <select asp-for="IDTipo"
-                asp-items="ViewBag.TiposIdentificacion"
-                class="form-control">
-            <option value="">-- Seleccione tipo de identificación --</option>
-        </select>
-        <span asp-validation-for="IDTipo" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Correo"></label>
-        <input asp-for="Correo" class="form-control" />
-        <span asp-validation-for="Correo" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Telefono"></label>
-        <input asp-for="Telefono" class="form-control" />
-        <span asp-validation-for="Telefono" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Comercio"></label>
-        <input asp-for="Comercio" class="form-control" />
-        <span asp-validation-for="Comercio" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Direccion"></label>
-        <input asp-for="Direccion" class="form-control" />
-        <span asp-validation-for="Direccion" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Actividad"></label>
-        <input asp-for="Actividad" class="form-control" />
-        <span asp-validation-for="Actividad" class="text-danger"></span>
-    </div>
-
-    <div class="form-check mt-2">
-        <input asp-for="Estado" class="form-check-input" />
-        <label asp-for="Estado" class="form-check-label"></label>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-3">
-        Guardar Cambios
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary mt-3">
-        Volver
-    </a>
 </form>
 
 @section Scripts {

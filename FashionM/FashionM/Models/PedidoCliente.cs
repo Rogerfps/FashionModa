@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FashionM.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FashionM.Models
@@ -19,14 +21,14 @@ namespace FashionM.Models
 
         public string? Observaciones { get; set; }
 
-        [Required]
-        public string Vendedor { get; set; } = string.Empty;
 
-        public bool FirmaCredito { get; set; }
+        public EstadoCredito EstadoCredito { get; set; } = EstadoCredito.Pendiente;
         public bool FirmaBodega { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Total { get; set; }
+
+        public string Empresa { get; set; }
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();
     }
