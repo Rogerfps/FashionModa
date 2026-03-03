@@ -59,6 +59,13 @@ namespace FashionM.Data
                 .HasForeignKey(z => z.ProveedorCedula)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<PedidoClienteDetalle>()
+                .HasOne(d => d.Proveedor)
+                .WithMany()
+                .HasForeignKey(d => d.ProveedorCedula)
+                .HasPrincipalKey(p => p.Cedula)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
         }
     }

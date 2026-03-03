@@ -30,7 +30,7 @@ namespace FashionM.Controllers
             int pageSize = 25;
             var clientes = _context.Clientes.AsQueryable();
 
-            // 🔍 BÚSQUEDA GENERAL
+            // 🔍 BUSQUEDA GENERAL
             if (!string.IsNullOrWhiteSpace(buscar))
             {
                 clientes = clientes.Where(c =>
@@ -38,7 +38,7 @@ namespace FashionM.Controllers
                     c.Nombre.Contains(buscar) ||
                     c.Apellidos.Contains(buscar) ||
                     c.Agente.Contains(buscar) ||
-                    c.Empresa.Contains(buscar) || // ✅ Empresa incluida en búsqueda
+                    c.Empresa.Contains(buscar) || 
                     c.Cedula.ToString().Contains(buscar) ||
                     (c.Telefonos != null && c.Telefonos.Contains(buscar))
                 );
@@ -240,7 +240,7 @@ namespace FashionM.Controllers
         }
 
         // ===============================
-        // MÉTODO PRIVADO
+        // METODO PRIVADO
         // ===============================
         private void CargarTiposIdentificacion()
         {

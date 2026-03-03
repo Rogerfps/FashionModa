@@ -1,4 +1,5 @@
 ﻿@using FashionM.Enums
+
 @model PedidoCliente
 
 @{
@@ -51,7 +52,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            
+            <th>Proveedor</th>
             <th>Código</th>
             <th>Color</th>
             <th>Talla</th>
@@ -64,7 +65,16 @@
         @foreach (var d in Model.Detalles)
         {
             <tr>
-                
+                <td>
+                    @if (d.Proveedor != null)
+                    {
+                        @d.Proveedor.Nombre
+                    }
+                    else
+                    {
+                        <span class="text-danger">Proveedor NULL</span>
+                    }
+                </td>
                 <td>@d.CodigoProducto</td>
                 <td>@d.Color</td>
                 <td>@d.Talla</td>

@@ -37,6 +37,7 @@ namespace FashionM.Controllers
             var pedido = _context.PedidosCliente
                 .Include(p => p.Cliente)
                 .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Proveedor)
                 .FirstOrDefault(p => p.Id == id);
 
             if (pedido == null)
