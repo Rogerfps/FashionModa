@@ -22,6 +22,7 @@ namespace FashionM.Models
         public string CodigoProducto { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
         public string Talla { get; set; } = string.Empty;
+        public string? Detalle { get; set; }
 
         public int Cantidad { get; set; }
 
