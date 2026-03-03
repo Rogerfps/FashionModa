@@ -16,13 +16,16 @@
     <div class="col-md-6">
         <h4>Cliente</h4>
         <p>
+
             <strong>Nombre:</strong> @Model.Cliente.Nombre @Model.Cliente.Apellidos <br />
             <strong>Cédula:</strong> @Model.Cliente.Cedula <br />
             <strong>Código:</strong> @Model.Cliente.Codigo <br />
             <strong>Dirección:</strong> @Model.Cliente.Direccion <br />
             <strong>Correo:</strong> @Model.Cliente.Correo <br />
             <strong>Teléfono:</strong> @Model.Cliente.Telefonos <br />
-            <strong>Transporte:</strong> @Model.Cliente.Transporte
+            <strong>Transporte:</strong> @Model.Cliente.Transporte <br />
+            <strong>Empresa:</strong> @Model.Cliente.Empresa <br />
+            
         </p>
     </div>
 
@@ -32,6 +35,7 @@
             <strong>Fecha Pedido:</strong> @Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy") <br />
             <strong>Fecha Entrega:</strong> @Model.FechaEntrega.ToLocalTime().ToString("dd/MM/yyyy") <br />
             <strong>Observaciones:</strong> @Model.Observaciones <br />
+            <strong>Semana:</strong> @Model.Semana <br />
             <strong>Agente:</strong> @Model.Cliente.Agente
         </p>
     </div>
@@ -47,6 +51,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
+            
             <th>Código</th>
             <th>Color</th>
             <th>Talla</th>
@@ -59,6 +64,7 @@
         @foreach (var d in Model.Detalles)
         {
             <tr>
+                
                 <td>@d.CodigoProducto</td>
                 <td>@d.Color</td>
                 <td>@d.Talla</td>

@@ -1,7 +1,7 @@
 ﻿using FashionM.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace FashionM.Models
 {
@@ -29,7 +29,9 @@ namespace FashionM.Models
         public decimal Total { get; set; }
 
         public string Empresa { get; set; }
+        public int Semana { get; set; }
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();
     }
 }
+

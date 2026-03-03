@@ -187,6 +187,9 @@ namespace FashionM.Migrations
                     b.Property<string>("Observaciones")
                         .HasColumnType("text");
 
+                    b.Property<int>("Semana")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
@@ -222,6 +225,9 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ProveedorCedula")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Talla")
                         .IsRequired()
                         .HasColumnType("text");
@@ -229,6 +235,8 @@ namespace FashionM.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PedidoClienteId");
+
+                    b.HasIndex("ProveedorCedula");
 
                     b.ToTable("PedidoClienteDetalles");
                 });
@@ -349,9 +357,9 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
                 {
                     b.HasOne("FashionM.Models.Clientes", "Cliente")
-                        .WithMany()
+                        .WithMany("Pedidos")
                         .HasForeignKey("ClienteCedula")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -365,7 +373,13 @@ namespace FashionM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorCedula");
+
                     b.Navigation("PedidoCliente");
+
+                    b.Navigation("Proveedor");
                 });
 
             modelBuilder.Entity("FashionM.Models.TallaInventario", b =>
@@ -388,6 +402,11 @@ namespace FashionM.Migrations
                         .IsRequired();
 
                     b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Clientes", b =>
+                {
+                    b.Navigation("Pedidos");
                 });
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>

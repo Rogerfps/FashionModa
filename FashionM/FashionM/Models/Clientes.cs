@@ -57,5 +57,8 @@ namespace FashionM.Models
 
         [StringLength(50)]
         public string Empresa { get; set; } = string.Empty;
+
+        public ICollection<PedidoCliente> Pedidos { get; set; }
+        = new List<PedidoCliente>();
     }
 }

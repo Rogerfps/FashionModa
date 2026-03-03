@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260302134014_EstadoCreditoPedido")]
-    partial class EstadoCreditoPedido
+    [Migration("20260303152449_InitialClean")]
+    partial class InitialClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,6 +171,10 @@ namespace FashionM.Migrations
                     b.Property<int>("ClienteCedula")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Empresa")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("EstadoCredito")
                         .HasColumnType("integer");
 
@@ -185,6 +189,9 @@ namespace FashionM.Migrations
 
                     b.Property<string>("Observaciones")
                         .HasColumnType("text");
+
+                    b.Property<int>("Semana")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
@@ -221,6 +228,9 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ProveedorCedula")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Talla")
                         .IsRequired()
                         .HasColumnType("text");
@@ -229,10 +239,12 @@ namespace FashionM.Migrations
 
                     b.HasIndex("PedidoClienteId");
 
+                    b.HasIndex("ProveedorCedula");
+
                     b.ToTable("PedidoClienteDetalles");
                 });
 
-            modelBuilder.Entity("FashionM.Models.Proveedores", b =>
+            modelBuilder.Entity("FashionM.Models.Proveedor", b =>
                 {
                     b.Property<int>("Cedula")
                         .ValueGeneratedOnAdd()
@@ -304,6 +316,36 @@ namespace FashionM.Migrations
                     b.ToTable("TallasInventario");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Zapato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProveedorCedula")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Suela")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProveedorCedula");
+
+                    b.ToTable("Zapatos");
+                });
+
             modelBuilder.Entity("FashionM.Models.Foto", b =>
                 {
                     b.HasOne("FashionM.Models.Inventario", "Inventario")
@@ -318,9 +360,9 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
                 {
                     b.HasOne("FashionM.Models.Clientes", "Cliente")
-                        .WithMany()
+                        .WithMany("Pedidos")
                         .HasForeignKey("ClienteCedula")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -334,7 +376,13 @@ namespace FashionM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorCedula");
+
                     b.Navigation("PedidoCliente");
+
+                    b.Navigation("Proveedor");
                 });
 
             modelBuilder.Entity("FashionM.Models.TallaInventario", b =>
@@ -348,6 +396,22 @@ namespace FashionM.Migrations
                     b.Navigation("Inventario");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Zapato", b =>
+                {
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                        .WithMany("Zapatos")
+                        .HasForeignKey("ProveedorCedula")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Clientes", b =>
+                {
+                    b.Navigation("Pedidos");
+                });
+
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
                     b.Navigation("Fotos");
@@ -358,6 +422,11 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
                 {
                     b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Proveedor", b =>
+                {
+                    b.Navigation("Zapatos");
                 });
 #pragma warning restore 612, 618
         }

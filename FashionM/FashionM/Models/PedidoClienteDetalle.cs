@@ -8,11 +8,17 @@ namespace FashionM.Models
         [Key]
         public int Id { get; set; }
 
+        // =========================
+        // RELACIÓN CON PEDIDO
+        // =========================
         public int PedidoClienteId { get; set; }
 
         [ForeignKey(nameof(PedidoClienteId))]
         public PedidoCliente PedidoCliente { get; set; } = null!;
 
+        // =========================
+        // DATOS DEL PRODUCTO (YA EXISTENTES)
+        // =========================
         public string CodigoProducto { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
         public string Talla { get; set; } = string.Empty;
@@ -24,6 +30,14 @@ namespace FashionM.Models
 
         [NotMapped]
         public decimal SubTotal => Cantidad * PrecioUnitario;
+
+        // =========================
+        // 🔗 NUEVO: PROVEEDOR
+        // =========================
+        public int? ProveedorCedula { get; set; }
+
+        [ForeignKey(nameof(ProveedorCedula))]
+        public Proveedor? Proveedor { get; set; }
     }
 
 }

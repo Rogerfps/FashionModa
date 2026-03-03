@@ -120,6 +120,54 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
+        // 🔹 NUEVO: OBTENER PROVEEDORES
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerProveedores()
+        {
+            var proveedores = _context.Proveedores
+                .Where(p => p.Estado)
+                .Select(p => new
+                {
+                    cedula = p.Cedula,
+                    nombre = p.Comercio
+                })
+                .ToList();
+
+            return Json(proveedores);
+        }
+
+        // =====================================================
+        // 🔹 NUEVO: OBTENER CÓDIGOS POR PROVEEDOR
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerCodigosPorProveedor(int proveedorCedula)
+        {
+            var codigos = _context.Zapatos
+                .Where(z => z.ProveedorCedula == proveedorCedula)
+                .Select(z => z.Codigo)
+                .Distinct()
+                .ToList();
+
+            return Json(codigos);
+        }
+
+        // =====================================================
+        // 🔹 NUEVO: OBTENER COLORES POR PROVEEDOR + CÓDIGO
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerColoresPorCodigo(string codigo, int proveedorCedula)
+        {
+            var colores = _context.Zapatos
+                .Where(z => z.Codigo == codigo && z.ProveedorCedula == proveedorCedula)
+                .Select(z => z.Color)
+                .Distinct()
+                .ToList();
+
+            return Json(colores);
+        }
+
+        // =====================================================
         // APROBAR CRÉDITO
         // =====================================================
         [HttpPost]
@@ -132,7 +180,7 @@ namespace FashionM.Controllers
             if (pedido == null)
                 return NotFound();
 
-            // 🔹 Validación básica de crédito
+            // 🔹 Validacion básica de credito
             if (pedido.Total > pedido.Cliente.LimiteCredito)
             {
                 pedido.EstadoCredito = EstadoCredito.Rechazado;
