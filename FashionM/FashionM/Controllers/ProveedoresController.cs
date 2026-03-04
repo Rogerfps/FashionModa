@@ -19,13 +19,14 @@ namespace FashionM.Controllers
         // =========================
         // LISTAR
         // =========================
-        public async Task<IActionResult> Index(string buscar, bool? estado, int page = 1)
+        public async Task<IActionResult> Index(string buscar, bool? estado, string empresa, int page = 1)
         {
             int pageSize = 5;
 
             var proveedores = _context.Proveedores.AsQueryable();
 
-            if (!string.IsNullOrEmpty(buscar))
+            // 🔍 BÚSQUEDA GENERAL
+            if (!string.IsNullOrWhiteSpace(buscar))
             {
                 proveedores = proveedores.Where(p =>
                     p.Nombre.Contains(buscar) ||
@@ -35,11 +36,42 @@ namespace FashionM.Controllers
                 );
             }
 
+            // ✅ FILTRO ESTADO
             if (estado.HasValue)
             {
                 proveedores = proveedores.Where(p => p.Estado == estado.Value);
             }
 
+            // 🏢 FILTRO POR EMPRESA 
+            if (!string.IsNullOrWhiteSpace(empresa))
+            {
+                var e = empresa.Trim();
+
+                proveedores = proveedores.Where(p =>
+                    p.Empresa != null &&
+                    (
+                        p.Empresa == e ||
+                        EF.Functions.Like(p.Empresa, $"{e}|%") ||
+                        EF.Functions.Like(p.Empresa, $"%|{e}") ||
+                        EF.Functions.Like(p.Empresa, $"%|{e}|%")
+                    )
+                );
+            }
+
+
+                ViewBag.Empresas = _context.Proveedores
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Empresa))
+                    .AsEnumerable()                 
+                    .SelectMany(p => p.Empresa.Split('|'))
+                    .Select(e => e.Trim())
+                    .Distinct()
+                    .OrderBy(e => e)
+                    .ToList();
+
+
+            ViewBag.EmpresaSeleccionada = empresa;
+
+            // 📊 PAGINACIÓN
             int totalRegistros = await proveedores.CountAsync();
 
             var lista = await proveedores
@@ -71,6 +103,20 @@ namespace FashionM.Controllers
 
             if (!ModelState.IsValid)
                 return View(proveedor);
+
+            // 🔴 VALIDAR CÉDULA DUPLICADA
+            bool existe = await _context.Proveedores
+                .AnyAsync(p => p.Cedula == proveedor.Cedula);
+
+            if (existe)
+            {
+                ModelState.AddModelError(
+                    "Cedula",
+                    "Ya existe un proveedor con esta cédula."
+                );
+
+                return View(proveedor);
+            }
 
             _context.Proveedores.Add(proveedor);
             await _context.SaveChangesAsync();
@@ -118,7 +164,26 @@ namespace FashionM.Controllers
                 return View(proveedor);
             }
 
-            _context.Update(proveedor);
+            // 🔴 Traer el proveedor original
+            var proveedorDB = await _context.Proveedores
+                .FirstOrDefaultAsync(p => p.Cedula == proveedor.Cedula);
+
+            if (proveedorDB == null)
+                return NotFound();
+
+            // 🔴 Actualizar SOLO campos editables
+            proveedorDB.Nombre = proveedor.Nombre;
+            proveedorDB.Apellidos = proveedor.Apellidos;
+            proveedorDB.IDTipo = proveedor.IDTipo;
+            proveedorDB.Correo = proveedor.Correo;
+            proveedorDB.Telefono = proveedor.Telefono;
+            proveedorDB.Comercio = proveedor.Comercio;
+            proveedorDB.Direccion = proveedor.Direccion;
+            proveedorDB.Actividad = proveedor.Actividad;
+            proveedorDB.Empresa = proveedor.Empresa;
+            proveedorDB.Estado = proveedor.Estado;
+
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

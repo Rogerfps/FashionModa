@@ -33,6 +33,9 @@ namespace FashionM.Models
         [Required]
         public decimal Actividad { get; set; }
 
+        [Required]
+        public string Empresa { get; set; } = string.Empty;
+
         // 🔗 Relación
         public ICollection<Zapato> Zapatos { get; set; } = new List<Zapato>();
     }

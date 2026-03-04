@@ -1,7 +1,11 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\imagenes\zapatos\001a6f99-5ea5-4de4-908c-ddce4ede5e72_ssss.jpg
 wwwroot\imagenes\zapatos\3ddaed88-79b4-4dae-a305-031b9d00125f_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
+wwwroot\imagenes\zapatos\60f5b0ca-c92f-4092-8756-b11283027b64_ssss.jpg
 wwwroot\imagenes\zapatos\76f44300-b7c3-4098-a7c0-d6c3acea05b4_ss.jpg
+wwwroot\imagenes\zapatos\da257a9a-c5d7-448e-84c8-6d051c852256_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
+wwwroot\imagenes\zapatos\dc6b8247-f2ed-4b71-a177-c8ce99b0ea6d_ssss.jpg
 wwwroot\imagenes\zapatos\e2decd1b-89b4-4b83-a6e1-638695b4e1df_ssss.jpg
 wwwroot\images\inventarios\0bcf5543-9bac-4204-8996-cf113ccc69fd.jpg
 wwwroot\images\inventarios\0e2aec2b-b614-495a-a87d-b836c81372bf.jpg
@@ -9,12 +13,15 @@ wwwroot\images\inventarios\289cd45b-b968-4b7f-afaf-ad9a48a06bfa.jpg
 wwwroot\images\inventarios\3d15fce9-c848-4cae-a2c0-43c94ae1241a.jpg
 wwwroot\images\inventarios\5_f8a8a581-42de-472d-8d4c-4b42c8dbfd2c.jpg
 wwwroot\images\inventarios\7094d08a-0fcc-4e47-812d-fea2589dd4e7.jpg
+wwwroot\images\inventarios\7abfe274-4f59-46a1-9076-bba3f5645b69.webp
 wwwroot\images\inventarios\9ff305fc-430a-4e23-8b29-740f5612d703.jpg
 wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
+wwwroot\images\inventarios\a43a42ad-a048-4459-bff5-da906d833812.jpg
 wwwroot\images\inventarios\acacfde0-e0ff-4bc7-a8d7-ead6b4279b8a.webp
 wwwroot\images\inventarios\ad899d51-4122-4f24-9f14-fcdeea39cbc2.webp
 wwwroot\images\inventarios\b0ee7de5-2901-47ae-8e48-7c454224761c.jpg
 wwwroot\images\inventarios\d98be7ea-8403-4a2c-abbb-3f308e5aecee.jpg
+wwwroot\images\inventarios\db587956-fda9-450a-a007-361bec7490d7.webp
 wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css

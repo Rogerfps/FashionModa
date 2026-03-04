@@ -30,6 +30,27 @@
             </select>
         </div>
 
+        <div class="col-lg-2">
+            <div class="filter-label">Empresa</div>
+
+            <select name="empresa" class="filter-input w-100">
+                <option value="">Todas</option>
+                
+
+                @if (ViewBag.Empresas != null)
+                {
+                    foreach (var e in ViewBag.Empresas as List<string>)
+                    {
+                        <option value="@e"
+                                selected="@(ViewBag.EmpresaSeleccionada != null &&
+                                                                    ViewBag.EmpresaSeleccionada.Equals(e, StringComparison.OrdinalIgnoreCase))">
+                            @e
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+
         <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">
                 Filtrar
@@ -46,6 +67,7 @@
             <th>Correo</th>
             <th>Teléfono</th>
             <th>Actividad</th>
+            <th>Emrpesa</th>
             <th>Estado</th>
             <th style="width:220px;">Acciones</th>
         </tr>
@@ -61,6 +83,7 @@
                     <td>@item.Correo</td>
                     <td>@item.Telefono</td>
                     <td>@item.Actividad</td>
+                    <td>@item.Empresa</td>
                     <td>
                         <span class="badge @(item.Estado ? "bg-success" : "bg-secondary")">
                             @(item.Estado ? "Activo" : "Inactivo")

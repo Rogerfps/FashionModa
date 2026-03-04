@@ -19,15 +19,74 @@ namespace FashionM.Controllers
         // =====================================================
         // LISTADO DE PEDIDOS
         // =====================================================
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string buscar, string empresa, int? semana, int page = 1)
         {
+            int pageSize = 10;
+
             var pedidos = _context.PedidosCliente
                 .Include(p => p.Cliente)
+                .AsQueryable();
+
+            // 🔍 BÚSQUEDA GENERAL
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                pedidos = pedidos.Where(p =>
+                    p.Cliente.Nombre.Contains(buscar) ||
+                    p.Cliente.Apellidos.Contains(buscar) ||
+                    p.Cliente.Cedula.ToString().Contains(buscar)
+                );
+            }
+
+            // 🏢 FILTRO POR EMPRESA 
+            if (!string.IsNullOrWhiteSpace(empresa))
+            {
+                var e = empresa.Trim();
+
+                pedidos = pedidos.Where(p =>
+                    p.Empresa != null &&
+                    (
+                        p.Empresa == e ||
+                        EF.Functions.Like(p.Empresa, $"{e}|%") ||
+                        EF.Functions.Like(p.Empresa, $"%|{e}") ||
+                        EF.Functions.Like(p.Empresa, $"%|{e}|%")
+                    )
+                );
+            }
+
+            // 📅 SEMANA
+            if (semana.HasValue)
+            {
+                pedidos = pedidos.Where(p => p.Semana == semana.Value);
+            }
+
+            
+
+            // 🔽 TOTAL
+            int totalRegistros = await pedidos.CountAsync();
+
+            var lista = await pedidos
                 .OrderByDescending(p => p.FechaPedido)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // 📄 PAGINACIÓN
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+            ViewBag.PaginaActual = page;
+
+            // 🏢 LISTA DE EMPRESAS 
+            ViewBag.Empresas = _context.PedidosCliente
+                .Where(p => !string.IsNullOrWhiteSpace(p.Empresa))
+                .AsEnumerable()                 
+                .SelectMany(p => p.Empresa.Split('|'))
+                .Select(e => e.Trim())
+                .Distinct()
+                .OrderBy(e => e)
                 .ToList();
 
-            return View(pedidos);
+            return View(lista);
         }
+        
 
         // =====================================================
         // DETALLE DEL PEDIDO

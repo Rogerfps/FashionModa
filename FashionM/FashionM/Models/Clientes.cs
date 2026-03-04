@@ -62,3 +62,5 @@ namespace FashionM.Models
         = new List<PedidoCliente>();
     }
 }
+
+// Add-Migration ProveedorEmpresa

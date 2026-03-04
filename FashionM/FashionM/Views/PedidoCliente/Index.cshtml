@@ -1,19 +1,70 @@
 ﻿@using FashionM.Enums
-
 @model IEnumerable<PedidoCliente>
 
 @{
     ViewData["Title"] = "Pedidos de Clientes";
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    int paginaActual = ViewBag.PaginaActual ?? 1;
 }
 
 <h2>Pedidos de Clientes</h2>
 
-<p>
-    <a asp-action="Index" class="btn btn-secondary">Actualizar</a>
-    <a asp-action="Create" class="btn btn-primary ms-2">➕ Crear Pedido</a>
-</p>
+<!-- =========================
+     FILTROS
+========================== -->
+<form method="get" class="row g-3 mb-3">
 
-<table class="table table-striped table-bordered">
+    <div class="col-md-4">
+        <label class="form-label">Buscar</label>
+        <input type="text"
+               name="buscar"
+               value="@Context.Request.Query["buscar"]"
+               class="form-control"
+               placeholder="Nombre, cédula..." />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Empresa</label>
+        <select name="empresa" class="form-select">
+            <option value="">Todas</option>
+            @if (ViewBag.Empresas != null)
+            {
+                foreach (var e in ViewBag.Empresas as List<string>)
+                {
+                    <option value="@e"
+                            selected="@(Context.Request.Query["empresa"] == e)">
+                        @e
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Semana</label>
+        <input type="number"
+               name="semana"
+               class="form-control"
+               min="1"
+               max="53"
+               value="@Context.Request.Query["semana"]"
+               placeholder="Ej: 32" />
+    </div>
+
+    <div class="col-md-3 align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Limpiar</a>
+    </div>
+
+    <div class="col-md-2 align-self-end text-end">
+        <a asp-action="Create" class="btn btn-success w-100">➕ Crear</a>
+    </div>
+</form>
+
+<!-- =========================
+     TABLA
+========================== -->
+<table class="table table-striped table-bordered align-middle">
     <thead>
         <tr>
             <th>#</th>
@@ -24,85 +75,139 @@
             <th>Total</th>
             <th>Crédito</th>
             <th>Bodega</th>
-            <th>Acciones</th>
+            <th style="width:260px">Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @if (!Model.Any())
         {
             <tr>
-                <td>@item.Id</td>
-                <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
-                <td>@item.Semana</td>
-                <td>
-                    @item.Cliente.Nombre @item.Cliente.Apellidos<br />
-                    <small>@item.Cliente.Cedula</small>
-                </td>
-                <td>@item.Cliente.Transporte</td>
-                <td>₡ @item.Total.ToString("N2")</td>
-
-                <!-- ESTADO CRÉDITO -->
-                <td>
-                    @switch (item.EstadoCredito)
-                    {
-                        case EstadoCredito.Aprobado:
-                            <span class="badge bg-success">Aprobado</span>
-                            break;
-                        case EstadoCredito.Rechazado:
-                            <span class="badge bg-danger">Rechazado</span>
-                            break;
-                        case EstadoCredito.Retenido:
-                            <span class="badge bg-warning text-dark">Retenido</span>
-                            break;
-                        default:
-                            <span class="badge bg-secondary">Pendiente</span>
-                            break;
-                    }
-                </td>
-
-                <!-- ESTADO BODEGA -->
-                <td>
-                    @if (item.FirmaBodega)
-                    {
-                        <span class="badge bg-success">Despachado</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Pendiente</span>
-                    }
-                </td>
-
-                <!-- ACCIONES -->
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Ver</a>
-
-                    @* Acciones de Crédito *@
-                    @if (item.EstadoCredito == EstadoCredito.Pendiente || item.EstadoCredito == EstadoCredito.Retenido)
-                    {
-                        <form asp-action="AprobarCredito" asp-route-id="@item.Id" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-success">Aprobar</button>
-                        </form>
-
-                        <form asp-action="RechazarCredito" asp-route-id="@item.Id" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
-                        </form>
-
-                        <form asp-action="RetenerCredito" asp-route-id="@item.Id" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-warning">Retener</button>
-                        </form>
-                    }
-
-                    @* Acción de Bodega *@
-                    @if (item.EstadoCredito == EstadoCredito.Aprobado && !item.FirmaBodega)
-                    {
-                        <form asp-action="FirmarBodega" asp-route-id="@item.Id" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-primary">Bodega</button>
-                        </form>
-                    }
-
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                <td colspan="9" class="text-center text-muted">
+                    No hay pedidos registrados
                 </td>
             </tr>
         }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Semana</td>
+                    <td>
+                        @item.Cliente.Nombre @item.Cliente.Apellidos<br />
+                        <small class="text-muted">@item.Cliente.Cedula</small>
+                    </td>
+                    <td>@item.Cliente.Transporte</td>
+                    <td>₡ @item.Total.ToString("N2")</td>
+
+                    <!-- CRÉDITO -->
+                    <td>
+                        @switch (item.EstadoCredito)
+                        {
+                            case EstadoCredito.Aprobado:
+                                <span class="badge bg-success">Aprobado</span>
+                                break;
+                            case EstadoCredito.Rechazado:
+                                <span class="badge bg-danger">Rechazado</span>
+                                break;
+                            case EstadoCredito.Retenido:
+                                <span class="badge bg-warning text-dark">Retenido</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">Pendiente</span>
+                                break;
+                        }
+                    </td>
+
+                    <!-- BODEGA -->
+                    <td>
+                        @if (item.FirmaBodega)
+                        {
+                            <span class="badge bg-success">Despachado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pendiente</span>
+                        }
+                    </td>
+
+                    <!-- ACCIONES -->
+                    <td>
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-info">
+                            Ver
+                        </a>
+
+                        @if (item.EstadoCredito == EstadoCredito.Pendiente || item.EstadoCredito == EstadoCredito.Retenido)
+                        {
+                            <form asp-action="AprobarCredito"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button class="btn btn-sm btn-success">Aprobar</button>
+                            </form>
+
+                            <form asp-action="RechazarCredito"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button class="btn btn-sm btn-danger">Rechazar</button>
+                            </form>
+
+                            <form asp-action="RetenerCredito"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button class="btn btn-sm btn-warning">Retener</button>
+                            </form>
+                        }
+
+                        @if (item.EstadoCredito == EstadoCredito.Aprobado && !item.FirmaBodega)
+                        {
+                            <form asp-action="FirmarBodega"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button class="btn btn-sm btn-primary">Bodega</button>
+                            </form>
+                        }
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-danger">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
     </tbody>
 </table>
+
+<!-- =========================
+     PAGINACIÓN
+========================== -->
+@if (totalPaginas > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPaginas; i++)
+            {
+                <li class="page-item @(i == paginaActual ? "active" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                           page = i,
+                           buscar = Context.Request.Query["buscar"],
+                           empresa = Context.Request.Query["empresa"],
+                           semana = Context.Request.Query["semana"]
+                       })">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
