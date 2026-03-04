@@ -16,10 +16,12 @@ namespace FashionM.Models
         [Required]
         public string Suela { get; set; } = string.Empty;
 
-        // FK Proveedor
         [Required]
         public int ProveedorCedula { get; set; }
         public Proveedor? Proveedor { get; set; }
+
+        public ICollection<ImagenZapato> Imagenes { get; set; }
+            = new List<ImagenZapato>();
     }
 }
 

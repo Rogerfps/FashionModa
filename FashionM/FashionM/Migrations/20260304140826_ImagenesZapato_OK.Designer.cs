@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260303195934_AddDetalleToPedidoClienteDetalle")]
-    partial class AddDetalleToPedidoClienteDetalle
+    [Migration("20260304140826_ImagenesZapato_OK")]
+    partial class ImagenesZapato_OK
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -122,6 +122,28 @@ namespace FashionM.Migrations
                     b.HasIndex("InventarioId");
 
                     b.ToTable("Fotos");
+                });
+
+            modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ZapatoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZapatoId");
+
+                    b.ToTable("ImagenesZapato");
                 });
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
@@ -344,6 +366,8 @@ namespace FashionM.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Codigo");
+
                     b.HasIndex("ProveedorCedula");
 
                     b.ToTable("Zapatos");
@@ -358,6 +382,17 @@ namespace FashionM.Migrations
                         .IsRequired();
 
                     b.Navigation("Inventario");
+                });
+
+            modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
+                {
+                    b.HasOne("FashionM.Models.Zapato", "Zapato")
+                        .WithMany("Imagenes")
+                        .HasForeignKey("ZapatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zapato");
                 });
 
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
@@ -431,6 +466,11 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.Proveedor", b =>
                 {
                     b.Navigation("Zapatos");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Zapato", b =>
+                {
+                    b.Navigation("Imagenes");
                 });
 #pragma warning restore 612, 618
         }

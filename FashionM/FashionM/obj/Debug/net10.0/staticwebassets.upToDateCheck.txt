@@ -1,5 +1,8 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\imagenes\zapatos\3ddaed88-79b4-4dae-a305-031b9d00125f_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
+wwwroot\imagenes\zapatos\76f44300-b7c3-4098-a7c0-d6c3acea05b4_ss.jpg
+wwwroot\imagenes\zapatos\e2decd1b-89b4-4b83-a6e1-638695b4e1df_ssss.jpg
 wwwroot\images\inventarios\0bcf5543-9bac-4204-8996-cf113ccc69fd.jpg
 wwwroot\images\inventarios\0e2aec2b-b614-495a-a87d-b836c81372bf.jpg
 wwwroot\images\inventarios\289cd45b-b968-4b7f-afaf-ad9a48a06bfa.jpg

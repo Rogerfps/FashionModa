@@ -2,7 +2,10 @@
 
 <h2 class="mb-4">Nuevo Zapato</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Create"
+      method="post"
+      enctype="multipart/form-data">
+
     @Html.AntiForgeryToken()
 
     <!-- FK PROVEEDOR -->
@@ -11,24 +14,41 @@
     <div class="card">
         <div class="card-body">
 
+            <!-- CÓDIGO -->
             <div class="mb-3">
                 <label asp-for="Codigo" class="form-label"></label>
                 <input asp-for="Codigo" class="form-control" />
                 <span asp-validation-for="Codigo" class="text-danger"></span>
             </div>
 
+            <!-- COLOR -->
             <div class="mb-3">
                 <label asp-for="Color" class="form-label"></label>
                 <input asp-for="Color" class="form-control" />
                 <span asp-validation-for="Color" class="text-danger"></span>
             </div>
 
+            <!-- SUELA -->
             <div class="mb-3">
                 <label asp-for="Suela" class="form-label"></label>
                 <input asp-for="Suela" class="form-control" />
                 <span asp-validation-for="Suela" class="text-danger"></span>
             </div>
 
+            <!-- 🔴 IMÁGENES -->
+            <div class="mb-3">
+                <label class="form-label">Imágenes del Zapato</label>
+                <input type="file"
+                       name="imagenes"
+                       class="form-control"
+                       multiple
+                       accept="image/*" />
+                <small class="text-muted">
+                    Puedes seleccionar varias imágenes (JPG, PNG).
+                </small>
+            </div>
+
+            <!-- BOTONES -->
             <div class="mt-4">
                 <button type="submit" class="btn btn-success">
                     Guardar

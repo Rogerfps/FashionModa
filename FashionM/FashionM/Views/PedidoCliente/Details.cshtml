@@ -1,9 +1,9 @@
 ﻿@using FashionM.Enums
-
 @model PedidoCliente
 
 @{
     ViewData["Title"] = "Detalle del Pedido";
+    var totalZapatos = Model.Detalles.Sum(d => d.Cantidad);
 }
 
 <h2>Detalle del Pedido #@Model.Id</h2>
@@ -17,7 +17,6 @@
     <div class="col-md-6">
         <h4>Cliente</h4>
         <p>
-
             <strong>Nombre:</strong> @Model.Cliente.Nombre @Model.Cliente.Apellidos <br />
             <strong>Cédula:</strong> @Model.Cliente.Cedula <br />
             <strong>Código:</strong> @Model.Cliente.Codigo <br />
@@ -26,7 +25,6 @@
             <strong>Teléfono:</strong> @Model.Cliente.Telefonos <br />
             <strong>Transporte:</strong> @Model.Cliente.Transporte <br />
             <strong>Empresa:</strong> @Model.Cliente.Empresa <br />
-            
         </p>
     </div>
 
@@ -67,14 +65,7 @@
         {
             <tr>
                 <td>
-                    @if (d.Proveedor != null)
-                    {
-                        @d.Proveedor.Nombre
-                    }
-                    else
-                    {
-                        <span class="text-danger">Proveedor NULL</span>
-                    }
+                    @(d.Proveedor != null ? d.Proveedor.Nombre : "—")
                 </td>
                 <td>@d.CodigoProducto</td>
                 <td>@d.Color</td>
@@ -87,6 +78,18 @@
         }
     </tbody>
 </table>
+
+<!-- =========================
+     TOTAL ZAPATOS
+========================== -->
+<div class="row mt-3">
+    <div class="col-md-4">
+        <label>Total de Zapatos</label>
+        <input class="form-control"
+               readonly
+               value="@totalZapatos" />
+    </div>
+</div>
 
 <hr />
 
@@ -123,14 +126,9 @@
 
         <p>
             <strong>Bodega:</strong>
-            @if (Model.FirmaBodega)
-            {
-                <span class="badge bg-success">Despachado</span>
-            }
-            else
-            {
-                <span class="badge bg-secondary">Pendiente</span>
-            }
+            @(Model.FirmaBodega
+                        ? Html.Raw("<span class='badge bg-success'>Despachado</span>")
+                        : Html.Raw("<span class='badge bg-secondary'>Pendiente</span>"))
         </p>
     </div>
 </div>
@@ -143,47 +141,25 @@
 <div>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 
-    @* Acciones de Crédito *@
     @if (Model.EstadoCredito == EstadoCredito.Pendiente || Model.EstadoCredito == EstadoCredito.Retenido)
     {
-        <form asp-action="AprobarCredito"
-              asp-route-id="@Model.Id"
-              method="post"
-              style="display:inline">
-            <button type="submit" class="btn btn-success">
-                Aprobar Crédito
-            </button>
+        <form asp-action="AprobarCredito" asp-route-id="@Model.Id" method="post" style="display:inline">
+            <button class="btn btn-success">Aprobar Crédito</button>
         </form>
 
-        <form asp-action="RechazarCredito"
-              asp-route-id="@Model.Id"
-              method="post"
-              style="display:inline">
-            <button type="submit" class="btn btn-danger">
-                Rechazar Crédito
-            </button>
+        <form asp-action="RechazarCredito" asp-route-id="@Model.Id" method="post" style="display:inline">
+            <button class="btn btn-danger">Rechazar Crédito</button>
         </form>
 
-        <form asp-action="RetenerCredito"
-              asp-route-id="@Model.Id"
-              method="post"
-              style="display:inline">
-            <button type="submit" class="btn btn-warning">
-                Retener Crédito
-            </button>
+        <form asp-action="RetenerCredito" asp-route-id="@Model.Id" method="post" style="display:inline">
+            <button class="btn btn-warning">Retener Crédito</button>
         </form>
     }
 
-    @* Acción de Bodega *@
     @if (Model.EstadoCredito == EstadoCredito.Aprobado && !Model.FirmaBodega)
     {
-        <form asp-action="FirmarBodega"
-              asp-route-id="@Model.Id"
-              method="post"
-              style="display:inline">
-            <button type="submit" class="btn btn-primary">
-                Aprobar Bodega
-            </button>
+        <form asp-action="FirmarBodega" asp-route-id="@Model.Id" method="post" style="display:inline">
+            <button class="btn btn-primary">Aprobar Bodega</button>
         </form>
     }
 </div>

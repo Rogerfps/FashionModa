@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialClean : Migration
+    public partial class ImagenesZapato : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -160,6 +160,7 @@ namespace FashionM.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Zapatos", x => x.Id);
+                    table.UniqueConstraint("AK_Zapatos_Codigo", x => x.Codigo);
                     table.ForeignKey(
                         name: "FK_Zapatos_Proveedores_ProveedorCedula",
                         column: x => x.ProveedorCedula,
@@ -178,6 +179,7 @@ namespace FashionM.Migrations
                     CodigoProducto = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false),
                     Talla = table.Column<string>(type: "text", nullable: false),
+                    Detalle = table.Column<string>(type: "text", nullable: true),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
                     PrecioUnitario = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     ProveedorCedula = table.Column<int>(type: "integer", nullable: true)
@@ -195,13 +197,39 @@ namespace FashionM.Migrations
                         name: "FK_PedidoClienteDetalles_Proveedores_ProveedorCedula",
                         column: x => x.ProveedorCedula,
                         principalTable: "Proveedores",
-                        principalColumn: "Cedula");
+                        principalColumn: "Cedula",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ImagenesZapato",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ZapatoId = table.Column<int>(type: "integer", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImagenesZapato", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ImagenesZapato_Zapatos_ZapatoId",
+                        column: x => x.ZapatoId,
+                        principalTable: "Zapatos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fotos_InventarioId",
                 table: "Fotos",
                 column: "InventarioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ImagenesZapato_ZapatoId",
+                table: "ImagenesZapato",
+                column: "ZapatoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PedidoClienteDetalles_PedidoClienteId",
@@ -234,6 +262,9 @@ namespace FashionM.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Fotos");
+
+            migrationBuilder.DropTable(
+                name: "ImagenesZapato");
 
             migrationBuilder.DropTable(
                 name: "PedidoClienteDetalles");

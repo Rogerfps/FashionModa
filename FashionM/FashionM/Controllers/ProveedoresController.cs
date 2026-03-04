@@ -84,8 +84,9 @@ namespace FashionM.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var proveedor = await _context.Proveedores
-        .Include(p => p.Zapatos)
-        .FirstOrDefaultAsync(p => p.Cedula == id);
+            .Include(p => p.Zapatos)
+            .ThenInclude(z => z.Imagenes)
+            .FirstOrDefaultAsync(p => p.Cedula == id);
 
             if (proveedor == null)
                 return NotFound();

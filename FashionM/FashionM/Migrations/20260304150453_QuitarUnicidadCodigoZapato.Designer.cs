@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260303152449_InitialClean")]
-    partial class InitialClean
+    [Migration("20260304150453_QuitarUnicidadCodigoZapato")]
+    partial class QuitarUnicidadCodigoZapato
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,28 @@ namespace FashionM.Migrations
                     b.ToTable("Fotos");
                 });
 
+            modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ZapatoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZapatoId");
+
+                    b.ToTable("ImagenesZapato");
+                });
+
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
                     b.Property<int>("Codigo")
@@ -220,6 +242,9 @@ namespace FashionM.Migrations
 
                     b.Property<string>("Color")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Detalle")
                         .HasColumnType("text");
 
                     b.Property<int>("PedidoClienteId")
@@ -357,6 +382,17 @@ namespace FashionM.Migrations
                     b.Navigation("Inventario");
                 });
 
+            modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
+                {
+                    b.HasOne("FashionM.Models.Zapato", "Zapato")
+                        .WithMany("Imagenes")
+                        .HasForeignKey("ZapatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zapato");
+                });
+
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
                 {
                     b.HasOne("FashionM.Models.Clientes", "Cliente")
@@ -378,7 +414,8 @@ namespace FashionM.Migrations
 
                     b.HasOne("FashionM.Models.Proveedor", "Proveedor")
                         .WithMany()
-                        .HasForeignKey("ProveedorCedula");
+                        .HasForeignKey("ProveedorCedula")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("PedidoCliente");
 
@@ -427,6 +464,11 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.Proveedor", b =>
                 {
                     b.Navigation("Zapatos");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Zapato", b =>
+                {
+                    b.Navigation("Imagenes");
                 });
 #pragma warning restore 612, 618
         }

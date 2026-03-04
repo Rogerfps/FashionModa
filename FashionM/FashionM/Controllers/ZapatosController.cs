@@ -47,10 +47,12 @@ namespace FashionM.Controllers
         // =========================
         public IActionResult Create(int proveedorCedula)
         {
-            return View(new Zapato
+            var zapato = new Zapato
             {
                 ProveedorCedula = proveedorCedula
-            });
+            };
+
+            return View(zapato);
         }
 
         // =========================
@@ -58,22 +60,53 @@ namespace FashionM.Controllers
         // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Zapato zapato)
+        public async Task<IActionResult> Create(
+    Zapato zapato,
+    List<IFormFile> imagenes
+)
         {
-            Console.WriteLine("ENTRÓ AL POST CREATE");
-
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("MODELSTATE INVALIDO");
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
                 return View(zapato);
             }
 
+            // 1️⃣ Guardar zapato primero
             _context.Zapatos.Add(zapato);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // ← AQUÍ ya tenemos zapato.Id
+
+            // 2️⃣ Guardar imágenes
+            if (imagenes != null && imagenes.Count > 0)
+            {
+                foreach (var file in imagenes)
+                {
+                    if (file.Length == 0) continue;
+
+                    // Nombre único
+                    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                    var rutaCarpeta = Path.Combine("wwwroot", "imagenes", "zapatos");
+
+                    if (!Directory.Exists(rutaCarpeta))
+                        Directory.CreateDirectory(rutaCarpeta);
+
+                    var rutaFisica = Path.Combine(rutaCarpeta, fileName);
+
+                    using (var stream = new FileStream(rutaFisica, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // 3️⃣ Guardar en BD
+                    var imagen = new ImagenZapato
+                    {
+                        ZapatoId = zapato.Id, // 🔴 CLAVE
+                        Url = $"/imagenes/zapatos/{fileName}"
+                    };
+
+                    _context.Add(imagen);
+                }
+
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction(
                 "Details",
