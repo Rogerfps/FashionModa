@@ -14,7 +14,7 @@ namespace FashionM.Models
         public int PedidoClienteId { get; set; }
 
         [ForeignKey(nameof(PedidoClienteId))]
-        public PedidoCliente PedidoCliente { get; set; } = null!;
+        public PedidoCliente? PedidoCliente { get; set; } = null!;
 
         // =========================
         // DATOS DEL PRODUCTO (YA EXISTENTES)

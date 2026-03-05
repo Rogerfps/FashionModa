@@ -141,6 +141,12 @@
                             Ver
                         </a>
 
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-info">
+                            Editar
+                        </a>
+
                         @if (item.EstadoCredito == EstadoCredito.Pendiente || item.EstadoCredito == EstadoCredito.Retenido)
                         {
                             <form asp-action="AprobarCredito"

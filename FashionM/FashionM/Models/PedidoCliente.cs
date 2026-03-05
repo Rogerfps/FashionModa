@@ -28,7 +28,7 @@ namespace FashionM.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Total { get; set; }
 
-        public string Empresa { get; set; }
+        public string? Empresa { get; set; }
         public int Semana { get; set; }
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();

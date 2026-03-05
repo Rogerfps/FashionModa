@@ -1,1 +1,235 @@
-﻿
+﻿@using System.Globalization
+@using FashionM.Enums
+@model PedidoCliente
+
+@{
+    ViewData["Title"] = "Editar Pedido";
+    var detalles = Model.Detalles?.ToList() ?? new List<PedidoClienteDetalle>();
+}
+
+<h2>Editar Pedido #@Model.Id</h2>
+
+<form asp-action="Edit" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ClienteCedula" />
+
+    <fieldset class="mb-3">
+        <legend>Cliente</legend>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <label>Nombre</label>
+                <input class="form-control"
+                       value="@Model.Cliente.Nombre @Model.Cliente.Apellidos"
+                       readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Cédula</label>
+                <input class="form-control"
+                       value="@Model.Cliente.Cedula"
+                       readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Transporte</label>
+                <input class="form-control"
+                       value="@Model.Cliente.Transporte"
+                       readonly />
+            </div>
+
+        </div>
+    </fieldset>
+
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+            <label asp-for="Empresa"></label>
+            <input asp-for="Empresa" class="form-control" />
+            <span asp-validation-for="Empresa" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Semana"></label>
+            <input asp-for="Semana"
+                   type="number"
+                   min="1"
+                   max="53"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Fecha Pedido</label>
+            <input class="form-control"
+                   value="@Model.FechaPedido.ToString("dd/MM/yyyy")"
+                   readonly />
+        </div>
+
+    </div>
+
+    <fieldset class="mb-3">
+
+        <legend>Detalle del Pedido</legend>
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Código</th>
+                    <th>Color</th>
+                    <th>Talla</th>
+                    <th>Cantidad</th>
+                    <th>Detalle</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @for (int i = 0; i < detalles.Count; i++)
+                {
+                    <tr>
+
+                        <!-- IMPORTANTE PARA BINDING -->
+                        <input type="hidden" name="Detalles.Index" value="@i" />
+
+                        <td>
+                            @detalles[i].Proveedor?.Nombre
+                        </td>
+
+                        <td>
+                            @detalles[i].CodigoProducto
+
+                            <input type="hidden" name="Detalles[@i].Id"
+                                   value="@detalles[i].Id" />
+
+                            <input type="hidden" name="Detalles[@i].PedidoClienteId"
+                                   value="@Model.Id" />
+
+                            <input type="hidden" name="Detalles[@i].ProveedorCedula"
+                                   value="@detalles[i].ProveedorCedula" />
+
+                            <input type="hidden" name="Detalles[@i].CodigoProducto"
+                                   value="@detalles[i].CodigoProducto" />
+                        </td>
+
+                        <td>
+                            @detalles[i].Color
+
+                            <input type="hidden" name="Detalles[@i].Color"
+                                   value="@detalles[i].Color" />
+                        </td>
+
+                        <td>
+                            @detalles[i].Talla
+
+                            <input type="hidden" name="Detalles[@i].Talla"
+                                   value="@detalles[i].Talla" />
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   class="form-control cantidad"
+                                   name="Detalles[@i].Cantidad"
+                                   value="@detalles[i].Cantidad"
+                                   min="1"
+                                   onchange="recalcular()" />
+                        </td>
+
+                        <td>
+                            <input class="form-control"
+                                   name="Detalles[@i].Detalle"
+                                   value="@detalles[i].Detalle" />
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   step="0.01"
+                                   class="form-control precio"
+                                   name="Detalles[@i].PrecioUnitario"
+                                   value="@detalles[i].PrecioUnitario.ToString("0.##")"
+                                   onchange="recalcular()" />
+                        </td>
+
+                        <td class="subtotal text-end">
+                            @((detalles[i].Cantidad * detalles[i].PrecioUnitario).ToString("0.00", CultureInfo.InvariantCulture))
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </fieldset>
+
+    <div class="mb-3">
+
+        <label asp-for="Observaciones"></label>
+
+        <textarea asp-for="Observaciones"
+                  class="form-control"
+                  rows="3"></textarea>
+
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+
+            <label>Total</label>
+
+            <input class="form-control"
+                   id="totalPedido"
+                   value="@Model.Total.ToString(CultureInfo.InvariantCulture)"
+                   readonly />
+
+        </div>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Guardar Cambios
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">
+        Cancelar
+    </a>
+
+</form>
+
+@section Scripts {
+
+    <script>
+
+        function recalcular(){
+
+            let total = 0;
+
+            document.querySelectorAll("tbody tr").forEach(row => {
+
+                const cantidad = parseFloat(row.querySelector(".cantidad")?.value || 0);
+                const precio = parseFloat(row.querySelector(".precio")?.value || 0);
+
+                const subtotal = cantidad * precio;
+
+                row.querySelector(".subtotal").innerText = subtotal.toFixed(2);
+
+                total += subtotal;
+
+            });
+
+            document.getElementById("totalPedido").value = total.toFixed(2);
+
+        }
+
+    </script>
+
+}

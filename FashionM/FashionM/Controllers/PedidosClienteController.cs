@@ -309,6 +309,86 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
+        // EDITAR
+        // =====================================================
+        public async Task<IActionResult> Edit(int id)
+        {
+            var pedido = await _context.PedidosCliente
+                .Include(p => p.Cliente)
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Proveedor)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            return View(pedido);
+        }
+
+
+        // =======================================
+        // POST: Edit
+        // =======================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(PedidoCliente model)
+        {
+            ModelState.Remove("Cliente");
+            ModelState.Remove("EstadoCredito");
+            ModelState.Remove("FechaPedido");
+            ModelState.Remove("FechaEntrega");
+            ModelState.Remove("FirmaBodega");
+            ModelState.Remove("Detalles");
+
+            if (!ModelState.IsValid)
+            {
+                var errores = ModelState
+                    .SelectMany(x => x.Value.Errors)
+                    .Select(x => x.ErrorMessage)
+                    .ToList();
+
+                throw new Exception(string.Join(" | ", errores));
+            }
+
+            var pedidoDb = await _context.PedidosCliente
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == model.Id);
+
+            if (pedidoDb == null)
+                return NotFound();
+
+            pedidoDb.Empresa = model.Empresa;
+            pedidoDb.Semana = model.Semana;
+            pedidoDb.Observaciones = model.Observaciones;
+
+            decimal total = 0;
+
+            if (model.Detalles != null)
+            {
+                foreach (var detalleForm in model.Detalles)
+                {
+                    var detalleDb = pedidoDb.Detalles
+                        .FirstOrDefault(d => d.Id == detalleForm.Id);
+
+                    if (detalleDb == null)
+                        continue;
+
+                    detalleDb.Cantidad = detalleForm.Cantidad;
+                    detalleDb.PrecioUnitario = detalleForm.PrecioUnitario;
+                    detalleDb.Detalle = detalleForm.Detalle;
+
+                    total += detalleDb.Cantidad * detalleDb.PrecioUnitario;
+                }
+            }
+
+            pedidoDb.Total = total;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = pedidoDb.Id });
+        }
+
+        // =====================================================
         // ELIMINAR PEDIDO - GET
         // =====================================================
         public IActionResult Delete(int id)
