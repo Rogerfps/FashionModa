@@ -1,0 +1,170 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --danger: #ef4444;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.neo-header {
+    background: var(--pure-white);
+    border-bottom: 2px solid var(--deep-blue);
+    padding: 0.7rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.title-glow {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.back-link {
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background: #f1f5f9;
+}
+
+/* Tarjeta principal */
+.form-card {
+    background: var(--pure-white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Form controls - exactamente la misma estructura pero con estilos mejorados */
+.form-control {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    background: #fafcff;
+}
+
+    .form-control:focus {
+        border-color: var(--electric-blue);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(87,108,188,0.1);
+    }
+
+textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 0.2rem;
+    display: block;
+}
+
+.mb-2, .mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Tabla de tallas - manteniendo estructura */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table input {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+/* Botones - manteniendo las clases originales btn, btn-danger, etc */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: var(--danger);
+    padding: 0.4rem 0.8rem;
+}
+
+    .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+.btn-success {
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    color: white;
+}
+
+    .btn-success:hover {
+        background: var(--electric-blue);
+    }
+
+/* Mantener el row original */
+.row {
+    display: flex;
+    gap: 1rem;
+}
+
+.col {
+    flex: 1;
+}
+
+hr {
+    margin: 1.5rem 0;
+    border: none;
+    border-top: 1px solid #e2e8f0;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: var(--deep-blue);
+    margin-bottom: 1rem;
+}
+
+h4 {
+    font-size: 1.2rem;
+    color: var(--deep-blue);
+    margin: 1.5rem 0 1rem 0;
+}

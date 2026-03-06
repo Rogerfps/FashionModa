@@ -2,32 +2,234 @@
     ViewData["Title"] = "Inicio";
 }
 
-<div class="container text-center mt-5">
-    <h1 class="mb-4">Sistema de Inventario</h1>
-    <p class="mb-4">Gestion de inventario de zapatos</p>
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --electric-blue: #576CBC;
+        --light-bg: #f8fafc;
+    }
 
-    <a asp-controller="Inventarios"
-       asp-action="Index"
-       class="btn btn-primary btn-lg">
-        Ir al Inventario
-    </a>
+    .hero-section {
+        min-height: calc(100vh - 150px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
 
-    <a asp-controller="Clientes"
-       asp-action="Index"
-       class="btn btn-primary btn-lg">
-        Ir a Clientes
-    </a>
+    .hero-card {
+        background: white;
+        border-radius: 40px;
+        padding: 3rem 2rem;
+        box-shadow: 0 25px 50px -12px rgba(11, 36, 71, 0.15);
+        max-width: 1000px;
+        width: 100%;
+        text-align: center;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
 
-    <a asp-controller="Proveedores"
-       asp-action="Index"
-       class="btn btn-primary btn-lg">
-        Ir a Proveedores
-    </a>
+    .logo-container {
+        margin-bottom: 2rem;
+    }
 
-    <a asp-controller="PedidoCliente"
-       asp-action="Index"
-       class="btn btn-primary btn-lg">
-        Ir a Pedidos Clientes
-    </a>
+    .logo-img {
+        height: 80px;
+        width: auto;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -8px rgba(11, 36, 71, 0.2);
+    }
 
+    .hero-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+    }
+
+    .module-card {
+        background: #f8fafc;
+        border-radius: 24px;
+        padding: 1.5rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--electric-blue);
+            box-shadow: 0 20px 30px -10px rgba(11, 36, 71, 0.1);
+            background: white;
+        }
+
+    .module-icon {
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .module-content {
+        flex: 1;
+        text-align: left;
+    }
+
+    .module-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        margin-bottom: 0.2rem;
+    }
+
+    .module-desc {
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    .stats-section {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--deep-blue);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .modules-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-card {
+            padding: 2rem 1rem;
+        }
+
+        .stats-section {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .logo-img {
+            height: 60px;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-card">
+        <!-- Logo centrado -->
+        <div class="logo-container">
+            <img src="~/images/LogoDavid.png" alt="El David" class="logo-img" />
+        </div>
+
+        <!-- Título -->
+        <h1 class="hero-title">
+            El David
+        </h1>
+
+        <p class="hero-subtitle">
+            Sistema de administracion
+        </p>
+
+        <!-- Módulos en grid -->
+        <div class="modules-grid">
+            <a asp-controller="Inventarios" asp-action="Index" class="module-card">
+                <div class="module-icon">📦</div>
+                <div class="module-content">
+                    <div class="module-title">Inventario</div>
+                    <div class="module-desc">Gestion de inventarios</div>
+                </div>
+            </a>
+
+            <a asp-controller="Clientes" asp-action="Index" class="module-card">
+                <div class="module-icon">👥</div>
+                <div class="module-content">
+                    <div class="module-title">Clientes</div>
+                    <div class="module-desc">Administracion de cartera de clientes</div>
+                </div>
+            </a>
+
+            <a asp-controller="Proveedores" asp-action="Index" class="module-card">
+                <div class="module-icon">🚚</div>
+                <div class="module-content">
+                    <div class="module-title">Proveedores</div>
+                    <div class="module-desc">Gestion tus proveedores</div>
+                </div>
+            </a>
+
+            <a asp-controller="PedidoCliente" asp-action="Index" class="module-card">
+                <div class="module-icon">📋</div>
+                <div class="module-content">
+                    <div class="module-title">Pedidos</div>
+                    <div class="module-desc">Control de pedidos</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Stats rápidos (opcional)
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number">150+</div>
+                <div class="stat-label">Productos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">45</div>
+                <div class="stat-label">Clientes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Proveedores</div>
+            </div>
+        </div>
+        -->
+    </div>
 </div>

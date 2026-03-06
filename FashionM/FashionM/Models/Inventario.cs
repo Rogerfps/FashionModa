@@ -7,7 +7,8 @@ namespace FashionM.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Codigo { get; set; }
+        public string Codigo { get; set; }
+        public string Empresa { get; set; } = string.Empty;
 
         public string Marca { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;

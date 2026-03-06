@@ -1,0 +1,243 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header compacto */
+.neo-header {
+    background: var(--pure-white);
+    border-bottom: 2px solid var(--deep-blue);
+    padding: 0.7rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.title-glow {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.back-link {
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background: #f1f5f9;
+}
+
+/* Tarjeta principal */
+.detail-card {
+    background: var(--pure-white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Grid de información */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    border-bottom: 1px dashed #e2e8f0;
+    padding: 0.5rem 0;
+}
+
+.info-label {
+    width: 120px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.info-value {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--deep-blue);
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Tabla de tallas */
+.tallas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+    .tallas-table th {
+        background: var(--deep-blue);
+        color: white;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        padding: 0.7rem;
+    }
+
+    .tallas-table td {
+        padding: 0.7rem;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+.talla-numero {
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 1rem;
+}
+
+.talla-cantidad {
+    background: #e6f0fa;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+}
+
+/* Grid de fotos */
+.fotos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.2rem;
+    margin: 1rem 0;
+}
+
+.foto-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 0.8rem;
+    border: 1px solid #e2e8f0;
+}
+
+.foto-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-delete-foto {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eef2f6;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-warning {
+    background: #fef3c7;
+    color: #d97706;
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge {
+    background: var(--deep-blue);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.empty-message {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #64748b;
+    border: 1px dashed #cbd5e1;
+}
+
+.detalle-texto {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    color: var(--deep-blue);
+    line-height: 1.5;
+}

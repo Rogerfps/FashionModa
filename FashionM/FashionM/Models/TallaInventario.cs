@@ -9,16 +9,14 @@ namespace FashionM.Models
     {
         public int Id { get; set; }
 
-        public int Numero { get; set; }
+        public string Numero { get; set; }
 
         public int Cantidad { get; set; }
 
         // FK
-        public int InventarioCodigo { get; set; }
+        public string? InventarioCodigo { get; set; }
 
-        //  NO MAPEADA 
         [NotMapped]
         public Inventario? Inventario { get; set; }
     }
 }
-

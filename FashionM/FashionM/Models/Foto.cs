@@ -13,9 +13,9 @@ namespace FashionM.Models
         public string Ruta { get; set; }
 
         // FK
-        public int InventarioId { get; set; }
+        public string? InventarioCodigo { get; set; }
 
-        [ForeignKey(nameof(InventarioId))]
-        public Inventario Inventario { get; set; }
+        [ForeignKey(nameof(InventarioCodigo))]
+        public Inventario? Inventario { get; set; }
     }
 }

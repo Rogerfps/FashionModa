@@ -1,114 +1,131 @@
 ﻿@model Inventario
-
 @{
     ViewData["Title"] = "Detalle de Inventario";
 }
 
-<h2>📦 Detalle del Inventario</h2>
+<link rel="stylesheet" href="~/css/Inventario/InventarioDetails.css" />
 
-<hr />
+<!-- HEADER -->
+<div class="neo-header">
+    <div class="container d-flex justify-content-between align-items-center px-3">
+        <h1 class="title-glow">📦 Detalle del Producto</h1>
+        <a asp-action="Index" class="back-link">← Volver al listado</a>
+    </div>
+</div>
 
-<dl class="row">
-    <dt class="col-sm-3">Código</dt>
-    <dd class="col-sm-9">@Model.Codigo</dd>
+<div class="container px-3" style="max-width: 1100px;">
+    <div class="detail-card">
+        <!-- Badges superiores -->
+        <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <span class="badge">Código: @Model.Codigo</span>
+            <span class="badge">@Model.Marca</span>
+            <span class="badge">@Model.Color</span>
+        </div>
 
-    <dt class="col-sm-3">Marca</dt>
-    <dd class="col-sm-9">@Model.Marca</dd>
+        <!-- Grid de información principal -->
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Código</span>
+                <span class="info-value">@Model.Codigo</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">SKU</span>
+                <span class="info-value">@Model.SKU</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Marca</span>
+                <span class="info-value">@Model.Marca</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Color</span>
+                <span class="info-value">@Model.Color</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Empresa</span>
+                <span class="info-value">@Model.Empresa</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">CABYS</span>
+                <span class="info-value">@Model.CodigoCabys</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Costo</span>
+                <span class="info-value">₡@Model.PrecioCosto.ToString("N0")</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Venta</span>
+                <span class="info-value" style="color: #10b981; font-weight: 600;">₡@Model.PrecioVenta.ToString("N0")</span>
+            </div>
+        </div>
 
-    <dt class="col-sm-3">Color</dt>
-    <dd class="col-sm-9">@Model.Color</dd>
-
-    <dt class="col-sm-3">Detalle</dt>
-    <dd class="col-sm-9">@Model.Detalle</dd>
-
-    <dt class="col-sm-3">SKU</dt>
-    <dd class="col-sm-9">@Model.SKU</dd>
-
-    <dt class="col-sm-3">CodigoCabys</dt>
-    <dd class="col-sm-9">@Model.CodigoCabys</dd>
-
-    <dt class="col-sm-3">Precio Costo</dt>
-    <dd class="col-sm-9">@Model.PrecioCosto</dd>
-
-    <dt class="col-sm-3">Precio Venta</dt>
-    <dd class="col-sm-9">@Model.PrecioVenta</dd>
-</dl>
-
-<hr />
-
-<h4>👟 Tallas</h4>
-
-@if (Model.Tallas.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Talla</th>
-                <th>Cantidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Model.Tallas)
-            {
-                <tr>
-                    <td>@t.Numero</td>
-                    <td>@t.Cantidad</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p class="text-muted">No hay tallas registradas.</p>
-}
-
-<hr />
-
-<h4>📷 Fotos</h4>
-
-@if (Model.Fotos.Any())
-{
-    <div class="d-flex flex-wrap gap-3">
-        @foreach (var foto in Model.Fotos)
+        <!-- Detalle del producto -->
+        @if (!string.IsNullOrEmpty(Model.Detalle))
         {
-            <div class="text-center">
-                <img src="@foto.Ruta"
-                     style="max-width: 200px;
-                                    border-radius: 8px;
-                                    border:1px solid #ccc;" />
+            <div class="section-title">📝 Descripción</div>
+            <div class="detalle-texto">@Model.Detalle</div>
+        }
 
-                <form asp-action="DeleteFoto"
-                      method="post"
-                      class="mt-2"
-                      onsubmit="return confirm('¿Eliminar esta imagen?')">
+        <!-- SECCIÓN TALLAS -->
+        <div class="section-title">
+            <span>👟</span> Tallas y Stock (@(Model.Tallas?.Count() ?? 0))
+        </div>
 
-                    @Html.AntiForgeryToken()
+        @if (Model.Tallas != null && Model.Tallas.Any())
+        {
+            <table class="tallas-table">
+                <thead>
+                    <tr>
+                        <th>Talla</th>
+                        <th>Cantidad Disponible</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Tallas.OrderBy(t => t.Numero))
+                    {
+                        <tr>
+                            <td class="talla-numero">@t.Numero</td>
+                            <td><span class="talla-cantidad">@t.Cantidad unidades</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-message">📏 No hay tallas registradas para este producto</div>
+        }
 
-                    <input type="hidden" name="id" value="@foto.Id" />
-                    <input type="hidden" name="inventarioCodigo" value="@Model.Codigo" />
+        <!-- SECCIÓN FOTOS -->
+        <div class="section-title">
+            <span>📷</span> Fotos del Producto (@(Model.Fotos?.Count() ?? 0))
+        </div>
 
-                    <button class="btn btn-danger btn-sm">
-                        🗑 Eliminar
-                    </button>
-                </form>
+        @if (Model.Fotos != null && Model.Fotos.Any())
+        {
+            <div class="fotos-grid">
+                @foreach (var foto in Model.Fotos)
+                {
+                    <div class="foto-item">
+                        <img src="@foto.Ruta" class="foto-img" />
+                        <form asp-action="DeleteFoto" method="post" onsubmit="return confirm('¿Eliminar esta imagen?')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@foto.Id" />
+                            <input type="hidden" name="inventarioCodigo" value="@Model.Codigo" />
+                            <button type="submit" class="btn-delete-foto">🗑 Eliminar foto</button>
+                        </form>
+                    </div>
+                }
             </div>
         }
+        else
+        {
+            <div class="empty-message">📸 No hay fotos disponibles para este producto</div>
+        }
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn-secondary">← Volver</a>
+            <a asp-action="Edit" asp-route-id="@Model.Codigo" class="btn-warning">✏️ Editar producto</a>
+        </div>
     </div>
-}
-else
-{
-    <p class="text-muted">No hay fotos.</p>
-}
-
-<hr />
-
-<a asp-action="Edit"
-   asp-route-id="@Model.Codigo"
-   class="btn btn-warning">
-    ✏ Editar
-</a>
-
-<a asp-action="Index" class="btn btn-secondary">
-    Volver
-</a>
+</div>

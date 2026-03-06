@@ -32,7 +32,7 @@ namespace FashionM.Data
             modelBuilder.Entity<Foto>()
                 .HasOne(f => f.Inventario)
                 .WithMany(i => i.Fotos)
-                .HasForeignKey(f => f.InventarioId)
+                .HasForeignKey(f => f.InventarioCodigo)
                 .OnDelete(DeleteBehavior.Cascade);
 
             //  Inventario -> Tallas 

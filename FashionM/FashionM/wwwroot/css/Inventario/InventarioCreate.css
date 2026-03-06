@@ -1,0 +1,206 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px; /* LETRAS MÁS GRANDES */
+}
+
+/* Header */
+.neo-header {
+    background: var(--pure-white);
+    border-bottom: 2px solid var(--deep-blue);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.title-glow {
+    font-size: 2rem; /* MÁS GRANDE */
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.back-link {
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    background: #f1f5f9;
+}
+
+/* Tarjeta */
+.form-card {
+    background: var(--pure-white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 0.8rem;
+}
+
+    .form-group label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--deep-blue);
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+
+.form-control {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    background: #fafcff;
+}
+
+/* QUITA BORDE ROJO BOOTSTRAP */
+.input-validation-error {
+    border: 1px solid #e2e8f0 !important;
+    background: #fafcff !important;
+}
+
+textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Secciones */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin: 1.5rem 0 0.7rem 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #eef2f6;
+}
+
+/* Tabla tallas */
+.tallas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+    .tallas-table th {
+        background: var(--deep-blue);
+        color: white;
+        font-weight: 500;
+        padding: 0.6rem;
+    }
+
+    .tallas-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .tallas-table input {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        padding: 0.4rem;
+        font-size: 0.95rem;
+    }
+
+.btn-add {
+    background: var(--deep-blue);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.btn-remove {
+    background: #e2e8f0;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    width: 26px;
+    height: 26px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* File input */
+.file-input {
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 0.7rem;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    width: 100%;
+}
+
+/* Botones */
+.action-buttons {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: flex-end;
+    margin-top: 1.2rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid #eef2f6;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.8rem;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.validation-error {
+    font-size: 0.85rem;
+    color: #ef4444;
+    margin-top: 0.2rem;
+}
+
+/* QUITA EL FONDO ROSADO */
+.validation-summary {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.9rem;
+    color: #ef4444;
+    margin-bottom: 0.5rem;
+}

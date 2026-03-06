@@ -1,0 +1,253 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+.neo-header {
+    background: var(--pure-white);
+    border-bottom: 3px solid var(--deep-blue);
+    padding: 1.2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.title-glow {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.btn-neo {
+    background: var(--deep-blue);
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+
+    .btn-neo:hover {
+        background: var(--electric-blue);
+        transform: translateY(-2px);
+        color: white;
+    }
+
+.filter-container {
+    background: var(--pure-white);
+    border-radius: 50px;
+    padding: 0.3rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    margin-bottom: 2rem;
+}
+
+.filter-input {
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    background: transparent;
+}
+
+    .filter-input:focus {
+        outline: none;
+    }
+
+.btn-filter {
+    background: var(--deep-blue);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+}
+
+.table-wrap {
+    background: var(--pure-white);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 10px 25px -8px rgba(0,0,0,0.06);
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+    .modern-table th {
+        background: var(--deep-blue);
+        color: white;
+        font-weight: 500;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding: 0.7rem 0.5rem;
+    }
+
+        .modern-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .modern-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+    .modern-table td {
+        padding: 0.7rem 0.5rem;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+.product-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+.no-img {
+    width: 100px;
+    height: 100px;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #94a3b8;
+    border: 1px dashed #cbd5e1;
+}
+
+.talla-badge {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    padding: 0.2rem 0.4rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    display: inline-block;
+    margin: 0.1rem;
+}
+
+.stock-badge {
+    background: #10b981;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.precio-venta {
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 0.85rem;
+}
+
+.precio-costo {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.action-group {
+    display: flex;
+    gap: 0.2rem;
+    justify-content: center;
+}
+
+.btn-action {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.15s;
+}
+
+.btn-view {
+    background: #e6f0fa;
+    color: #2563eb;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-view:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #d97706;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.pagination-compact {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.page-compact {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: white;
+    color: var(--deep-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+}
+
+    .page-compact.active {
+        background: var(--deep-blue);
+        color: white;
+        border-color: var(--deep-blue);
+    }
+
+.product-line {
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 0.85rem;
+}
+
+.text-muted-small {
+    color: #64748b;
+    font-size: 0.7rem;
+}
