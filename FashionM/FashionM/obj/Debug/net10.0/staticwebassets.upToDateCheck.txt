@@ -1,16 +1,18 @@
 wwwroot\css\Inventario\InventarioCreate.css
-wwwroot\css\Inventario\InventarioDetails.css
 wwwroot\css\Inventario\InventarioEdit.css
 wwwroot\css\Inventario\InventarioIndex.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\imagenes\zapatos\001a6f99-5ea5-4de4-908c-ddce4ede5e72_ssss.jpg
+wwwroot\imagenes\zapatos\097157c5-748b-4b31-9cf5-1374f11bbdb6_dd.jpg
+wwwroot\imagenes\zapatos\0e61f059-1a80-4324-8801-bb72d78fcdfc_ss.jpg
 wwwroot\imagenes\zapatos\3ddaed88-79b4-4dae-a305-031b9d00125f_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
 wwwroot\imagenes\zapatos\4c7b6529-5d71-4c0a-b6af-7e7535751954_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
 wwwroot\imagenes\zapatos\60f5b0ca-c92f-4092-8756-b11283027b64_ssss.jpg
 wwwroot\imagenes\zapatos\76f44300-b7c3-4098-a7c0-d6c3acea05b4_ss.jpg
 wwwroot\imagenes\zapatos\da257a9a-c5d7-448e-84c8-6d051c852256_Post de Instagram Cumpleaños Femenino Rosa Pastel.png
 wwwroot\imagenes\zapatos\dc6b8247-f2ed-4b71-a177-c8ce99b0ea6d_ssss.jpg
+wwwroot\imagenes\zapatos\e2cc154d-e78a-432d-b850-09bb9deb4361_ss.jpg
 wwwroot\imagenes\zapatos\e2decd1b-89b4-4b83-a6e1-638695b4e1df_ssss.jpg
 wwwroot\imagenes\zapatos\ecc58678-acd6-4d13-9ea7-e3656097d5e7_LogoDavid.png
 wwwroot\images\inventarios\0bcf5543-9bac-4204-8996-cf113ccc69fd.jpg
@@ -30,6 +32,7 @@ wwwroot\images\inventarios\b0ee7de5-2901-47ae-8e48-7c454224761c.jpg
 wwwroot\images\inventarios\d20a0539-f14f-49f7-b771-16de147418ca.jpg
 wwwroot\images\inventarios\d3225179-2ce2-4b09-9cb3-b7ea2969dd07.png
 wwwroot\images\inventarios\d98be7ea-8403-4a2c-abbb-3f308e5aecee.jpg
+wwwroot\images\inventarios\d9bcf52e-8f1f-486a-abee-8f39e7bb0d2b.png
 wwwroot\images\inventarios\db587956-fda9-450a-a007-361bec7490d7.webp
 wwwroot\images\inventarios\ea641d22-07dc-4726-9756-bcbe78b02f1f.jpg
 wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
@@ -95,8 +98,13 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\css\Inventario\InventarioDetails.css
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioCreate.css
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioEdit.css
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioIndex.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\site.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\favicon.ico
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\js\site.js
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -156,8 +164,4 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\j
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\lib\jquery\LICENSE.txt
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\js\site.js
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioIndex.css
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioCreate.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioDetails.css
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioEdit.css

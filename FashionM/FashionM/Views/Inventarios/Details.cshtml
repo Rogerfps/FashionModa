@@ -72,27 +72,50 @@
 
         @if (Model.Tallas != null && Model.Tallas.Any())
         {
-            <table class="tallas-table">
-                <thead>
-                    <tr>
-                        <th>Talla</th>
-                        <th>Cantidad Disponible</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var t in Model.Tallas.OrderBy(t => t.Numero))
-                    {
+            var tallas = Model.Tallas;
+
+            <div class="tabla-tallas-wrapper">
+                <table class="tabla-tallas">
+                    <thead>
                         <tr>
-                            <td class="talla-numero">@t.Numero</td>
-                            <td><span class="talla-cantidad">@t.Cantidad unidades</span></td>
+                            <th>Talla</th>
+                            <th>A</th>
+                            <th>B</th>
+
+                            @for (int i = 15; i <= 45; i++)
+                            {
+                                <th>@i</th>
+                            }
                         </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="empty-message">📏 No hay tallas registradas para este producto</div>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Stock</td>
+
+                            <!-- Talla A -->
+                            @{
+                                var tallaA = tallas.FirstOrDefault(t => t.Numero == "A");
+                            }
+                            <td>@(tallaA?.Cantidad ?? 0)</td>
+
+                            <!-- Talla B -->
+                            @{
+                                var tallaB = tallas.FirstOrDefault(t => t.Numero == "B");
+                            }
+                            <td>@(tallaB?.Cantidad ?? 0)</td>
+
+                            <!-- Tallas 15 a 45 -->
+                            @for (int i = 15; i <= 45; i++)
+                            {
+                                var talla = tallas.FirstOrDefault(t => t.Numero == i.ToString());
+                                <td>@(talla?.Cantidad ?? 0)</td>
+                            }
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         }
 
         <!-- SECCIÓN FOTOS -->

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260304140826_ImagenesZapato_OK")]
-    partial class ImagenesZapato_OK
+    [Migration("20260309225159_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,8 +110,8 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("InventarioId")
-                        .HasColumnType("integer");
+                    b.Property<string>("InventarioCodigo")
+                        .HasColumnType("text");
 
                     b.Property<string>("Ruta")
                         .IsRequired()
@@ -119,7 +119,7 @@ namespace FashionM.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InventarioId");
+                    b.HasIndex("InventarioCodigo");
 
                     b.ToTable("Fotos");
                 });
@@ -148,8 +148,8 @@ namespace FashionM.Migrations
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
-                    b.Property<int>("Codigo")
-                        .HasColumnType("integer");
+                    b.Property<string>("Codigo")
+                        .HasColumnType("text");
 
                     b.Property<string>("CodigoCabys")
                         .IsRequired()
@@ -160,6 +160,10 @@ namespace FashionM.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -194,7 +198,6 @@ namespace FashionM.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Empresa")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("EstadoCredito")
@@ -297,6 +300,10 @@ namespace FashionM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Empresa")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("Estado")
                         .HasColumnType("boolean");
 
@@ -328,11 +335,13 @@ namespace FashionM.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
 
-                    b.Property<int>("InventarioCodigo")
-                        .HasColumnType("integer");
+                    b.Property<string>("InventarioCodigo")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("Numero")
-                        .HasColumnType("integer");
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -366,8 +375,6 @@ namespace FashionM.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Codigo");
-
                     b.HasIndex("ProveedorCedula");
 
                     b.ToTable("Zapatos");
@@ -377,9 +384,8 @@ namespace FashionM.Migrations
                 {
                     b.HasOne("FashionM.Models.Inventario", "Inventario")
                         .WithMany("Fotos")
-                        .HasForeignKey("InventarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InventarioCodigo")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Inventario");
                 });

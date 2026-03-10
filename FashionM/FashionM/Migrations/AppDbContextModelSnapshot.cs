@@ -107,8 +107,8 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("InventarioId")
-                        .HasColumnType("integer");
+                    b.Property<string>("InventarioCodigo")
+                        .HasColumnType("text");
 
                     b.Property<string>("Ruta")
                         .IsRequired()
@@ -116,7 +116,7 @@ namespace FashionM.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InventarioId");
+                    b.HasIndex("InventarioCodigo");
 
                     b.ToTable("Fotos");
                 });
@@ -145,8 +145,8 @@ namespace FashionM.Migrations
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
-                    b.Property<int>("Codigo")
-                        .HasColumnType("integer");
+                    b.Property<string>("Codigo")
+                        .HasColumnType("text");
 
                     b.Property<string>("CodigoCabys")
                         .IsRequired()
@@ -157,6 +157,10 @@ namespace FashionM.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -328,11 +332,13 @@ namespace FashionM.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
 
-                    b.Property<int>("InventarioCodigo")
-                        .HasColumnType("integer");
+                    b.Property<string>("InventarioCodigo")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("Numero")
-                        .HasColumnType("integer");
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -375,9 +381,8 @@ namespace FashionM.Migrations
                 {
                     b.HasOne("FashionM.Models.Inventario", "Inventario")
                         .WithMany("Fotos")
-                        .HasForeignKey("InventarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InventarioCodigo")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Inventario");
                 });

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     /// <inheritdoc />
-    public partial class ImagenesZapato : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,7 +43,8 @@ namespace FashionM.Migrations
                 name: "Inventarios",
                 columns: table => new
                 {
-                    Codigo = table.Column<int>(type: "integer", nullable: false),
+                    Codigo = table.Column<string>(type: "text", nullable: false),
+                    Empresa = table.Column<string>(type: "text", nullable: false),
                     Marca = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false),
                     Detalle = table.Column<string>(type: "text", nullable: false),
@@ -71,7 +72,8 @@ namespace FashionM.Migrations
                     Estado = table.Column<bool>(type: "boolean", nullable: false),
                     Comercio = table.Column<string>(type: "text", nullable: false),
                     Direccion = table.Column<string>(type: "text", nullable: false),
-                    Actividad = table.Column<decimal>(type: "numeric", nullable: false)
+                    Actividad = table.Column<decimal>(type: "numeric", nullable: false),
+                    Empresa = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,7 +93,7 @@ namespace FashionM.Migrations
                     EstadoCredito = table.Column<int>(type: "integer", nullable: false),
                     FirmaBodega = table.Column<bool>(type: "boolean", nullable: false),
                     Total = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    Empresa = table.Column<string>(type: "text", nullable: false),
+                    Empresa = table.Column<string>(type: "text", nullable: true),
                     Semana = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -112,14 +114,14 @@ namespace FashionM.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Ruta = table.Column<string>(type: "text", nullable: false),
-                    InventarioId = table.Column<int>(type: "integer", nullable: false)
+                    InventarioCodigo = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Fotos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Fotos_Inventarios_InventarioId",
-                        column: x => x.InventarioId,
+                        name: "FK_Fotos_Inventarios_InventarioCodigo",
+                        column: x => x.InventarioCodigo,
                         principalTable: "Inventarios",
                         principalColumn: "Codigo",
                         onDelete: ReferentialAction.Cascade);
@@ -131,9 +133,9 @@ namespace FashionM.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Numero = table.Column<int>(type: "integer", nullable: false),
+                    Numero = table.Column<string>(type: "text", nullable: false),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
-                    InventarioCodigo = table.Column<int>(type: "integer", nullable: false)
+                    InventarioCodigo = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -160,7 +162,6 @@ namespace FashionM.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Zapatos", x => x.Id);
-                    table.UniqueConstraint("AK_Zapatos_Codigo", x => x.Codigo);
                     table.ForeignKey(
                         name: "FK_Zapatos_Proveedores_ProveedorCedula",
                         column: x => x.ProveedorCedula,
@@ -222,9 +223,9 @@ namespace FashionM.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Fotos_InventarioId",
+                name: "IX_Fotos_InventarioCodigo",
                 table: "Fotos",
-                column: "InventarioId");
+                column: "InventarioCodigo");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ImagenesZapato_ZapatoId",

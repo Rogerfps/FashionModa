@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -13,10 +14,10 @@ namespace FashionM.Models
 
         public int Cantidad { get; set; }
 
-        // FK
-        public string? InventarioCodigo { get; set; }
+        [ValidateNever]
+        public string InventarioCodigo { get; set; }
 
-        [NotMapped]
+        [ValidateNever]
         public Inventario? Inventario { get; set; }
     }
 }

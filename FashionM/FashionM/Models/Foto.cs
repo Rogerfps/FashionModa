@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FashionM.Models
@@ -10,12 +11,13 @@ namespace FashionM.Models
         public int Id { get; set; }
 
         [Required]
-        public string Ruta { get; set; }
+        public string Ruta { get; set; } = string.Empty;
 
         // FK
-        public string? InventarioCodigo { get; set; }
+        [ValidateNever]
+        public string? InventarioCodigo { get; set; } = string.Empty;
 
-        [ForeignKey(nameof(InventarioCodigo))]
+        [ValidateNever]
         public Inventario? Inventario { get; set; }
     }
 }

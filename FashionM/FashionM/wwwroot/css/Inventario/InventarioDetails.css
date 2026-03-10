@@ -97,7 +97,29 @@ body {
     overflow: hidden;
     margin-bottom: 0.5rem;
 }
+.tabla-tallas-wrapper {
+    overflow-x: auto;
+    margin-top: 15px;
+}
 
+.tabla-tallas {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+    .tabla-tallas th {
+        background: #111;
+        color: white;
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .tabla-tallas td {
+        border: 1px solid #e5e7eb;
+        padding: 6px;
+    }
+/*
     .tallas-table th {
         background: var(--deep-blue);
         color: white;
@@ -127,6 +149,7 @@ body {
     font-weight: 600;
     color: var(--deep-blue);
 }
+*/
 
 /* Grid de fotos */
 .fotos-grid {
