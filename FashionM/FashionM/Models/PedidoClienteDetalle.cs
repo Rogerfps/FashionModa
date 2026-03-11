@@ -43,3 +43,4 @@ namespace FashionM.Models
 
 }
 
+/*El detalle esta justo en pedido cliente cuando se selecciona el provedor,Codigo,color,talla y cantidad entonces lo tomamos de ahi mismo*/

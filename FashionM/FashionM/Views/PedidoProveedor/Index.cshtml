@@ -1,0 +1,166 @@
+﻿@model IEnumerable<PedidoProveedor>
+
+@{
+    ViewData["Title"] = "Pedidos a Proveedores";
+}
+
+<h2>Pedidos a Proveedores</h2>
+
+<hr />
+
+<!-- GENERAR PEDIDOS -->
+<div class="card mb-4">
+    <div class="card-body">
+
+        <h4>Generar pedidos por semana</h4>
+
+        <form asp-action="GenerarPedidos" method="post">
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <label>Semana</label>
+                    <input type="number" name="semana" class="form-control" required />
+                </div>
+
+                <div class="col-md-3 mt-4">
+                    <button class="btn btn-success">
+                        Generar pedidos proveedores
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<form method="get" class="mb-3">
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <label>N° Pedido</label>
+            <input type="number"
+                   name="pedidoId"
+                   value="@ViewBag.PedidoId"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Empresa</label>
+            <input type="text"
+                   name="empresa"
+                   value="@ViewBag.Empresa"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label>Semana</label>
+            <input type="number"
+                   name="semana"
+                   value="@ViewBag.Semana"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-3 mt-4">
+            <button class="btn btn-primary">Buscar</button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Limpiar
+            </a>
+        </div>
+
+    </div>
+
+</form>
+
+<!-- LISTA DE PEDIDOS -->
+<table class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Empresa</th>
+            <th>Semana</th>
+            <th>Proveedor</th>
+            <th>Fecha</th>
+            <th>Total Pares</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var p in Model)
+        {
+            <tr>
+
+                <td>@p.Id</td>
+
+                <td>@p.Empresa</td>
+
+                <td>@p.Semana</td>
+
+                <td>
+                    @(p.Proveedor != null ? p.Proveedor.Comercio : p.ProveedorCedula.ToString())
+                </td>
+
+
+                <td>@p.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")</td>
+
+                <td>@p.Detalles.Sum(d => d.Cantidad)</td>
+
+                <td>
+
+                    <a asp-action="Details"
+                       asp-route-id="@p.Id"
+                       class="btn btn-sm btn-primary">
+                        Ver
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@p.Id"
+                          method="post"
+                          style="display:inline">
+
+                        <button class="btn btn-sm btn-danger">
+                            Eliminar
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<nav>
+    <ul class="pagination">
+
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(ViewBag.Page == i ? "active" : "")">
+
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-pedidoId="@ViewBag.PedidoId"
+                   asp-route-empresa="@ViewBag.Empresa"
+                   asp-route-semana="@ViewBag.Semana">
+
+                    @i
+
+                </a>
+
+            </li>
+        }
+
+    </ul>
+</nav>

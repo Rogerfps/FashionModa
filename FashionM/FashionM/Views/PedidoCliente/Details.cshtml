@@ -50,6 +50,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
+            <th>Foto</th>
             <th>Proveedor</th>
             <th>Código</th>
             <th>Color</th>
@@ -65,6 +66,23 @@
         {
             <tr>
                 <td>
+                    @{
+                        var zapato = d.Proveedor?.Zapatos?
+                        .FirstOrDefault(z => z.Codigo == d.CodigoProducto && z.Color == d.Color);
+
+                        var foto = zapato?.Imagenes?.FirstOrDefault()?.Url;
+                    }
+
+                    @if (!string.IsNullOrEmpty(foto))
+                    {
+                        <img src="@foto" style="width:70px; border-radius:6px;" />
+                    }
+                    else
+                    {
+                        <span>—</span>
+                    }
+                </td>
+                <td>
                     @(d.Proveedor != null ? d.Proveedor.Nombre : "—")
                 </td>
                 <td>@d.CodigoProducto</td>
@@ -74,6 +92,8 @@
                 <td>@d.Detalle</td>
                 <td>@d.PrecioUnitario.ToString("N2")</td>
                 <td>@d.SubTotal.ToString("N2")</td>
+                
+
             </tr>
         }
     </tbody>

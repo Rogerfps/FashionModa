@@ -97,6 +97,8 @@ namespace FashionM.Controllers
                 .Include(p => p.Cliente)
                 .Include(p => p.Detalles)
                     .ThenInclude(d => d.Proveedor)
+                        .ThenInclude(p => p.Zapatos)
+                            .ThenInclude(z => z.Imagenes)
                 .FirstOrDefault(p => p.Id == id);
 
             if (pedido == null)

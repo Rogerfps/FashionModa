@@ -22,6 +22,12 @@ namespace FashionM.Data
 
         public DbSet<ImagenZapato> ImagenesZapato { get; set; }
 
+        public DbSet<PedidoMain> PedidosMain { get; set; }
+
+        public DbSet<PedidoProveedor> PedidosProveedor { get; set; }
+
+        public DbSet<PedidoProveedorDetalle> PedidosProveedorDetalle { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,6 +82,19 @@ namespace FashionM.Data
                 .WithMany(z => z.Imagenes)
                 .HasForeignKey(i => i.ZapatoId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PedidoProveedor>()
+                .HasOne<PedidoMain>()
+                .WithMany(p => p.PedidosProveedor)
+                .HasForeignKey(p => p.PedidoMainId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PedidoProveedor>()
+                .HasOne(p => p.Proveedor)
+                .WithMany()
+                .HasForeignKey(p => p.ProveedorCedula)
+                .HasPrincipalKey(p => p.Cedula)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
         }

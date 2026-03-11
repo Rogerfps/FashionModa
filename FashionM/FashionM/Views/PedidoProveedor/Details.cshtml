@@ -1,0 +1,128 @@
+﻿@model PedidoProveedor
+
+@{
+    ViewData["Title"] = "Detalle Pedido Proveedor";
+    var totalPares = Model.Detalles.Sum(d => d.Cantidad);
+}
+
+@{
+    var zapatos = ViewBag.Zapatos as List<Zapato>;
+}
+
+<h2>Pedido a Proveedor #@Model.Id</h2>
+
+<hr />
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <h4>Proveedor</h4>
+
+        <p>
+            <strong>Nombre:</strong>
+            @(Model.Proveedor != null ? Model.Proveedor.Nombre + " " + Model.Proveedor.Apellidos : "—")
+            <br />
+
+            <strong>Comercio:</strong>
+            @(Model.Proveedor != null ? Model.Proveedor.Comercio : "—")
+            <br />
+
+            <strong>Cédula:</strong>
+            @Model.ProveedorCedula
+        </p>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <h4>Pedido</h4>
+
+        <p>
+            <strong>Empresa:</strong> @Model.Empresa <br />
+            <strong>Fecha Pedido:</strong> @Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")
+        </p>
+
+    </div>
+
+</div>
+
+<hr />
+
+<h4>Detalle del Pedido</h4>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>Foto</th>
+            <th>Código</th>
+            <th>Color</th>
+            <th>Talla</th>
+            <th>Detalle</th>
+            <th>Cantidad</th>
+            
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var d in Model.Detalles)
+        {
+            <tr>
+                <td>
+                    @{
+                        var zapato = zapatos?
+                        .FirstOrDefault(z => z.Codigo == d.CodigoProducto && z.Color == d.Color);
+
+                        if (zapato != null && zapato.Imagenes.Any())
+                        {
+                            <img src="@zapato.Imagenes.First().Url"
+                                 style="width:60px;height:60px;object-fit:cover;" />
+                        }
+                    }
+                </td>
+
+                <td>@d.CodigoProducto</td>
+
+                <td>@d.Color</td>
+
+                <td>@d.Talla</td>
+
+                <td>@d.Detalle</td>
+
+                <td>@d.Cantidad</td>
+
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<hr />
+
+<div class="row">
+
+    <div class="col-md-4">
+
+        <label>Total Pares</label>
+
+        <input class="form-control"
+               readonly
+               value="@totalPares" />
+
+    </div>
+
+</div>
+
+<hr />
+
+<div>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Volver
+    </a>
+
+</div>

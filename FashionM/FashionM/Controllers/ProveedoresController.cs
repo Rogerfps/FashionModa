@@ -21,7 +21,7 @@ namespace FashionM.Controllers
         // =========================
         public async Task<IActionResult> Index(string buscar, bool? estado, string empresa, int page = 1)
         {
-            int pageSize = 5;
+            int pageSize = 25;
 
             var proveedores = _context.Proveedores.AsQueryable();
 
