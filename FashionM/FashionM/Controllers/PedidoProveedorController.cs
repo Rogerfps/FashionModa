@@ -1,4 +1,5 @@
-﻿using FashionM.Data;
+﻿using ClosedXML.Excel;
+using FashionM.Data;
 using FashionM.Enums;
 using FashionM.Models;
 using Microsoft.AspNetCore.Http;
@@ -236,7 +237,211 @@ namespace FashionM.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> ExportarExcel(int id)
+        {
+            var pedido = await _context.PedidosProveedor
+                .Include(p => p.Proveedor)
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            var codigos = pedido.Detalles.Select(d => d.CodigoProducto).Distinct().ToList();
+
+            var zapatos = await _context.Zapatos
+                .Where(z => codigos.Contains(z.Codigo))
+                .Include(z => z.Imagenes)
+                .ToListAsync();
+
+            var tallas = Enumerable.Range(15, 31).ToList();
+
+            var grupos = pedido.Detalles
+                .GroupBy(d => new { d.CodigoProducto, d.Color, d.Detalle })
+                .ToList();
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Pedido");
+
+            // =========================
+            // TITULO
+            // =========================
+            ws.Cell("A1").Value = "PEDIDO DE PRODUCCIÓN";
+            ws.Range("A1:AK1").Merge();
+
+            var titulo = ws.Range("A1:AK1");
+            titulo.Style.Font.Bold = true;
+            titulo.Style.Font.FontSize = 22;
+            titulo.Style.Font.FontColor = XLColor.White;
+            titulo.Style.Fill.BackgroundColor = XLColor.FromHtml("#2C3E50");
+            titulo.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            titulo.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            ws.Row(1).Height = 35;
+
+            // =========================
+            // INFORMACIÓN PEDIDO
+            // =========================
+            ws.Cell("A3").Value = "Proveedor:";
+            ws.Cell("B3").Value = pedido.Proveedor?.Comercio;
+
+            ws.Cell("A4").Value = "Empresa:";
+            ws.Cell("B4").Value = pedido.Empresa;
+
+            ws.Cell("A5").Value = "Semana:";
+            ws.Cell("B5").Value = pedido.Semana;
+
+            ws.Cell("A6").Value = "Fecha:";
+            ws.Cell("B6").Value = pedido.FechaPedido.ToString("dd/MM/yyyy");
+
+            var info = ws.Range("A3:D6");
+            info.Style.Fill.BackgroundColor = XLColor.FromHtml("#ECF0F1");
+            info.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+
+            ws.Range("A3:A6").Style.Font.Bold = true;
+
+            // =========================
+            // ENCABEZADOS
+            // =========================
+            ws.Cell("A8").Value = "Imagen";
+            ws.Cell("B8").Value = "Código";
+            ws.Cell("C8").Value = "Color";
+            ws.Cell("D8").Value = "Detalle";
+
+            int col = 5;
+
+            foreach (var talla in tallas)
+            {
+                ws.Cell(8, col).Value = talla;
+                col++;
+            }
+
+            ws.Cell(8, col).Value = "Total";
+
+            var header = ws.Range(8, 1, 8, col);
+
+            header.Style.Font.Bold = true;
+            header.Style.Font.FontColor = XLColor.White;
+            header.Style.Fill.BackgroundColor = XLColor.FromHtml("#34495E");
+
+            header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            header.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            header.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+            ws.Row(8).Height = 25;
+
+            // =========================
+            // DATOS
+            // =========================
+            int row = 9;
+            int totalGeneral = 0;
+
+            foreach (var g in grupos)
+            {
+                ws.Row(row).Height = 70;
+
+                ws.Cell(row, 2).Value = g.Key.CodigoProducto;
+                ws.Cell(row, 3).Value = g.Key.Color;
+                ws.Cell(row, 4).Value = g.Key.Detalle;
+
+                int colTalla = 5;
+                int totalModelo = 0;
+
+                foreach (var talla in tallas)
+                {
+                    var cantidad = g
+                        .Where(x => x.Talla == talla.ToString())
+                        .Sum(x => x.Cantidad);
+
+                    if (cantidad > 0)
+                        ws.Cell(row, colTalla).Value = cantidad;
+
+                    ws.Cell(row, colTalla).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    totalModelo += cantidad;
+
+                    colTalla++;
+                }
+
+                // TOTAL POR MODELO
+                ws.Cell(row, colTalla).Value = totalModelo;
+                ws.Cell(row, colTalla).Style.Font.Bold = true;
+                ws.Cell(row, colTalla).Style.Fill.BackgroundColor = XLColor.FromHtml("#D5F5E3");
+
+                totalGeneral += totalModelo;
+
+                // BORDES
+                ws.Range(row, 1, row, colTalla).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                // FILAS ALTERNADAS
+                if (row % 2 == 0)
+                {
+                    ws.Range(row, 1, row, colTalla).Style.Fill.BackgroundColor = XLColor.FromHtml("#F8F9F9");
+                }
+
+                // =========================
+                // IMAGEN
+                // =========================
+                var zapato = zapatos
+                    .FirstOrDefault(z => z.Codigo == g.Key.CodigoProducto && z.Color == g.Key.Color);
+
+                if (zapato != null && zapato.Imagenes.Any())
+                {
+                    var imgPath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        zapato.Imagenes.First().Url.TrimStart('/')
+                    );
+
+                    if (System.IO.File.Exists(imgPath))
+                    {
+                        ws.AddPicture(imgPath)
+                            .MoveTo(ws.Cell(row, 1))
+                            .Scale(0.4);
+                    }
+                }
+
+                row++;
+            }
+
+            // =========================
+            // TOTAL GENERAL
+            // =========================
+            ws.Cell(row + 1, 4).Value = "TOTAL GENERAL:";
+            ws.Cell(row + 1, 4).Style.Font.Bold = true;
+
+            ws.Cell(row + 1, 5).Value = totalGeneral;
+
+            var totalRange = ws.Range(row + 1, 4, row + 1, 5);
+            totalRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#F9E79F");
+            totalRange.Style.Font.Bold = true;
+            totalRange.Style.Font.FontSize = 14;
+
+            // =========================
+            // AJUSTES
+            // =========================
+            ws.Column(1).Width = 18;
+
+            ws.Columns().AdjustToContents();
+
+            ws.Columns(5, 35).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            ws.SheetView.FreezeRows(8);
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            string fileName = $"PedidoProveedor_{pedido.Id}.xlsx";
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
+        }
     }
 }
-    
-

@@ -50,6 +50,11 @@
 <hr />
 
 <h4>Detalle del Pedido</h4>
+<a asp-action="ExportarExcel"
+       asp-route-id="@Model.Id"
+       class="btn btn-success">
+    Descargar Excel
+</a>
 
 <table class="table table-bordered table-striped">
 

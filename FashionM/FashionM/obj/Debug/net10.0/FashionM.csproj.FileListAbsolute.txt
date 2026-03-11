@@ -192,3 +192,11 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compres
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\nf61v6yvyk-{0}-of4644wn51-of4644wn51.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\pb0vhet7d1-{0}-xarn79zavg-xarn79zavg.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\rjr3sqlv2s-{0}-g6fp2380f6-g6fp2380f6.gz
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\ClosedXML.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\ExcelNumberFormat.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\RBush.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\SixLabors.Fonts.dll
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\bin\Debug\net10.0\System.IO.Packaging.dll
