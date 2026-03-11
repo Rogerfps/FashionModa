@@ -20,7 +20,7 @@ namespace FashionM.Controllers
         // INDEX
         public IActionResult Index(string search, string empresa, int page = 1)
         {
-            int pageSize = 6;
+            int pageSize = 25;
 
             var query = _context.Inventarios
                 .Include(i => i.Tallas)
