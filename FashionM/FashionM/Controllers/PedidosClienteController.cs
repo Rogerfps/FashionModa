@@ -230,6 +230,24 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
+        // APROBAR SECRETARIA
+        // =====================================================
+        [HttpPost]
+        public IActionResult AprobarSecretaria(int id)
+        {
+            var pedido = _context.PedidosCliente.Find(id);
+
+            if (pedido == null)
+                return NotFound();
+
+            pedido.AprobadoSecretaria = true;
+
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // =====================================================
         // APROBAR CRÉDITO
         // =====================================================
         [HttpPost]
@@ -241,6 +259,9 @@ namespace FashionM.Controllers
 
             if (pedido == null)
                 return NotFound();
+
+            if (!pedido.AprobadoSecretaria)
+                return BadRequest("El pedido aún no ha sido aprobado por secretaría.");
 
             // 🔹 Validacion básica de credito
             if (pedido.Total > pedido.Cliente.LimiteCredito)

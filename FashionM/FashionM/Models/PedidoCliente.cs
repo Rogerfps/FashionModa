@@ -21,7 +21,7 @@ namespace FashionM.Models
 
         public string? Observaciones { get; set; }
 
-
+        public bool AprobadoSecretaria { get; set; } = false;
         public EstadoCredito EstadoCredito { get; set; } = EstadoCredito.Pendiente;
         public bool FirmaBodega { get; set; }
 

@@ -145,6 +145,13 @@
         </p>
 
         <p>
+            <strong>Secretaría:</strong>
+            @(Model.AprobadoSecretaria
+                ? Html.Raw("<span class='badge bg-success'>Aprobado</span>")
+                : Html.Raw("<span class='badge bg-secondary'>Pendiente</span>"))
+        </p>
+
+        <p>
             <strong>Bodega:</strong>
             @(Model.FirmaBodega
                         ? Html.Raw("<span class='badge bg-success'>Despachado</span>")
@@ -160,6 +167,13 @@
 ========================== -->
 <div>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
+    @if (!Model.AprobadoSecretaria)
+    {
+        <form asp-action="AprobarSecretaria" asp-route-id="@Model.Id" method="post" style="display:inline">
+            <button class="btn btn-info">Aprobar Secretaría</button>
+        </form>
+    }
 
     @if (Model.EstadoCredito == EstadoCredito.Pendiente || Model.EstadoCredito == EstadoCredito.Retenido)
     {
