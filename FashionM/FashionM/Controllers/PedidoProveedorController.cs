@@ -2,6 +2,7 @@
 using FashionM.Data;
 using FashionM.Enums;
 using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin,Secretaria")]
     public class PedidoProveedorController : Controller
     {
         private readonly AppDbContext _context;

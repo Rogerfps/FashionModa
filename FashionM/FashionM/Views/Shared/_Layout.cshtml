@@ -1,235 +1,162 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using FashionM.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - El David</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FashionM.styles.css" asp-append-version="true" />
 
     <style>
-        :root {
-            --deep-blue: #0B2447;
-            --electric-blue: #576CBC;
-            --bg-white: #ffffff;
-            --text-dark: #1e293b;
-            --text-gray: #64748b;
-        }
-
-        body {
-            background: var(--bg-white);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            color: var(--text-dark);
-        }
-
-        /* Navbar flotante más delgado */
-        .floating-header {
-            position: sticky;
-            top: 15px;
-            z-index: 1000;
-            width: 100%;
-            padding: 0 2rem;
-        }
-
-        .floating-nav {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: var(--deep-blue);
-            border-radius: 50px;
-            padding: 0.2rem 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 10px 25px -8px rgba(11, 36, 71, 0.3);
-            height: 48px;
-            position: relative; /* Para posicionamiento absoluto del texto centrado */
-        }
-
-        .nav-logo {
-            height: 24px;
-            width: auto;
-        }
-
-        /* Texto centrado */
-        .nav-brand-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            text-transform: uppercase;
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-left: auto; /* Empuja el menú hacia la derecha */
-        }
-
-        .nav-link {
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-
-            .nav-link:hover {
-                color: white;
+            :root {
+                --deep-blue: #0B2447;
+                --electric-blue: #576CBC;
+                --bg-white: #ffffff;
+                --text-dark: #1e293b;
+                --text-gray: #64748b;
             }
 
-        .nav-email {
-            color: #94a3b8;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding-left: 1rem;
-            margin-left: 0.5rem;
-            border-left: 1px solid rgba(255,255,255,0.1);
-            line-height: 1;
-        }
-
-            .nav-email span {
-                color: var(--electric-blue);
+            body {
+                background: var(--bg-white);
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                color: var(--text-dark);
             }
 
-        .mobile-toggle {
-            display: none;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 30px;
-            padding: 0.2rem 0.6rem;
-            color: white;
-            font-size: 0.9rem;
-            line-height: 1;
-            margin-left: auto; /* En móvil, empuja el botón a la derecha */
-        }
-
-        .main-container {
-            flex: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 1.5rem 2rem;
-        }
-
-        .footer-modern {
-            background: #f8fafc;
-            border-top: 1px solid #e2e8f0;
-            padding: 1rem 0;
-            margin-top: auto;
-        }
-
-        .footer-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-gray);
-            font-size: 0.8rem;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-            .footer-links a {
-                color: var(--text-gray);
-                text-decoration: none;
-            }
-
-                .footer-links a:hover {
-                    color: var(--deep-blue);
-                }
-
-        @@media (max-width: 768px) {
             .floating-header {
-                padding: 0 1rem;
+                position: sticky;
+                top: 15px;
+                z-index: 1000;
+                width: 100%;
+                padding: 0 2rem;
             }
 
             .floating-nav {
-                padding: 0.2rem 1rem;
-                height: 44px;
+                max-width: 1100px;
+                margin: 0 auto;
+                background: var(--deep-blue);
+                border-radius: 50px;
+                padding: 0.2rem 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 10px 25px -8px rgba(11, 36, 71, 0.3);
+                height: 48px;
+                position: relative;
+            }
+
+            .nav-logo {
+                height: 24px;
             }
 
             .nav-brand-center {
-                font-size: 1rem; /* Más pequeño en móvil */
-            }
-
-            .mobile-toggle {
-                display: block;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                color: white;
+                font-size: 1.1rem;
+                font-weight: 600;
+                letter-spacing: 1px;
+                text-transform: uppercase;
             }
 
             .nav-menu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 1rem;
-                right: 1rem;
-                background: var(--deep-blue);
-                border-radius: 20px;
-                padding: 0.8rem;
-                flex-direction: column;
-                gap: 0.8rem;
-                margin-top: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                margin-left: auto;
             }
 
-                .nav-menu.show {
-                    display: flex;
+            .nav-link {
+                color: #94a3b8;
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 500;
+            }
+
+                .nav-link:hover {
+                    color: white;
                 }
 
             .nav-email {
-                border-left: none;
-                border-top: 1px solid rgba(255,255,255,0.1);
-                padding-left: 0;
-                margin-left: 0;
-                padding-top: 0.8rem;
+                color: #94a3b8;
+                font-size: 0.8rem;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding-left: 1rem;
+                margin-left: 0.5rem;
+                border-left: 1px solid rgba(255,255,255,0.1);
+            }
+
+                .nav-email span {
+                    color: var(--electric-blue);
+                }
+
+            .main-container {
+                flex: 1;
+                max-width: 1400px;
+                margin: 0 auto;
                 width: 100%;
-                justify-content: center;
+                padding: 1.5rem 2rem;
+            }
+
+            .footer-modern {
+                background: #f8fafc;
+                border-top: 1px solid #e2e8f0;
+                padding: 1rem 0;
             }
 
             .footer-container {
-                flex-direction: column;
-                gap: 0.5rem;
-                text-align: center;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                color: var(--text-gray);
+                font-size: 0.8rem;
             }
-        }
     </style>
 </head>
+
 <body>
+
     <header class="floating-header">
         <nav class="floating-nav">
-            <img src="~/images/LogoDavid.png" alt="El David" class="nav-logo" />
 
-            <!-- Texto centrado en blanco -->
-            <div class="nav-brand-center">EL DAVID</div>
+            <img src="~/images/LogoDavid.png" class="nav-logo" />
 
-            <button class="mobile-toggle" onclick="toggleMenu()">☰</button>
+            <div class="nav-brand-center">
+                EL DAVID
+            </div>
 
-            <div class="nav-menu" id="navbarMenu">
-                <a class="nav-link" asp-action="Index" asp-controller="Home">Home</a>
-                <a class="nav-link" asp-action="Index" asp-controller="Inventarios">Inventario</a>
-                <a class="nav-link" asp-action="Index" asp-controller="PedidoCliente">Pedidos</a>
+            <div class="nav-menu">
 
+                <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="nav-link" asp-controller="Inventarios" asp-action="Index">Inventario</a>
+                <a class="nav-link" asp-controller="PedidoCliente" asp-action="Index">Pedidos</a>
+
+                <a class="nav-link" href="/Account/Logout">Cerrar sesión</a>
 
                 <div class="nav-email">
-                    <span>✉️</span> Roger@gmail.com
+                    <span>👤</span>
+                    @(user?.Nombre ?? User.Identity?.Name)
                 </div>
+
             </div>
+
         </nav>
     </header>
 
@@ -241,33 +168,16 @@
 
     <footer class="footer-modern">
         <div class="footer-container">
-            <div>© @DateTime.Now.Year · El David</div>
-            <div class="footer-links">
-                <a asp-action="Privacy" asp-controller="Home">Privacidad</a>
-                <a href="#">Términos</a>
-                <span>v1.0</span>
+            <div>© @DateTime.UtcNow.Year · El David</div>
+            <div>
+                <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
             </div>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <script>
-        function toggleMenu() {
-            document.getElementById('navbarMenu').classList.toggle('show');
-        }
-
-        document.addEventListener('click', (e) => {
-            const menu = document.getElementById('navbarMenu');
-            const toggle = document.querySelector('.mobile-toggle');
-            if (!menu.contains(e.target) && !toggle.contains(e.target)) {
-                menu.classList.remove('show');
-            }
-        });
-    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

@@ -32,6 +32,7 @@ wwwroot\images\inventarios\acacfde0-e0ff-4bc7-a8d7-ead6b4279b8a.webp
 wwwroot\images\inventarios\ad899d51-4122-4f24-9f14-fcdeea39cbc2.webp
 wwwroot\images\inventarios\b0ee7de5-2901-47ae-8e48-7c454224761c.jpg
 wwwroot\images\inventarios\b5fb59a8-4172-43eb-aa47-a763bb6c5c14.png
+wwwroot\images\inventarios\cb9c3a81-b786-4b2e-b21a-b33afeb63456.png
 wwwroot\images\inventarios\d20a0539-f14f-49f7-b771-16de147418ca.jpg
 wwwroot\images\inventarios\d3225179-2ce2-4b09-9cb3-b7ea2969dd07.png
 wwwroot\images\inventarios\d98be7ea-8403-4a2c-abbb-3f308e5aecee.jpg

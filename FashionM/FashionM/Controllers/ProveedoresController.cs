@@ -1,5 +1,6 @@
 ﻿using FashionM.Data;
 using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin,Secretaria")]
     public class ProveedoresController : Controller
     {
         private readonly AppDbContext _context;

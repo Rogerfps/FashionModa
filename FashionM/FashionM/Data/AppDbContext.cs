@@ -1,9 +1,10 @@
 ﻿using FashionM.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace FashionM.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -27,6 +28,10 @@ namespace FashionM.Data
         public DbSet<PedidoProveedor> PedidosProveedor { get; set; }
 
         public DbSet<PedidoProveedorDetalle> PedidosProveedorDetalle { get; set; }
+
+        public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
+
+        public DbSet<MovimientoDetalle> MovimientosDetalle { get; set; }
 
 
 
@@ -96,7 +101,15 @@ namespace FashionM.Data
                 .HasPrincipalKey(p => p.Cedula)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<MovimientoInventario>()
+                .HasOne(m => m.Inventario)
+                .WithMany()
+                .HasForeignKey(m => m.InventarioCodigo);
 
+            modelBuilder.Entity<MovimientoDetalle>()
+                .HasOne(d => d.MovimientoInventario)
+                .WithMany(m => m.Detalles)
+                .HasForeignKey(d => d.MovimientoInventarioId);
         }
-}
+    }
 }

@@ -1,0 +1,132 @@
+﻿@model MovimientoInventario
+
+@{
+    ViewData["Title"] = "Detalle del Movimiento";
+}
+
+<div class="container mt-4">
+
+    <h2>📦 Detalle del Movimiento</h2>
+
+    <div class="card mt-3">
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-3">
+                    <strong>Fecha</strong><br />
+                    @Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Tipo</strong><br />
+
+                    @if (Model.Tipo == "Entrada")
+                    {
+                        <span class="badge bg-success">Entrada</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Salida</span>
+                    }
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Código</strong><br />
+                    @Model.InventarioCodigo
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Marca</strong><br />
+                    @Model.Inventario?.Marca
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-3">
+                    <strong>Color</strong><br />
+                    @Model.Inventario?.Color
+                </div>
+
+                <div class="col-md-9">
+                    <strong>Detalle</strong><br />
+                    @Model.Detalle
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TALLAS -->
+
+    <h4 class="mt-4">Numeración Movida</h4>
+
+    <table class="table table-bordered text-center">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Talla</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var d in Model.Detalles.Where(x => x.Cantidad > 0))
+            {
+                <tr>
+
+                    <td>@d.Numero</td>
+
+                    <td>
+
+                        @if (Model.Tipo == "Entrada")
+                        {
+                            <span class="text-success fw-bold">
+                                +@d.Cantidad
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-danger fw-bold">
+                                -@d.Cantidad
+                            </span>
+                        }
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+        <tfoot>
+            <tr>
+
+                <th>Total</th>
+
+                <th>
+                    @Model.Detalles.Sum(x => x.Cantidad)
+                </th>
+
+            </tr>
+        </tfoot>
+
+    </table>
+
+
+    <div class="mt-3">
+
+        <a asp-action="Index" class="btn btn-secondary">
+            ← Volver
+        </a>
+
+    </div>
+
+</div>

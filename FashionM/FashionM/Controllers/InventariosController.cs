@@ -1,11 +1,13 @@
 ﻿using FashionM.Data;
 using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin,Secretaria,Bodega")]
     public class InventariosController : Controller
     {
         private readonly AppDbContext _context;

@@ -9,8 +9,10 @@
       "FashionM/1.0.0": {
         "dependencies": {
           "ClosedXML": "0.105.0",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.3",
+          "Microsoft.AspNetCore.Identity.UI": "10.0.3",
           "Microsoft.EntityFrameworkCore": "10.0.3",
-          "Microsoft.EntityFrameworkCore.Tools": "10.0.3",
+          "Microsoft.EntityFrameworkCore.Design": "10.0.3",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
         },
         "runtime": {
@@ -75,6 +77,25 @@
           "lib/net6.0/Humanizer.dll": {
             "assemblyVersion": "2.14.0.0",
             "fileVersion": "2.14.1.48190"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.3": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.3"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {
+            "assemblyVersion": "10.0.3.0",
+            "fileVersion": "10.0.326.7603"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Identity.UI/10.0.3": {
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.UI.dll": {
+            "assemblyVersion": "10.0.3.0",
+            "fileVersion": "10.0.326.7603"
           }
         }
       },
@@ -407,11 +428,6 @@
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Tools/10.0.3": {
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Design": "10.0.3"
-        }
-      },
       "Microsoft.Extensions.DependencyModel/10.0.3": {
         "runtime": {
           "lib/net10.0/Microsoft.Extensions.DependencyModel.dll": {
@@ -610,6 +626,20 @@
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
     },
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6SEGWi35DZ9syBqCT8v5vEkm9tWUayWxVkHWLwW2FdyXSwS0zzEpIzGPLVQGeug3VU8d+hK/PFxFwwZnblv/zA==",
+      "path": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.3",
+      "hashPath": "microsoft.aspnetcore.identity.entityframeworkcore.10.0.3.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Identity.UI/10.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xhxrP7QcUuyA2FcZsbvdHSqTauPseNrXzhFUYaRj+Elz1nxJceKbW+COc1P9QbpKeZDh9aTDSldHbz3AnMWOqg==",
+      "path": "microsoft.aspnetcore.identity.ui/10.0.3",
+      "hashPath": "microsoft.aspnetcore.identity.ui.10.0.3.nupkg.sha512"
+    },
     "Microsoft.Build.Framework/18.0.2": {
       "type": "package",
       "serviceable": true,
@@ -679,13 +709,6 @@
       "sha512": "sha512-Pmh60OK9neVr/M0FJwm9hlzm2bD4Kd65SID8E6SP5c90tExNgXwORrlEWl0oGU/ig9ifpNN4PSpIrnHNozlT5w==",
       "path": "microsoft.entityframeworkcore.relational/10.0.3",
       "hashPath": "microsoft.entityframeworkcore.relational.10.0.3.nupkg.sha512"
-    },
-    "Microsoft.EntityFrameworkCore.Tools/10.0.3": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-m6DcnrjYfYwNrxcLjchzehd7kLEVGo33Vq83O2y6GXtEgAL0JdBTWtqZzGuRa/8YFcrEUxfYlsSpu4w1SdYcAg==",
-      "path": "microsoft.entityframeworkcore.tools/10.0.3",
-      "hashPath": "microsoft.entityframeworkcore.tools.10.0.3.nupkg.sha512"
     },
     "Microsoft.Extensions.DependencyModel/10.0.3": {
       "type": "package",

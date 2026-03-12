@@ -175,7 +175,9 @@
         </form>
     }
 
-    @if (Model.EstadoCredito == EstadoCredito.Pendiente || Model.EstadoCredito == EstadoCredito.Retenido)
+    @if (User.IsInRole("Admin") &&
+        (Model.EstadoCredito == EstadoCredito.Pendiente ||
+         Model.EstadoCredito == EstadoCredito.Retenido))
     {
         <form asp-action="AprobarCredito" asp-route-id="@Model.Id" method="post" style="display:inline">
             <button class="btn btn-success">Aprobar Crédito</button>

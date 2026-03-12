@@ -1,0 +1,113 @@
+﻿@model MovimientoInventario
+
+@{
+    ViewData["Title"] = "Nuevo Movimiento";
+}
+
+@{
+    var tallas = new List<string> { "A", "B" };
+
+    for (int i = 15; i <= 45; i++)
+    {
+        tallas.Add(i.ToString());
+    }
+}
+
+<div class="container mt-4">
+
+    <h2>📦 Registrar Movimiento</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div class="row mb-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Producto</label>
+                <select asp-for="InventarioCodigo" class="form-control">
+
+                    <option value="">-- Seleccionar --</option>
+
+                    @foreach (var p in ViewBag.Inventarios)
+                    {
+                        <option value="@p.Codigo">
+                            @p.Marca - @p.Color (@p.Codigo)
+                        </option>
+                    }
+
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Tipo</label>
+                <select asp-for="Tipo" class="form-control">
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label class="form-label">Detalle</label>
+                <input asp-for="Detalle" class="form-control" placeholder="Ej: Compra proveedor / Venta cliente">
+                </div>
+
+            </div>
+
+
+            <!-- TABLA DE TALLAS -->
+
+            <h5 class="mt-4">Numeración</h5>
+
+            <table class="table table-bordered">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:150px">Talla</th>
+                        <th style="width:200px">Cantidad</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @for (int i = 0; i < tallas.Count; i++)
+                    {
+                        <tr>
+
+                            <td>
+                                <strong>@tallas[i]</strong>
+
+                                <input type="hidden"
+                                       name="Detalles[@i].Numero"
+                                       value="@tallas[i]" />
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       name="Detalles[@i].Cantidad"
+                                       class="form-control"
+                                       min="0"
+                                       value="0" />
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+
+            <div class="mt-3">
+
+                <button type="submit" class="btn btn-success">
+                    Guardar Movimiento
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>

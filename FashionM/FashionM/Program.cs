@@ -1,6 +1,10 @@
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using FashionM.Models;
+using Microsoft.AspNetCore.Identity;
+using FashionM.Controllers;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +18,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.LoginPath = "/Account/Login";
+});
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await AccountController.CrearRoles(services);
+}
 
 if (!app.Environment.IsDevelopment())
 {
@@ -27,9 +48,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();   // 👈 necesario para login
 app.UseAuthorization();
 
-// Ruta MVC por defecto
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
