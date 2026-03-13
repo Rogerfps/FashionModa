@@ -33,7 +33,7 @@
     }
 
     .logo-img {
-        height: 80px;
+        height: 200px;
         width: auto;
         border-radius: 16px;
         box-shadow: 0 10px 25px -8px rgba(11, 36, 71, 0.2);
@@ -182,13 +182,6 @@
 
         <!-- Módulos en grid -->
         <div class="modules-grid">
-            <a asp-controller="Inventarios" asp-action="Index" class="module-card">
-                <div class="module-icon">📦</div>
-                <div class="module-content">
-                    <div class="module-title">Inventario</div>
-                    <div class="module-desc">Gestion de inventarios</div>
-                </div>
-            </a>
 
             <a asp-controller="Clientes" asp-action="Index" class="module-card">
                 <div class="module-icon">👥</div>
@@ -206,6 +199,22 @@
                 </div>
             </a>
 
+            <a asp-controller="Inventarios" asp-action="Index" class="module-card">
+                <div class="module-icon">📦</div>
+                <div class="module-content">
+                    <div class="module-title">Inventario</div>
+                    <div class="module-desc">Gestion de inventarios</div>
+                </div>
+            </a>
+
+            <a asp-controller="MovimientosInventario" asp-action="Index" class="module-card">
+                <div class="module-icon">📦</div>
+                <div class="module-content">
+                    <div class="module-title">MovimientoInventario</div>
+                    <div class="module-desc">Gestion de inventarios</div>
+                </div>
+            </a>
+
             <a asp-controller="PedidoCliente" asp-action="Index" class="module-card">
                 <div class="module-icon">📋</div>
                 <div class="module-content">
@@ -219,14 +228,6 @@
                 <div class="module-content">
                     <div class="module-title">PedidosProveedor</div>
                     <div class="module-desc">Paso 0 y Paso 1</div>
-                </div>
-            </a>
-
-            <a asp-controller="MovimientosInventario" asp-action="Index" class="module-card">
-                <div class="module-icon">📦</div>
-                <div class="module-content">
-                    <div class="module-title">MovimientoInventario</div>
-                    <div class="module-desc">Gestion de inventarios</div>
                 </div>
             </a>
 

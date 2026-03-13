@@ -73,6 +73,7 @@
             <th>Cliente</th>
             <th>Transporte</th>
             <th>Total</th>
+            <th>Aprobacion</th/>
             <th>Crédito</th>
             <th>Bodega</th>
             <th style="width:260px">Acciones</th>
@@ -101,6 +102,18 @@
                     </td>
                     <td>@item.Cliente.Transporte</td>
                     <td>₡ @item.Total.ToString("N2")</td>
+
+                    <!-- SECRETARIA -->
+                    <td>
+                        @if (item.AprobadoSecretaria)
+                        {
+                            <span class="badge bg-success">Aprobado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pendiente</span>
+                        }
+                    </td>
 
                     <!-- CRÉDITO -->
                     <td>
@@ -147,39 +160,7 @@
                             Editar
                         </a>
 
-                        @if (item.EstadoCredito == EstadoCredito.Pendiente || item.EstadoCredito == EstadoCredito.Retenido)
-                        {
-                            <form asp-action="AprobarCredito"
-                                  asp-route-id="@item.Id"
-                                  method="post"
-                                  class="d-inline">
-                                <button class="btn btn-sm btn-success">Aprobar</button>
-                            </form>
-
-                            <form asp-action="RechazarCredito"
-                                  asp-route-id="@item.Id"
-                                  method="post"
-                                  class="d-inline">
-                                <button class="btn btn-sm btn-danger">Rechazar</button>
-                            </form>
-
-                            <form asp-action="RetenerCredito"
-                                  asp-route-id="@item.Id"
-                                  method="post"
-                                  class="d-inline">
-                                <button class="btn btn-sm btn-warning">Retener</button>
-                            </form>
-                        }
-
-                        @if (item.EstadoCredito == EstadoCredito.Aprobado && !item.FirmaBodega)
-                        {
-                            <form asp-action="FirmarBodega"
-                                  asp-route-id="@item.Id"
-                                  method="post"
-                                  class="d-inline">
-                                <button class="btn btn-sm btn-primary">Bodega</button>
-                            </form>
-                        }
+                        
 
                         <a asp-action="Delete"
                            asp-route-id="@item.Id"

@@ -1,0 +1,111 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --bg-white: #ffffff;
+    --text-dark: #1e293b;
+    --text-gray: #64748b;
+}
+
+body {
+    background: var(--bg-white);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-dark);
+}
+
+.floating-header {
+    position: sticky;
+    top: 15px;
+    z-index: 1000;
+    width: 100%;
+    padding: 0 2rem;
+}
+
+.floating-nav {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--deep-blue);
+    border-radius: 50px;
+    padding: 0.2rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px -8px rgba(11, 36, 71, 0.3);
+    height: 48px;
+    position: relative;
+}
+
+.nav-logo {
+    height: 24px;
+}
+
+.nav-brand-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: auto;
+}
+
+.nav-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .nav-link:hover {
+        color: white;
+    }
+
+.nav-email {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 1rem;
+    margin-left: 0.5rem;
+    border-left: 1px solid rgba(255,255,255,0.1);
+}
+
+    .nav-email span {
+        color: var(--electric-blue);
+    }
+
+.main-container {
+    flex: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 1.5rem 2rem;
+}
+
+.footer-modern {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 0;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-gray);
+    font-size: 0.8rem;
+}
