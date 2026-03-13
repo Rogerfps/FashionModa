@@ -6,7 +6,6 @@
 
 <link rel="stylesheet" href="~/css/Inventario/InventarioEdit.css" />
 
-<!-- HEADER -->
 <div class="neo-header">
     <div class="container d-flex justify-content-between align-items-center px-3">
         <h1 class="title-glow">✏️ Editar Inventario</h1>
@@ -16,19 +15,17 @@
 
 <div class="container px-3" style="max-width: 1000px;">
     <div class="form-card">
+
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
             @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger"></div>
 
             <input type="hidden" asp-for="Codigo" />
 
             <label>Marca</label>
             <input asp-for="Marca" class="form-control mb-2" />
-
-            <label>Color</label>
-            <input asp-for="Color" class="form-control mb-2" />
-
-            <label>Detalle</label>
-            <textarea asp-for="Detalle" class="form-control mb-2"></textarea>
 
             <label>SKU</label>
             <input asp-for="SKU" class="form-control mb-2" />
@@ -53,77 +50,147 @@
                 </div>
             </div>
 
-            <h4>Tallas</h4>
+            <hr />
 
-            <table class="table" id="tablaTallas">
+            <h4>Variantes</h4>
+
+            <table class="table table-bordered" id="tablaTallas">
+
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>Detalle</th>
+                        <th>Talla</th>
+                        <th>Cantidad</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
                 <tbody>
+
                     @for (int i = 0; i < Model.Tallas.Count; i++)
                     {
                         <tr>
+
+                            <td>
+                                <input type="hidden" name="Tallas[@i].Id" value="@Model.Tallas[i].Id" />
+
+                                <input name="Tallas[@i].Color"
+                                       value="@Model.Tallas[i].Color"
+                                       class="form-control" />
+                            </td>
+
+                            <td>
+                                <input name="Tallas[@i].Detalle"
+                                       value="@Model.Tallas[i].Detalle"
+                                       class="form-control" />
+                            </td>
+
                             <td>
                                 <input name="Tallas[@i].Numero"
                                        value="@Model.Tallas[i].Numero"
                                        class="form-control" />
                             </td>
+
                             <td>
                                 <input name="Tallas[@i].Cantidad"
                                        value="@Model.Tallas[i].Cantidad"
                                        type="number"
                                        class="form-control" />
                             </td>
+
                             <td>
                                 <button type="button"
                                         class="btn btn-danger"
-                                        onclick="this.closest('tr').remove()">
+                                        onclick="removeRow(this)">
                                     X
                                 </button>
                             </td>
+
                         </tr>
                     }
+
                 </tbody>
+
             </table>
 
-            <button type="button" class="btn btn-secondary"
+            <button type="button"
+                    class="btn btn-secondary mb-3"
                     onclick="addRow()">
-                ➕ Talla
+                ➕ Nueva Variante
             </button>
 
             <hr />
 
             <label>Agregar fotos</label>
-            <input type="file" name="nuevasFotos" multiple class="form-control mb-3" />
+            <input type="file"
+                   name="nuevasFotos"
+                   multiple
+                   class="form-control mb-3" />
 
             <button class="btn btn-success">Guardar</button>
             <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
         </form>
+
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        function addRow() {
-            let i = document.querySelectorAll("#tablaTallas tbody tr").length;
 
-            document.querySelector("#tablaTallas tbody").insertAdjacentHTML("beforeend",
-                `<tr>
-                    <td>
-                        <input name="Tallas[${i}].Numero"
-                               class="form-control"
-                               placeholder="Ej: 38, 39, 40, S, M"/>
-                    </td>
-                    <td>
-                        <input name="Tallas[${i}].Cantidad"
-                               type="number"
-                               class="form-control"/>
-                    </td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-danger"
-                                onclick="this.closest('tr').remove()">
-                            X
-                        </button>
-                    </td>
-                </tr>`);
+    <script>
+
+        function addRow(){
+
+        let table = document.querySelector("#tablaTallas tbody");
+        let i = table.rows.length;
+
+        table.insertAdjacentHTML("beforeend",
+
+        `<tr>
+
+        <td>
+        <input name="Tallas[${i}].Color"
+        class="form-control"/>
+        </td>
+
+        <td>
+        <input name="Tallas[${i}].Detalle"
+        class="form-control"/>
+        </td>
+
+        <td>
+        <input name="Tallas[${i}].Numero"
+        class="form-control"/>
+        </td>
+
+        <td>
+        <input name="Tallas[${i}].Cantidad"
+        type="number"
+        value="0"
+        class="form-control"/>
+        </td>
+
+        <td>
+        <button type="button"
+        class="btn btn-danger"
+        onclick="removeRow(this)">
+        X
+        </button>
+        </td>
+
+        </tr>`
+
+        );
+
         }
+
+        function removeRow(btn){
+
+        btn.closest("tr").remove();
+
+        }
+
     </script>
+
 }

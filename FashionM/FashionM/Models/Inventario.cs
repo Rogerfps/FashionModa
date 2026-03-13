@@ -11,8 +11,6 @@ namespace FashionM.Models
         public string Empresa { get; set; } = string.Empty;
 
         public string Marca { get; set; } = string.Empty;
-        public string Color { get; set; } = string.Empty;
-        public string Detalle { get; set; } = string.Empty;
         public string SKU { get; set; } = string.Empty;
         public string CodigoCabys { get; set; } = string.Empty;
 

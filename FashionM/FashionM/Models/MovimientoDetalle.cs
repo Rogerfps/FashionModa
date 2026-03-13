@@ -9,6 +9,10 @@
 
         public string Numero { get; set; } = string.Empty;
 
+        public string? Color { get; set; }
+
+        public string? Detalle { get; set; }
+
         public int Cantidad { get; set; }
 
         public MovimientoInventario? MovimientoInventario { get; set; }

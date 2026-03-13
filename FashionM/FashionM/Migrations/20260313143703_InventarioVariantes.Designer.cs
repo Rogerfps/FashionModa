@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313143703_InventarioVariantes")]
+    partial class InventarioVariantes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,6 +223,14 @@ namespace FashionM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnType("text");
@@ -253,12 +264,6 @@ namespace FashionM.Migrations
 
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Color")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Detalle")
-                        .HasColumnType("text");
 
                     b.Property<int>("MovimientoInventarioId")
                         .HasColumnType("integer");
@@ -549,6 +554,7 @@ namespace FashionM.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Detalle")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("InventarioCodigo")

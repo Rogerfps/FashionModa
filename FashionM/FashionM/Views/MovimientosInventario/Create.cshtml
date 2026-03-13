@@ -23,6 +23,7 @@
 
             <div class="col-md-4">
                 <label class="form-label">Producto</label>
+
                 <select asp-for="InventarioCodigo" class="form-control">
 
                     <option value="">-- Seleccionar --</option>
@@ -30,7 +31,7 @@
                     @foreach (var p in ViewBag.Inventarios)
                     {
                         <option value="@p.Codigo">
-                            @p.Marca - @p.Color (@p.Codigo)
+                            @p.Marca (@p.Codigo)
                         </option>
                     }
 
@@ -39,6 +40,7 @@
 
             <div class="col-md-3">
                 <label class="form-label">Tipo</label>
+
                 <select asp-for="Tipo" class="form-control">
                     <option value="Entrada">Entrada</option>
                     <option value="Salida">Salida</option>
@@ -46,8 +48,28 @@
             </div>
 
             <div class="col-md-5">
-                <label class="form-label">Detalle</label>
-                <input asp-for="Detalle" class="form-control" placeholder="Ej: Compra proveedor / Venta cliente">
+                <label class="form-label">Detalle Movimiento</label>
+
+                <input asp-for="Detalle"
+                       class="form-control"
+                       placeholder="Ej: Compra proveedor / Venta cliente">
+                </div>
+
+            </div>
+
+
+            <!-- COLOR Y DETALLE DEL PRODUCTO -->
+
+            <div class="row mb-4">
+
+                <div class="col-md-4">
+                    <label class="form-label">Color</label>
+                    <input id="colorInput" class="form-control" placeholder="Ej: Negro">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Detalle</label>
+                    <input id="detalleInput" class="form-control" placeholder="Ej: Cuero">
                 </div>
 
             </div>
@@ -78,14 +100,25 @@
                                 <input type="hidden"
                                        name="Detalles[@i].Numero"
                                        value="@tallas[i]" />
+
+                                <input type="hidden"
+                                       name="Detalles[@i].Color"
+                                       class="colorHidden" />
+
+                                <input type="hidden"
+                                       name="Detalles[@i].Detalle"
+                                       class="detalleHidden" />
+
                             </td>
 
                             <td>
+
                                 <input type="number"
                                        name="Detalles[@i].Cantidad"
                                        class="form-control"
                                        min="0"
                                        value="0" />
+
                             </td>
 
                         </tr>
@@ -111,3 +144,18 @@
         </form>
 
     </div>
+
+
+    <script>
+
+        document.querySelector("form").addEventListener("submit", function () {
+
+            const color = document.getElementById("colorInput").value;
+            const detalle = document.getElementById("detalleInput").value;
+
+            document.querySelectorAll(".colorHidden").forEach(e => e.value = color);
+            document.querySelectorAll(".detalleHidden").forEach(e => e.value = detalle);
+
+        });
+
+    </script>

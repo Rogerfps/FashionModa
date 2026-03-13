@@ -10,7 +10,11 @@ namespace FashionM.Models
     {
         public int Id { get; set; }
 
-        public string Numero { get; set; }
+        public string Color { get; set; } = string.Empty;
+
+        public string? Detalle { get; set; }
+
+        public string Numero { get; set; } = string.Empty;
 
         public int Cantidad { get; set; }
 

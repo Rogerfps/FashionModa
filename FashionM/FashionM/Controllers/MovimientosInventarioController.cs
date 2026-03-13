@@ -1,11 +1,13 @@
 ﻿using FashionM.Data;
 using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin,Secretaria,Bodega")]
     public class MovimientosInventarioController : Controller
     {
         private readonly AppDbContext _context;
@@ -72,23 +74,49 @@ namespace FashionM.Controllers
             if (inventario == null)
                 return NotFound();
 
-            foreach (var detalle in movimiento.Detalles)
+            // validar que exista al menos una cantidad
+            if (!movimiento.Detalles.Any(d => d.Cantidad > 0))
+            {
+                ModelState.AddModelError("", "Debe ingresar al menos una cantidad.");
+                ViewBag.Inventarios = _context.Inventarios.ToList();
+                return View(movimiento);
+            }
+
+            foreach (var detalle in movimiento.Detalles.Where(d => d.Cantidad > 0))
             {
                 var talla = inventario.Tallas
-                    .FirstOrDefault(t => t.Numero == detalle.Numero);
+                    .FirstOrDefault(t =>
+                        t.Numero == detalle.Numero &&
+                        t.Color == detalle.Color &&
+                        t.Detalle == detalle.Detalle
+                    );
 
+                // si la variante no existe
                 if (talla == null)
                 {
+                    if (movimiento.Tipo == "Salida")
+                    {
+                        ModelState.AddModelError("",
+                            $"La variante no existe: {detalle.Color} {detalle.Detalle} talla {detalle.Numero}");
+
+                        ViewBag.Inventarios = _context.Inventarios.ToList();
+                        return View(movimiento);
+                    }
+
+                    // crear nueva variante para entradas
                     talla = new TallaInventario
                     {
+                        InventarioCodigo = inventario.Codigo,
+                        Color = detalle.Color,
+                        Detalle = detalle.Detalle,
                         Numero = detalle.Numero,
-                        Cantidad = 0,
-                        InventarioCodigo = inventario.Codigo
+                        Cantidad = 0
                     };
 
                     inventario.Tallas.Add(talla);
                 }
 
+                // aplicar movimiento
                 if (movimiento.Tipo == "Entrada")
                 {
                     talla.Cantidad += detalle.Cantidad;
@@ -97,7 +125,9 @@ namespace FashionM.Controllers
                 {
                     if (talla.Cantidad < detalle.Cantidad)
                     {
-                        ModelState.AddModelError("", $"Stock insuficiente en talla {detalle.Numero}");
+                        ModelState.AddModelError("",
+                            $"Stock insuficiente en {detalle.Color} {detalle.Detalle} talla {detalle.Numero}");
+
                         ViewBag.Inventarios = _context.Inventarios.ToList();
                         return View(movimiento);
                     }

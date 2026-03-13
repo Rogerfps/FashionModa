@@ -36,7 +36,8 @@ namespace FashionM.Controllers
                     i.Codigo.Contains(search) ||
                     i.Marca.Contains(search) ||
                     i.SKU.Contains(search) ||
-                    i.Color.Contains(search)
+                    i.Tallas.Any(t => t.Color.Contains(search)) ||
+                    i.Tallas.Any(t => t.Detalle.Contains(search))
                 );
             }
 
@@ -103,6 +104,10 @@ namespace FashionM.Controllers
             foreach (var talla in inventario.Tallas)
             {
                 talla.InventarioCodigo = inventario.Codigo;
+
+                // seguridad por si vienen null
+                talla.Color ??= "";
+                talla.Detalle ??= "";
             }
 
             // guardar imagenes
@@ -170,6 +175,7 @@ namespace FashionM.Controllers
         }
 
         // EDIT GET
+        // EDIT GET
         public async Task<IActionResult> Edit(string id)
         {
             var inventario = await _context.Inventarios
@@ -183,11 +189,12 @@ namespace FashionM.Controllers
             return View(inventario);
         }
 
-        // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Inventario model, List<IFormFile> nuevasFotos)
         {
+            ModelState.Remove("Tallas");
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -197,8 +204,6 @@ namespace FashionM.Controllers
                 .FirstAsync(i => i.Codigo == model.Codigo);
 
             inventario.Marca = model.Marca;
-            inventario.Color = model.Color;
-            inventario.Detalle = model.Detalle;
             inventario.SKU = model.SKU;
             inventario.CodigoCabys = model.CodigoCabys;
             inventario.PrecioCosto = model.PrecioCosto;
@@ -215,7 +220,9 @@ namespace FashionM.Controllers
                 {
                     InventarioCodigo = inventario.Codigo,
                     Numero = talla.Numero,
-                    Cantidad = talla.Cantidad
+                    Cantidad = talla.Cantidad,
+                    Color = talla.Color,
+                    Detalle = talla.Detalle ?? ""
                 });
             }
 
@@ -259,6 +266,35 @@ namespace FashionM.Controllers
                 return NotFound();
 
             return View(inventario);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStock(string Codigo, List<TallaInventario> Tallas)
+        {
+            foreach (var t in Tallas)
+            {
+                if (t.Id == 0)
+                {
+                    t.InventarioCodigo = Codigo;
+                    _context.TallasInventario.Add(t);
+                }
+                else
+                {
+                    var tallaDb = await _context.TallasInventario.FindAsync(t.Id);
+
+                    if (tallaDb != null)
+                    {
+                        tallaDb.Color = t.Color;
+                        tallaDb.Detalle = t.Detalle;
+                        tallaDb.Numero = t.Numero;
+                        tallaDb.Cantidad = t.Cantidad;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = Codigo });
         }
 
         // DELETE FOTO
