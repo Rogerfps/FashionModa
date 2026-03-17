@@ -1,0 +1,139 @@
+﻿@model Proforma
+
+@{
+    ViewData["Title"] = "Agregar Productos";
+}
+
+<link rel="stylesheet" href="~/css/Proforma/ProformaAgregar.css" />
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>🛒</span> Agregar Productos a Proforma #@Model.Id
+        </h1>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <span>←</span> Ver Detalle
+        </a>
+    </div>
+
+    <!-- Información de la proforma -->
+    <div class="info-card">
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Empresa</div>
+                <div class="info-value">@Model.Empresa?.Nombre</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Cliente</div>
+                <div class="info-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Fecha</div>
+                <div class="info-value">@Model.Fecha.ToString("dd/MM/yyyy")</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario para agregar producto -->
+    <div class="form-card">
+        <div class="section-title">
+            <span>➕</span> Agregar Nuevo Producto
+        </div>
+
+        <form asp-action="AgregarProducto" method="post">
+            <input type="hidden" name="proformaId" value="@Model.Id" />
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Producto</label>
+                    <select name="codigo" class="form-select" required>
+                        <option value="">Seleccione</option>
+                        @foreach (var item in ViewBag.Productos)
+                        {
+                            <option value="@item.Codigo">
+                                @item.Codigo
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Color</label>
+                    <input type="text" name="color" class="form-control" required placeholder="Ej: Negro" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Talla</label>
+                    <input type="text" name="talla" class="form-control" required placeholder="Ej: 38" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" name="cantidad" class="form-control" required min="1" placeholder="1" />
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn-add">
+                        ➕ Agregar a la Proforma
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Mensajes de error -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-modern">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Tabla de productos -->
+    <div class="table-wrapper">
+        <div class="section-title" style="margin-bottom: 1rem;">
+            <span>📋</span> Productos en la Proforma
+        </div>
+
+        <div class="table-responsive">
+            <table class="productos-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Color</th>
+                        <th>Talla</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-right">Precio</th>
+                        <th class="text-right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Detalles)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.InventarioCodigo</td>
+                            <td>@item.Color</td>
+                            <td>@item.Talla</td>
+                            <td class="text-center">@item.Cantidad</td>
+                            <td class="text-right">₡ @item.PrecioUnitario.ToString("N2")</td>
+                            <td class="text-right fw-bold" style="color: var(--deep-blue);">₡ @item.SubTotal.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="total-footer">
+            <span class="total-label">Total:</span>
+            <span class="total-value">₡ @Model.Total.ToString("N2")</span>
+        </div>
+    </div>
+
+    <!-- Botón volver -->
+    <div class="action-bar">
+        <a asp-action="Index" class="btn-back-modern">
+            ← Volver a Proformas
+        </a>
+    </div>
+</div>

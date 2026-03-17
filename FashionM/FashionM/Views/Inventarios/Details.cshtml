@@ -1,192 +1,176 @@
 ﻿@model Inventario
 
 @{
-var tallas = Model.Tallas
-.Select(t => t.Numero)
-.Distinct()
-.OrderBy(t => t)
-.ToList();
+    ViewData["Title"] = "Detalle del Producto";
+    
+    var tallas = Model.Tallas
+        .Select(t => t.Numero)
+        .Distinct()
+        .OrderBy(t => t)
+        .ToList();
 
-var grupos = Model.Tallas
-.GroupBy(t => new { t.Color, t.Detalle })
-.ToList();
+    var grupos = Model.Tallas
+        .GroupBy(t => new { t.Color, t.Detalle })
+        .ToList();
 }
 
-<h2 class="mb-4">Detalle del Producto</h2>
+<link rel="stylesheet" href="~/css/Inventario/InventarioDetails.css" />
 
-<!-- =========================
-     DATOS DEL PRODUCTO
-========================== -->
-<div class="card mb-4">
-    <div class="card-body">
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>👟</span> Detalle del Producto
+    </h1>
+    <a asp-action="Index" class="back-link">
+        <span>←</span> Volver
+    </a>
+</div>
 
-        <dl class="row">
+<!-- Card principal - Datos del Producto -->
+<div class="detail-card">
+    <div class="section-title">
+        <span>📋</span> Información del Producto
+    </div>
 
-            <dt class="col-sm-3">Código</dt>
-            <dd class="col-sm-9">@Model.Codigo</dd>
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">Código</span>
+            <span class="info-value">@Model.Codigo</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Marca</span>
+            <span class="info-value">@Model.Marca</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">SKU</span>
+            <span class="info-value">@Model.SKU</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Empresa</span>
+            <span class="info-value"><span class="empresa-badge">@Model.Empresa</span></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">CABYS</span>
+            <span class="info-value">@Model.CodigoCabys</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Costo</span>
+            <span class="info-value">₡@Model.PrecioCosto.ToString("N0")</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Venta</span>
+            <span class="info-value" style="color: var(--success);">₡@Model.PrecioVenta.ToString("N0")</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Stock Total</span>
+            <span class="info-value total">@Model.StockTotal unidades</span>
+        </div>
+    </div>
 
-            <dt class="col-sm-3">Marca</dt>
-            <dd class="col-sm-9">@Model.Marca</dd>
-
-            <dt class="col-sm-3">SKU</dt>
-            <dd class="col-sm-9">@Model.SKU</dd>
-
-            <dt class="col-sm-3">Empresa</dt>
-            <dd class="col-sm-9">@Model.Empresa</dd>
-
-            <dt class="col-sm-3">CABYS</dt>
-            <dd class="col-sm-9">@Model.CodigoCabys</dd>
-
-            <dt class="col-sm-3">Costo</dt>
-            <dd class="col-sm-9">₡@Model.PrecioCosto.ToString("N0")</dd>
-
-            <dt class="col-sm-3">Venta</dt>
-            <dd class="col-sm-9">₡@Model.PrecioVenta.ToString("N0")</dd>
-
-            <dt class="col-sm-3">Stock Total</dt>
-            <dd class="col-sm-9">@Model.StockTotal</dd>
-
-        </dl>
-
-        <a asp-action="Edit" asp-route-id="@Model.Codigo" class="btn btn-warning">
-            Editar
+    <div class="action-buttons">
+        <a asp-action="Edit" asp-route-id="@Model.Codigo" class="btn-edit">
+            <span>✏️</span> Editar Producto
         </a>
-
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            Volver
+        <a asp-action="Index" class="btn-back">
+            <span>←</span> Volver
         </a>
-
     </div>
 </div>
 
-
-<!-- =========================
-     VARIANTES DEL PRODUCTO
-========================== -->
-<div class="card">
-
-    <div class="card-header d-flex justify-content-between align-items-center">
-
-        <strong>Variantes del Producto</strong>
-
-        <a asp-action="Edit"
-               asp-route-id="@Model.Codigo"
-               class="btn btn-sm btn-primary">
-            + Nueva Variante
+<!-- Card - Variantes del Producto -->
+<div class="detail-card">
+    <div class="card-header-custom">
+        <div class="card-header-title">
+            <span>🎨</span> Variantes del Producto
+        </div>
+        <a asp-action="Edit" asp-route-id="@Model.Codigo" class="btn-primary-small">
+            <span>➕</span> Nueva Variante
         </a>
-
     </div>
 
-    <div class="card-body">
-
-        @if (Model.Tallas != null && Model.Tallas.Any())
-        {
-
-            <table class="table table-bordered align-middle">
-
+    @if (Model.Tallas != null && Model.Tallas.Any())
+    {
+        <div class="table-wrapper">
+            <table class="variantes-table">
                 <thead>
                     <tr>
                         <th>Color</th>
                         <th>Detalle</th>
-
                         @foreach (var talla in tallas)
                         {
                             <th class="text-center">@talla</th>
                         }
-
                         <th>Total</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     @foreach (var g in grupos)
                     {
                         <tr>
-
-                            <td>@g.Key.Color</td>
-                            <td>@g.Key.Detalle</td>
-
+                            <td class="color-cell">@g.Key.Color</td>
+                            <td class="detalle-cell">@g.Key.Detalle</td>
                             @foreach (var talla in tallas)
                             {
                                 var item = g.FirstOrDefault(x => x.Numero == talla);
-
-                                <td class="text-center">
-                                    @(item?.Cantidad ?? 0)
-                                </td>
+                                <td class="cantidad-cell">@(item?.Cantidad ?? 0)</td>
                             }
-
-                            <td class="fw-bold text-center">
-                                @g.Sum(x => x.Cantidad)
-                            </td>
-
+                            <td class="fw-bold" style="color: var(--deep-blue);">@g.Sum(x => x.Cantidad)</td>
                         </tr>
                     }
-
                 </tbody>
-
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2" class="fw-bold">Totales</td>
+                        @foreach (var talla in tallas)
+                        {
+                            var totalTalla = Model.Tallas.Where(x => x.Numero == talla).Sum(x => x.Cantidad);
+                            <td class="fw-bold">@totalTalla</td>
+                        }
+                        <td class="fw-bold">@Model.StockTotal</td>
+                    </tr>
+                </tfoot>
             </table>
-
-        }
-        else
-        {
-            <p class="text-muted">
-                Este producto no tiene variantes registradas.
-            </p>
-        }
-
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎨</div>
+            <p>Este producto no tiene variantes registradas</p>
+        </div>
+    }
 </div>
 
-
-<!-- =========================
-     FOTOS
-========================== -->
-<div class="card mt-4">
-
-    <div class="card-header">
-        <strong>Fotos del Producto</strong>
+<!-- Card - Fotos del Producto -->
+<div class="detail-card">
+    <div class="card-header-title">
+        <span>📸</span> Fotos del Producto
     </div>
 
-    <div class="card-body">
-
-        @if (Model.Fotos != null && Model.Fotos.Any())
-        {
-
-            <div class="d-flex flex-wrap gap-2">
-
-                @foreach (var foto in Model.Fotos)
-                {
-                    <div>
-
-                        <img src="@foto.Ruta"
-                             class="img-thumbnail"
-                             style="width:90px;height:90px;object-fit:cover" />
-
-                        <form asp-action="DeleteFoto" method="post" class="mt-1">
-
-                            @Html.AntiForgeryToken()
-
-                            <input type="hidden" name="id" value="@foto.Id" />
-                            <input type="hidden" name="inventarioCodigo" value="@Model.Codigo" />
-
-                            <button class="btn btn-sm btn-danger">
-                                Eliminar
-                            </button>
-
-                        </form>
-
-                    </div>
-                }
-
-            </div>
-
-        }
-        else
-        {
-            <span class="text-muted">Sin imágenes</span>
-        }
-
-    </div>
-
+    @if (Model.Fotos != null && Model.Fotos.Any())
+    {
+        <div class="fotos-grid">
+            @foreach (var foto in Model.Fotos)
+            {
+                <div class="foto-item">
+                    <img src="@foto.Ruta" class="foto-img" />
+                    <form asp-action="DeleteFoto" method="post" onsubmit="return confirm('¿Eliminar esta imagen?')">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@foto.Id" />
+                        <input type="hidden" name="inventarioCodigo" value="@Model.Codigo" />
+                        <button type="submit" class="btn-delete-foto">
+                            🗑 Eliminar
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
+            <p>No hay fotos disponibles para este producto</p>
+        </div>
+    }
 </div>

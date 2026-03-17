@@ -1,0 +1,299 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --ocean-blue: #19376D;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-gray: #64748b;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-link {
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    background: #f1f5f9;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Card del formulario */
+.form-card {
+    background: var(--pure-white);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
+    border: 1px solid rgba(11, 36, 71, 0.05);
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .section-title span {
+        font-size: 1.4rem;
+    }
+
+fieldset {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+legend {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    padding: 0 0.5rem;
+    width: auto;
+    margin-left: 1rem;
+}
+
+/* Form controls */
+.form-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: #fafcff;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--electric-blue);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(87, 108, 188, 0.1);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--electric-blue);
+    }
+
+    .form-control[readonly] {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: var(--text-gray);
+    }
+
+/* Botón buscar */
+.btn-search {
+    background: var(--deep-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+    .btn-search:hover {
+        background: var(--electric-blue);
+        transform: translateY(-2px);
+    }
+
+/* Tabla de productos */
+.table-wrapper {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.productos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 1000px;
+}
+
+    .productos-table th {
+        background: var(--deep-blue);
+        color: white;
+        font-weight: 500;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        padding: 0.8rem 0.5rem;
+        white-space: nowrap;
+    }
+
+        .productos-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .productos-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+    .productos-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .productos-table select, .productos-table input {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+.btn-remove-row {
+    background: #fee2e2;
+    color: var(--danger);
+    border: none;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+    .btn-remove-row:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+.btn-add-row {
+    background: var(--deep-blue);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 1rem 0;
+}
+
+    .btn-add-row:hover {
+        background: var(--electric-blue);
+    }
+
+/* Botones principales */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eef2f6;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.7rem 2.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -8px rgba(11, 36, 71, 0.3);
+    }
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.7rem 2.5rem;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+    .btn-cancel:hover {
+        background: var(--deep-blue);
+        color: white;
+    }
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-save, .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    fieldset {
+        padding: 1rem;
+    }
+}

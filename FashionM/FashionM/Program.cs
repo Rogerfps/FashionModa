@@ -3,10 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using FashionM.Models;
 using Microsoft.AspNetCore.Identity;
 using FashionM.Controllers;
+using QuestPDF.Infrastructure;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // MVC
 builder.Services.AddControllersWithViews();

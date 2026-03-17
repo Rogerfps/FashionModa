@@ -32,6 +32,9 @@ namespace FashionM.Data
         public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
 
         public DbSet<MovimientoDetalle> MovimientosDetalle { get; set; }
+        public DbSet<Empresa> Empresas { get; set; }
+        public DbSet<Proforma> Proformas { get; set; }
+        public DbSet<ProformaDetalle> ProformaDetalles { get; set; }
 
 
 
@@ -110,6 +113,35 @@ namespace FashionM.Data
                 .HasOne(d => d.MovimientoInventario)
                 .WithMany(m => m.Detalles)
                 .HasForeignKey(d => d.MovimientoInventarioId);
+
+            modelBuilder.Entity<Proforma>()
+            .HasOne(p => p.Empresa)
+            .WithMany(e => e.Proformas)
+            .HasForeignKey(p => p.EmpresaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            // Proforma -> Cliente
+            modelBuilder.Entity<Proforma>()
+                .HasOne(p => p.Cliente)
+                .WithMany()
+                .HasForeignKey(p => p.ClienteCedula)
+                .HasPrincipalKey(c => c.Cedula)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Proforma -> Detalles
+            modelBuilder.Entity<ProformaDetalle>()
+                .HasOne(d => d.Proforma)
+                .WithMany(p => p.Detalles)
+                .HasForeignKey(d => d.ProformaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ProformaDetalle -> Inventario
+            modelBuilder.Entity<ProformaDetalle>()
+                .HasOne<Inventario>()
+                .WithMany()
+                .HasForeignKey(d => d.InventarioCodigo)
+                .HasPrincipalKey(i => i.Codigo)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

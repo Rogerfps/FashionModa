@@ -1,304 +1,338 @@
 ﻿@model PedidoCliente
 
-<h2>Nuevo Pedido</h2>
+@{
+    ViewData["Title"] = "Nuevo Pedido";
+}
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
+<link rel="stylesheet" href="~/css/PedidoCliente/PedidoCreate.css" />
 
-    <!-- =========================
-         CLIENTE
-    ========================== -->
-    <fieldset class="mb-3">
-        <legend>Cliente</legend>
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>📦</span> Nuevo Pedido
+    </h1>
+    <a asp-action="Index" class="back-link">
+        <span>←</span> Volver
+    </a>
+</div>
 
+<!-- Formulario -->
+<div class="form-card">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- =========================
+             CLIENTE
+        ========================== -->
+        <fieldset>
+            <legend>👤 Cliente</legend>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">Cédula</label>
+                    <div class="d-flex gap-2">
+                        <input type="number" id="cedula" class="form-control" placeholder="Ingrese cédula" />
+                        <button type="button"
+                                onclick="buscarCliente()"
+                                class="btn-search">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <input asp-for="ClienteCedula" type="hidden" />
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre</label>
+                    <input id="nombre" readonly class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dirección</label>
+                    <input id="direccion" readonly class="form-control" />
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <label class="form-label">Transporte</label>
+                    <input id="transporte" readonly class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Correo</label>
+                    <input id="correo" readonly class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Teléfono</label>
+                    <input id="telefono" readonly class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Empresa</label>
+                    <input id="empresaCliente" readonly class="form-control" />
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- =========================
+             EMPRESA / SEMANA
+        ========================== -->
         <div class="row">
-            <div class="col-md-4">
-                <label>Cédula</label>
-                <input type="number" id="cedula" class="form-control" />
-                <button type="button"
-                        onclick="buscarCliente()"
-                        class="btn btn-secondary mt-2">
-                    Buscar
-                </button>
-            </div>
-        </div>
-
-        <input asp-for="ClienteCedula" type="hidden" />
-
-        <div class="row mt-2">
             <div class="col-md-6">
-                <label>Nombre</label>
-                <input id="nombre" readonly class="form-control" />
+                <label class="form-label">Empresa</label>
+                <input asp-for="Empresa" class="form-control" placeholder="Empresa" />
             </div>
             <div class="col-md-6">
-                <label>Dirección</label>
-                <input id="direccion" readonly class="form-control" />
+                <label class="form-label">Semana</label>
+                <input asp-for="Semana" class="form-control" placeholder="Ej: 32" />
             </div>
         </div>
 
-        <div class="row mt-2">
-            <div class="col-md-4">
-                <label>Transporte</label>
-                <input id="transporte" readonly class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <label>Correo</label>
-                <input id="correo" readonly class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <label>Teléfono</label>
-                <input id="telefono" readonly class="form-control" />
-            </div>
+        <!-- =========================
+             DETALLE DEL PEDIDO
+        ========================== -->
+        <div class="section-title">
+            <span>🛒</span> Detalle del Pedido
         </div>
-    </fieldset>
 
-    <!-- =========================
-         EMPRESA / SEMANA
-    ========================== -->
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label>Empresa</label>
-            <input asp-for="Empresa" class="form-control" />
+        <div class="table-wrapper">
+            <table class="productos-table" id="tablaDetalle">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>Código</th>
+                        <th>Color</th>
+                        <th>Talla</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Detalle</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <div class="col-md-6">
-            <label>Semana</label>
-            <input asp-for="Semana" class="form-control" />
-        </div>
-    </div>
-
-    <!-- =========================
-         DETALLE DEL PEDIDO
-    ========================== -->
-    <fieldset class="mb-3">
-        <legend>Detalle del Pedido</legend>
-
-        <table class="table table-bordered" id="tablaDetalle">
-            <thead>
-                <tr>
-                    <th>Proveedor</th>
-                    <th>Código</th>
-                    <th>Color</th>
-                    <th>Talla</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Detalle</th>
-                    
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
 
         <button type="button"
                 onclick="agregarFila()"
-                class="btn btn-secondary">
-            Agregar Producto
+                class="btn-add-row">
+            ➕ Agregar Producto
         </button>
-    </fieldset>
 
-    <!-- =========================
-         OBSERVACIONES
-    ========================== -->
-    <div class="mb-3">
-        <label>Observaciones</label>
-        <textarea asp-for="Observaciones"
-                  class="form-control"
-                  rows="3"></textarea>
-    </div>
+        <!-- =========================
+             OBSERVACIONES
+        ========================== -->
+        <div class="mt-4">
+            <label class="form-label">Observaciones</label>
+            <textarea asp-for="Observaciones"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Notas adicionales sobre el pedido..."></textarea>
+        </div>
 
-    <button type="submit" class="btn btn-primary">
-        Guardar Pedido
-    </button>
-</form>
+        <!-- =========================
+             BOTONES
+        ========================== -->
+        <div class="action-buttons">
+            <button type="submit" class="btn-save">
+                💾 Guardar Pedido
+            </button>
+            <a asp-action="Index" class="btn-cancel">
+                ← Cancelar
+            </a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
-<script>
-    let index = 0;
-    let proveedoresCache = [];
+    <script>
+            let index = 0;
+            let proveedoresCache = [];
 
-    // =========================
-    // CLIENTE
-    // =========================
-    function buscarCliente() {
-        const cedula = document.getElementById("cedula").value;
+            // =========================
+            // CLIENTE
+            // =========================
+            function buscarCliente() {
+                const cedula = document.getElementById("cedula").value;
 
-        if (!cedula) {
-            alert("Digite la cédula del cliente");
-            return;
-        }
-
-        fetch(`/PedidoCliente/BuscarCliente?cedula=${cedula}`)
-            .then(r => {
-                if (!r.ok) throw "Cliente no encontrado";
-                return r.json();
-            })
-            .then(data => {
-                console.log("Cliente recibido:", data);
-
-                document.getElementById("nombre").value = data.nombre;
-                document.getElementById("direccion").value = data.direccion;
-                document.getElementById("transporte").value = data.transporte;
-                document.getElementById("correo").value = data.correo;
-                document.getElementById("telefono").value = data.telefonos;
-
-                document.querySelector("input[name='ClienteCedula']").value = data.cedula;
-
-                if (data.empresa) {
-                    document.getElementById("Empresa").value = data.empresa;
+                if (!cedula) {
+                    alert("Digite la cédula del cliente");
+                    return;
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Cliente no existe");
-            });
-    }
 
-    // =========================
-    // DETALLE
-    // =========================
-    async function cargarProveedores() {
-        if (proveedoresCache.length > 0) return proveedoresCache;
+                fetch(`/PedidoCliente/BuscarCliente?cedula=${cedula}`)
+                    .then(r => {
+                        if (!r.ok) throw "Cliente no encontrado";
+                        return r.json();
+                    })
+                    .then(data => {
+                        console.log("Cliente recibido:", data);
 
-        const r = await fetch("/PedidoCliente/ObtenerProveedores");
-        proveedoresCache = await r.json();
-        return proveedoresCache;
-    }
+                        document.getElementById("nombre").value = data.nombre;
+                        document.getElementById("direccion").value = data.direccion;
+                        document.getElementById("transporte").value = data.transporte;
+                        document.getElementById("correo").value = data.correo;
+                        document.getElementById("telefono").value = data.telefonos;
+                        document.getElementById("empresaCliente").value = data.empresa;
 
-    async function agregarFila() {
-        const proveedores = await cargarProveedores();
+                        document.querySelector("input[name='ClienteCedula']").value = data.cedula;
 
-        let opcionesProveedor = `<option value="">Seleccione</option>`;
-        proveedores.forEach(p => {
-            opcionesProveedor += `<option value="${p.cedula}">${p.nombre}</option>`;
-        });
+                        if (data.empresa) {
+                            document.getElementById("Empresa").value = data.empresa;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Cliente no existe");
+                    });
+            }
 
-        const row = `
-<tr>
-    <td>
-        <select class="form-control"
-                name="Detalles[${index}].ProveedorCedula"
-                onchange="cargarCodigos(this, ${index})">
-            ${opcionesProveedor}
-        </select>
-    </td>
+            // =========================
+            // DETALLE
+            // =========================
+            async function cargarProveedores() {
+                if (proveedoresCache.length > 0) return proveedoresCache;
 
-    <td>
-        <select class="form-control"
-                name="Detalles[${index}].CodigoProducto"
-                id="codigo_${index}"
-                onchange="cargarColores(this, ${index})">
-            <option value="">Seleccione</option>
-        </select>
-    </td>
+                const r = await fetch("/PedidoCliente/ObtenerProveedores");
+                proveedoresCache = await r.json();
+                return proveedoresCache;
+            }
 
-    <td>
-        <select class="form-control"
-                name="Detalles[${index}].Color"
-                id="color_${index}">
-            <option value="">Seleccione</option>
-        </select>
-    </td>
+            async function agregarFila() {
+                const proveedores = await cargarProveedores();
 
-    <td>
-        <input class="form-control"
-               name="Detalles[${index}].Talla" />
-    </td>
-
-    <!-- ✅ CANTIDAD -->
-    <td>
-        <input type="number"
-               class="form-control"
-               name="Detalles[${index}].Cantidad"
-               value="1" />
-    </td>
-
-    <!-- ✅ PRECIO -->
-    <td>
-        <input type="number"
-               step="0.01"
-               class="form-control"
-               name="Detalles[${index}].PrecioUnitario" />
-    </td>
-
-    <!-- ✅ DETALLE (YA ES TEXTO) -->
-    <td>
-        <input type="text"
-               class="form-control"
-               name="Detalles[${index}].Detalle"
-               placeholder="Detalle del producto" />
-    </td>
-
-    <td>
-        <button type="button"
-                class="btn btn-danger btn-sm"
-                onclick="this.closest('tr').remove()">
-            X
-        </button>
-    </td>
-</tr>`;
-
-        document.querySelector("#tablaDetalle tbody")
-            .insertAdjacentHTML("beforeend", row);
-
-        index++;
-    }
-
-    function cargarCodigos(select, i) {
-        const proveedorCedula = select.value;
-
-        const comboCodigo = document.getElementById(`codigo_${i}`);
-        const comboColor = document.getElementById(`color_${i}`);
-
-        comboCodigo.innerHTML = `<option value="">Seleccione</option>`;
-        comboColor.innerHTML = `<option value="">Seleccione</option>`;
-
-        if (!proveedorCedula) return;
-
-        fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorCedula=${proveedorCedula}`)
-            .then(r => r.text())
-            .then(text => text ? JSON.parse(text) : [])
-            .then(data => {
-                console.log("Códigos recibidos:", data);
-
-                data.forEach(codigo => {
-                    comboCodigo.innerHTML +=
-                        `<option value="${codigo}">${codigo}</option>`;
+                let opcionesProveedor = `<option value="">Seleccione</option>`;
+                proveedores.forEach(p => {
+                    opcionesProveedor += `<option value="${p.cedula}">${p.nombre}</option>`;
                 });
-            })
-            .catch(err => console.error(err));
-    }
 
-    function cargarColores(select, i) {
-        const codigo = select.value;
+                const row = `
+        <tr>
+            <td>
+                <select class="form-control"
+                        name="Detalles[${index}].ProveedorCedula"
+                        onchange="cargarCodigos(this, ${index})">
+                    ${opcionesProveedor}
+                </select>
+            </td>
 
-        if (!codigo || codigo === "undefined") {
-            console.warn("Código inválido:", codigo);
-            return;
-        }
+            <td>
+                <select class="form-control"
+                        name="Detalles[${index}].CodigoProducto"
+                        id="codigo_${index}"
+                        onchange="cargarColores(this, ${index})">
+                    <option value="">Seleccione</option>
+                </select>
+            </td>
 
-        const proveedorCedula =
-            document.querySelector(`select[name='Detalles[${i}].ProveedorCedula']`)?.value;
+            <td>
+                <select class="form-control"
+                        name="Detalles[${index}].Color"
+                        id="color_${index}">
+                    <option value="">Seleccione</option>
+                </select>
+            </td>
 
-        if (!proveedorCedula) {
-            console.warn("Proveedor no seleccionado");
-            return;
-        }
+            <td>
+                <input class="form-control"
+                       name="Detalles[${index}].Talla"
+                       placeholder="Ej: 38" />
+            </td>
 
-        const comboColor = document.getElementById(`color_${i}`);
-        comboColor.innerHTML = `<option value="">Seleccione</option>`;
+            <td>
+                <input type="number"
+                       class="form-control"
+                       name="Detalles[${index}].Cantidad"
+                       value="1"
+                       min="1" />
+            </td>
 
-        fetch(`/PedidoCliente/ObtenerColoresPorCodigo?codigo=${codigo}&proveedorCedula=${proveedorCedula}`)
-            .then(r => r.text())
-            .then(text => text ? JSON.parse(text) : [])
-            .then(data => {
-                console.log("Colores recibidos:", data);
+            <td>
+                <input type="number"
+                       step="0.01"
+                       class="form-control"
+                       name="Detalles[${index}].PrecioUnitario"
+                       placeholder="0.00" />
+            </td>
 
-                data.forEach(color => {
-                    comboColor.innerHTML +=
-                        `<option value="${color}">${color}</option>`;
-                });
-            })
-            .catch(err => console.error(err));
-    }
-</script>
+            <td>
+                <input type="text"
+                       class="form-control"
+                       name="Detalles[${index}].Detalle"
+                       placeholder="Detalle" />
+            </td>
+
+            <td>
+                <button type="button"
+                        class="btn-remove-row"
+                        onclick="this.closest('tr').remove()">
+                    ✕
+                </button>
+            </td>
+        </tr>`;
+
+                document.querySelector("#tablaDetalle tbody")
+                    .insertAdjacentHTML("beforeend", row);
+
+                index++;
+            }
+
+            function cargarCodigos(select, i) {
+                const proveedorCedula = select.value;
+
+                const comboCodigo = document.getElementById(`codigo_${i}`);
+                const comboColor = document.getElementById(`color_${i}`);
+
+                comboCodigo.innerHTML = `<option value="">Seleccione</option>`;
+                comboColor.innerHTML = `<option value="">Seleccione</option>`;
+
+                if (!proveedorCedula) return;
+
+                fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorCedula=${proveedorCedula}`)
+                    .then(r => r.text())
+                    .then(text => text ? JSON.parse(text) : [])
+                    .then(data => {
+                        console.log("Códigos recibidos:", data);
+
+                        data.forEach(codigo => {
+                            comboCodigo.innerHTML +=
+                                `<option value="${codigo}">${codigo}</option>`;
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }
+
+            function cargarColores(select, i) {
+                const codigo = select.value;
+
+                if (!codigo || codigo === "undefined") {
+                    console.warn("Código inválido:", codigo);
+                    return;
+                }
+
+                const proveedorCedula =
+                    document.querySelector(`select[name='Detalles[${i}].ProveedorCedula']`)?.value;
+
+                if (!proveedorCedula) {
+                    console.warn("Proveedor no seleccionado");
+                    return;
+                }
+
+                const comboColor = document.getElementById(`color_${i}`);
+                comboColor.innerHTML = `<option value="">Seleccione</option>`;
+
+                fetch(`/PedidoCliente/ObtenerColoresPorCodigo?codigo=${codigo}&proveedorCedula=${proveedorCedula}`)
+                    .then(r => r.text())
+                    .then(text => text ? JSON.parse(text) : [])
+                    .then(data => {
+                        console.log("Colores recibidos:", data);
+
+                        data.forEach(color => {
+                            comboColor.innerHTML +=
+                                `<option value="${color}">${color}</option>`;
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }
+    </script>
 }

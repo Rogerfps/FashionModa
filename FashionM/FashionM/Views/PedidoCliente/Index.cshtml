@@ -7,194 +7,200 @@
     int paginaActual = ViewBag.PaginaActual ?? 1;
 }
 
-<h2>Pedidos de Clientes</h2>
+<link rel="stylesheet" href="~/css/PedidoCliente/PedidoIndex.css" />
 
-<!-- =========================
-     FILTROS
-========================== -->
-<form method="get" class="row g-3 mb-3">
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>📋</span> Pedidos de Clientes
+    </h1>
+</div>
 
-    <div class="col-md-4">
-        <label class="form-label">Buscar</label>
-        <input type="text"
-               name="buscar"
-               value="@Context.Request.Query["buscar"]"
-               class="form-control"
-               placeholder="Nombre, cédula..." />
-    </div>
+<!-- Filtros -->
+<div class="filters-container">
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            <div class="filter-label">Buscar</div>
+            <input type="text"
+                   name="buscar"
+                   value="@Context.Request.Query["buscar"]"
+                   class="filter-input"
+                   placeholder="Nombre, cédula..." />
+        </div>
 
-    <div class="col-md-3">
-        <label class="form-label">Empresa</label>
-        <select name="empresa" class="form-select">
-            <option value="">Todas</option>
-            @if (ViewBag.Empresas != null)
-            {
-                foreach (var e in ViewBag.Empresas as List<string>)
+        <div class="col-md-2">
+            <div class="filter-label">Empresa</div>
+            <select name="empresa" class="filter-input">
+                <option value="">Todas</option>
+                @if (ViewBag.Empresas != null)
                 {
-                    <option value="@e"
-                            selected="@(Context.Request.Query["empresa"] == e)">
-                        @e
-                    </option>
+                    foreach (var e in ViewBag.Empresas as List<string>)
+                    {
+                        <option value="@e" selected="@(Context.Request.Query["empresa"] == e)">
+                            @e
+                        </option>
+                    }
                 }
-            }
-        </select>
-    </div>
+            </select>
+        </div>
 
-    <div class="col-md-2">
-        <label class="form-label">Semana</label>
-        <input type="number"
-               name="semana"
-               class="form-control"
-               min="1"
-               max="53"
-               value="@Context.Request.Query["semana"]"
-               placeholder="Ej: 32" />
-    </div>
+        <div class="col-md-2">
+            <div class="filter-label">Semana</div>
+            <input type="number"
+                   name="semana"
+                   class="filter-input"
+                   min="1"
+                   max="53"
+                   value="@Context.Request.Query["semana"]"
+                   placeholder="Ej: 32" />
+        </div>
 
-    <div class="col-md-3 align-self-end">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Limpiar</a>
-    </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn-filter w-100">
+                <span>🔍</span> Filtrar
+            </button>
+        </div>
 
-    <div class="col-md-2 align-self-end text-end">
-        <a asp-action="Create" class="btn btn-success w-100">➕ Crear</a>
-    </div>
-</form>
+        <div class="col-md-2 d-flex align-items-end">
+            <a asp-action="Index" class="btn-clear w-100">
+                <span>✖</span> Limpiar
+            </a>
+        </div>
 
-<!-- =========================
-     TABLA
-========================== -->
-<table class="table table-striped table-bordered align-middle">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Fecha</th>
-            <th>Semana</th>
-            <th>Cliente</th>
-            <th>Transporte</th>
-            <th>Total</th>
-            <th>Aprobacion</th/>
-            <th>Crédito</th>
-            <th>Bodega</th>
-            <th style="width:260px">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!Model.Any())
-        {
-            <tr>
-                <td colspan="9" class="text-center text-muted">
-                    No hay pedidos registrados
-                </td>
-            </tr>
-        }
-        else
-        {
-            foreach (var item in Model)
-            {
+        <div class="col-12 mt-3">
+            <a asp-action="Create" class="btn-create">
+                <span>➕</span> Crear Nuevo Pedido
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="modern-table">
+            <thead>
                 <tr>
-                    <td>@item.Id</td>
-                    <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Semana</td>
-                    <td>
-                        @item.Cliente.Nombre @item.Cliente.Apellidos<br />
-                        <small class="text-muted">@item.Cliente.Cedula</small>
-                    </td>
-                    <td>@item.Cliente.Transporte</td>
-                    <td>₡ @item.Total.ToString("N2")</td>
-
-                    <!-- SECRETARIA -->
-                    <td>
-                        @if (item.AprobadoSecretaria)
-                        {
-                            <span class="badge bg-success">Aprobado</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Pendiente</span>
-                        }
-                    </td>
-
-                    <!-- CRÉDITO -->
-                    <td>
-                        @switch (item.EstadoCredito)
-                        {
-                            case EstadoCredito.Aprobado:
-                                <span class="badge bg-success">Aprobado</span>
-                                break;
-                            case EstadoCredito.Rechazado:
-                                <span class="badge bg-danger">Rechazado</span>
-                                break;
-                            case EstadoCredito.Retenido:
-                                <span class="badge bg-warning text-dark">Retenido</span>
-                                break;
-                            default:
-                                <span class="badge bg-secondary">Pendiente</span>
-                                break;
-                        }
-                    </td>
-
-                    <!-- BODEGA -->
-                    <td>
-                        @if (item.FirmaBodega)
-                        {
-                            <span class="badge bg-success">Despachado</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Pendiente</span>
-                        }
-                    </td>
-
-                    <!-- ACCIONES -->
-                    <td>
-                        <a asp-action="Details"
-                           asp-route-id="@item.Id"
-                           class="btn btn-sm btn-info">
-                            Ver
-                        </a>
-
-                        <a asp-action="Edit"
-                           asp-route-id="@item.Id"
-                           class="btn btn-sm btn-info">
-                            Editar
-                        </a>
-
-                        
-
-                        <a asp-action="Delete"
-                           asp-route-id="@item.Id"
-                           class="btn btn-sm btn-danger">
-                            Eliminar
-                        </a>
-                    </td>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Semana</th>
+                    <th>Cliente</th>
+                    <th>Transporte</th>
+                    <th>Total</th>
+                    <th>Secretaría</th>
+                    <th>Crédito</th>
+                    <th>Bodega</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <div class="empty-text">No hay pedidos registrados</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.Id</td>
+                            <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Semana</td>
+                            <td>
+                                <div class="cliente-info">
+                                    <span class="cliente-nombre">@item.Cliente.Nombre @item.Cliente.Apellidos</span>
+                                    <span class="cliente-cedula">@item.Cliente.Cedula</span>
+                                </div>
+                            </td>
+                            <td>@item.Cliente.Transporte</td>
+                            <td class="total-monto">₡ @item.Total.ToString("N2")</td>
 
-<!-- =========================
-     PAGINACIÓN
-========================== -->
+                            <!-- SECRETARIA -->
+                            <td>
+                                <span class="status-badge @(item.AprobadoSecretaria ? "success" : "secondary")">
+                                    @(item.AprobadoSecretaria ? "Aprobado" : "Pendiente")
+                                </span>
+                            </td>
+
+                            <!-- CRÉDITO -->
+                            <td>
+                                @switch (item.EstadoCredito)
+                                {
+                                    case EstadoCredito.Aprobado:
+                                        <span class="status-badge success">Aprobado</span>
+                                        break;
+                                    case EstadoCredito.Rechazado:
+                                        <span class="status-badge danger">Rechazado</span>
+                                        break;
+                                    case EstadoCredito.Retenido:
+                                        <span class="status-badge warning">Retenido</span>
+                                        break;
+                                    default:
+                                        <span class="status-badge secondary">Pendiente</span>
+                                        break;
+                                }
+                            </td>
+
+                            <!-- BODEGA -->
+                            <td>
+                                <span class="status-badge @(item.FirmaBodega ? "success" : "secondary")">
+                                    @(item.FirmaBodega ? "Despachado" : "Pendiente")
+                                </span>
+                            </td>
+
+                            <!-- ACCIONES -->
+                            <td>
+                                <div class="action-group">
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn-action btn-view">
+                                        👁 Ver
+                                    </a>
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn-action btn-edit">
+                                        ✏️ Editar
+                                    </a>
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn-action btn-delete"
+                                       onclick="return confirm('¿Eliminar este pedido?')">
+                                        🗑 Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Paginación -->
 @if (totalPaginas > 1)
 {
-    <nav>
-        <ul class="pagination justify-content-center">
-            @for (int i = 1; i <= totalPaginas; i++)
-            {
-                <li class="page-item @(i == paginaActual ? "active" : "")">
-                    <a class="page-link"
-                       href="@Url.Action("Index", new {
-                           page = i,
-                           buscar = Context.Request.Query["buscar"],
-                           empresa = Context.Request.Query["empresa"],
-                           semana = Context.Request.Query["semana"]
-                       })">
-                        @i
-                    </a>
-                </li>
-            }
-        </ul>
-    </nav>
+    <ul class="pagination-modern">
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new {
+                       page = i,
+                       buscar = Context.Request.Query["buscar"],
+                       empresa = Context.Request.Query["empresa"],
+                       semana = Context.Request.Query["semana"]
+                   })">
+                    @i
+                </a>
+            </li>
+        }
+    </ul>
 }

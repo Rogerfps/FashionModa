@@ -1,0 +1,63 @@
+﻿@model Empresa
+
+<div class="container mt-4">
+
+    <h2>➕ Nueva Empresa</h2>
+
+    <form asp-action="Create">
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+                <label>Nombre</label>
+                <input asp-for="Nombre" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Cédula Jurídica</label>
+                <input asp-for="CedulaJuridica" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Teléfono</label>
+                <input asp-for="Telefono" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Dirección</label>
+                <input asp-for="Direccion" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Cuenta BAC</label>
+                <input asp-for="CuentaBAC" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Cuenta BCR</label>
+                <input asp-for="CuentaBCR" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Cuenta BN</label>
+                <input asp-for="CuentaBN" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Sinpe Movil</label>
+                <input asp-for="SimpeMovil" class="form-control" />
+            </div>
+
+        </div>
+
+        <button class="btn btn-success">
+            Guardar
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
+
+    </form>
+
+</div>

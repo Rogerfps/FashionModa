@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Proforma>
+
+@{
+    ViewData["Title"] = "Proformas";
+}
+
+<link rel="stylesheet" href="~/css/Proforma/ProformaIndex.css" />
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>📄</span> Proformas
+        </h1>
+        <a asp-action="Create" class="btn-neo">
+            <span>➕</span> Nueva Proforma
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Empresa</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📄</div>
+                                    <div class="empty-text">No hay proformas registradas</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.Id</td>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Empresa?.Nombre))
+                                    {
+                                        <span class="empresa-badge">@item.Empresa.Nombre</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Cliente != null)
+                                    {
+                                        <div class="cliente-info">
+                                            <span class="cliente-nombre">@item.Cliente.Nombre @item.Cliente.Apellidos</span>
+                                            <span class="cliente-cedula">@item.Cliente.Cedula</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td class="total-monto">₡ @item.Total.ToString("N2")</td>
+                                <td>
+                                    <div class="action-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn-action btn-view"
+                                           title="Ver detalles">
+                                            👁 Ver
+                                        </a>
+
+                                        <a asp-action="AgregarProducto" asp-route-id="@item.Id"
+                                           class="btn-action btn-productos"
+                                           title="Agregar productos">
+                                            🛒 Productos
+                                        </a>
+
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn-action btn-delete"
+                                           title="Eliminar proforma"
+                                           onclick="return confirm('¿Eliminar esta proforma?')">
+                                            🗑 Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

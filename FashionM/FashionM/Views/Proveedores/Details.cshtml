@@ -1,105 +1,434 @@
 ﻿@model Proveedor
 
-<h2 class="mb-4">Detalle del Proveedor</h2>
+@{
+    ViewData["Title"] = "Detalle del Proveedor";
+}
 
-<!-- =========================
-     DATOS DEL PROVEEDOR
-========================== -->
-<div class="card mb-4">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Cédula</dt>
-            <dd class="col-sm-9">@Model.Cedula</dd>
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+    }
 
-            <dt class="col-sm-3">Nombre</dt>
-            <dd class="col-sm-9">@Model.Nombre @Model.Apellidos</dd>
+    body {
+        background: var(--light-bg);
+        font-family: 'Inter', sans-serif;
+    }
 
-            <dt class="col-sm-3">Tipo Identificación</dt>
-            <dd class="col-sm-9">@Model.IDTipo</dd>
+    /* Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
 
-            <dt class="col-sm-3">Correo</dt>
-            <dd class="col-sm-9">@Model.Correo</dd>
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
 
-            <dt class="col-sm-3">Teléfono</dt>
-            <dd class="col-sm-9">@Model.Telefono</dd>
+    .back-link {
+        color: var(--deep-blue);
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        background: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-            <dt class="col-sm-3">Comercio</dt>
-            <dd class="col-sm-9">@Model.Comercio</dd>
+    /* Cards */
+    .detail-card {
+        background: var(--pure-white);
+        border-radius: 24px;
+        padding: 1.8rem;
+        box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(11, 36, 71, 0.05);
+    }
 
-            <dt class="col-sm-3">Dirección</dt>
-            <dd class="col-sm-9">@Model.Direccion</dd>
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #eef2f6;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-            <dt class="col-sm-3">Actividad Económica</dt>
-            <dd class="col-sm-9">@Model.Actividad</dd>
+        .section-title span {
+            font-size: 1.4rem;
+        }
 
-            <dt class="col-sm-3">Empresa</dt>
-            <dd class="col-sm-9">@Model.Empresa</dd>
+    /* Grid de información */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem 2rem;
+        margin-bottom: 1.5rem;
+    }
 
+    .info-item {
+        display: flex;
+        border-bottom: 1px dashed #e2e8f0;
+        padding: 0.6rem 0;
+    }
 
-            <dt class="col-sm-3">Estado</dt>
-            <dd class="col-sm-9">
-                <span class="badge @(Model.Estado ? "bg-success" : "bg-secondary")">
+    .info-label {
+        width: 140px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .info-value {
+        flex: 1;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--deep-blue);
+    }
+
+    /* Badge estado */
+    .status-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.inactive {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+    /* Botones */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-edit {
+        background: #fef3c7;
+        color: var(--warning);
+        border: none;
+        border-radius: 30px;
+        padding: 0.6rem 2rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-edit:hover {
+            background: var(--warning);
+            color: white;
+        }
+
+    .btn-back {
+        background: #f1f5f9;
+        color: var(--deep-blue);
+        border: none;
+        border-radius: 30px;
+        padding: 0.6rem 2rem;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-back:hover {
+            background: var(--deep-blue);
+            color: white;
+        }
+
+    .btn-primary-small {
+        background: var(--deep-blue);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 0.4rem 1.2rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-primary-small:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+    /* Tabla de zapatos */
+    .zapatos-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+        .zapatos-table th {
+            background: var(--deep-blue);
+            color: white;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0.8rem 0.5rem;
+        }
+
+            .zapatos-table th:first-child {
+                border-radius: 12px 0 0 12px;
+            }
+
+            .zapatos-table th:last-child {
+                border-radius: 0 12px 12px 0;
+            }
+
+        .zapatos-table td {
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .zapatos-table tbody tr:hover {
+            background: rgba(87, 108, 188, 0.02);
+        }
+
+    /* Imágenes */
+    .imagenes-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .imagen-thumb {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+        .imagen-thumb:hover {
+            transform: scale(1.05);
+            border-color: var(--electric-blue);
+        }
+
+    /* Acciones de zapatos */
+    .zapato-actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+
+    .btn-zapato {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .btn-zapato-edit {
+        background: #fef3c7;
+        color: var(--warning);
+    }
+
+        .btn-zapato-edit:hover {
+            background: var(--warning);
+            color: white;
+        }
+
+    .btn-zapato-delete {
+        background: #fee2e2;
+        color: var(--danger);
+    }
+
+        .btn-zapato-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        background: #f8fafc;
+        border-radius: 16px;
+        color: #64748b;
+    }
+
+    @@media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-item {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        
+        .info-label {
+            width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-edit, .btn-back {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">👤 Detalle del Proveedor</h1>
+    <a asp-action="Index" class="back-link">
+        <span>←</span> Volver
+    </a>
+</div>
+
+<!-- Card principal - Datos del Proveedor -->
+<div class="detail-card">
+    <div class="section-title">
+        <span>📋</span> Información del Proveedor
+    </div>
+
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">Cédula</span>
+            <span class="info-value">@Model.Cedula</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Nombre</span>
+            <span class="info-value">@Model.Nombre @Model.Apellidos</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Tipo ID</span>
+            <span class="info-value">@Model.IDTipo</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Correo</span>
+            <span class="info-value">@Model.Correo</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Teléfono</span>
+            <span class="info-value">@Model.Telefono</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Comercio</span>
+            <span class="info-value">@Model.Comercio</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Dirección</span>
+            <span class="info-value">@Model.Direccion</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Actividad</span>
+            <span class="info-value">@Model.Actividad</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Empresa</span>
+            <span class="info-value"><span class="empresa-badge">@Model.Empresa</span></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Estado</span>
+            <span class="info-value">
+                <span class="status-badge @(Model.Estado ? "active" : "inactive")">
                     @(Model.Estado ? "Activo" : "Inactivo")
                 </span>
-            </dd>
-        </dl>
+            </span>
+        </div>
+    </div>
 
-        <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn btn-warning">
-            Editar
+    <div class="action-buttons">
+        <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn-edit">
+            <span>✏️</span> Editar Proveedor
         </a>
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            Volver
+        <a asp-action="Index" class="btn-back">
+            <span>←</span> Volver
         </a>
     </div>
 </div>
 
-<!-- =========================
-     ZAPATOS DEL PROVEEDOR
-========================== -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>Zapatos del Proveedor</strong>
-
+<!-- Card - Zapatos del Proveedor -->
+<div class="detail-card">
+    <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+        <span><span>👞</span> Zapatos del Proveedor</span>
         <a asp-controller="Zapatos"
-           asp-action="Create"
-           asp-route-proveedorCedula="@Model.Cedula"
-           class="btn btn-sm btn-primary">
-            + Nuevo Zapato
+               asp-action="Create"
+               asp-route-proveedorCedula="@Model.Cedula"
+               class="btn-primary-small">
+            <span>➕</span> Nuevo Zapato
         </a>
     </div>
 
-    <div class="card-body">
-
-        @if (Model.Zapatos != null && Model.Zapatos.Any())
-        {
-            <table class="table table-bordered align-middle">
+    @if (Model.Zapatos != null && Model.Zapatos.Any())
+    {
+        <div class="table-responsive">
+            <table class="zapatos-table">
                 <thead>
                     <tr>
                         <th>Código</th>
                         <th>Color</th>
                         <th>Suela</th>
                         <th>Imágenes</th>
-                        <th style="width:160px">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var zapato in Model.Zapatos)
                     {
                         <tr>
-                            <td>@zapato.Codigo</td>
+                            <td class="fw-semibold">@zapato.Codigo</td>
                             <td>@zapato.Color</td>
                             <td>@zapato.Suela</td>
-
-                            <!-- 🔴 IMÁGENES -->
                             <td>
                                 @if (zapato.Imagenes != null && zapato.Imagenes.Any())
                                 {
-                                    <div class="d-flex flex-wrap gap-2">
+                                    <div class="imagenes-grid">
                                         @foreach (var img in zapato.Imagenes)
                                         {
                                             <img src="@img.Url"
-                                                 class="img-thumbnail"
-                                                 style="width:70px;height:70px;object-fit:cover" />
+                                                 class="imagen-thumb"
+                                                 title="Imagen de @zapato.Codigo" />
                                         }
                                     </div>
                                 }
@@ -108,32 +437,36 @@
                                     <span class="text-muted">Sin imágenes</span>
                                 }
                             </td>
-
                             <td>
-                                <a asp-controller="Zapatos"
-                                   asp-action="Edit"
-                                   asp-route-id="@zapato.Id"
-                                   class="btn btn-sm btn-warning">
-                                    Editar
-                                </a>
-
-                                <a asp-controller="Zapatos"
-                                   asp-action="Delete"
-                                   asp-route-id="@zapato.Id"
-                                   class="btn btn-sm btn-danger ms-1">
-                                    Eliminar
-                                </a>
+                                <div class="zapato-actions">
+                                    <a asp-controller="Zapatos"
+                                           asp-action="Edit"
+                                           asp-route-id="@zapato.Id"
+                                           class="btn-zapato btn-zapato-edit"
+                                           title="Editar zapato">
+                                        ✏️
+                                    </a>
+                                    <a asp-controller="Zapatos"
+                                           asp-action="Delete"
+                                           asp-route-id="@zapato.Id"
+                                           class="btn-zapato btn-zapato-delete"
+                                           title="Eliminar zapato"
+                                           onclick="return confirm('¿Eliminar este zapato?')">
+                                        🗑
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-        else
-        {
-            <p class="text-muted">
-                Este proveedor no tiene zapatos registrados.
-            </p>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👞</div>
+            <p>Este proveedor no tiene zapatos registrados</p>
+        </div>
+    }
 </div>

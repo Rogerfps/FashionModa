@@ -1,0 +1,128 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --danger: #ef4444;
+    --text-gray: #64748b;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+.denied-section {
+    min-height: calc(100vh - 150px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.denied-card {
+    background: var(--pure-white);
+    border-radius: 40px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(11, 36, 71, 0.15);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid rgba(11, 36, 71, 0.05);
+}
+
+.icon-container {
+    width: 100px;
+    height: 100px;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem auto;
+}
+
+    .icon-container span {
+        font-size: 3.5rem;
+    }
+
+.denied-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.denied-message {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    color: white;
+    text-decoration: none;
+    padding: 0.9rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 10px 20px -8px rgba(11, 36, 71, 0.3);
+}
+
+    .btn-home:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px -8px rgba(11, 36, 71, 0.4);
+    }
+
+.error-code {
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    letter-spacing: 1px;
+}
+
+/* Animación */
+@@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.icon-container {
+    animation: shake 0.5s ease-in-out;
+}
+
+@@media (max-width: 480px) {
+    .denied-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .denied-title {
+        font-size: 2rem;
+    }
+
+    .denied-message {
+        font-size: 1rem;
+    }
+
+    .btn-home {
+        width: 100%;
+        justify-content: center;
+    }
+}

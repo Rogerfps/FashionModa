@@ -1,0 +1,99 @@
+﻿@model Proforma
+
+@{
+    ViewData["Title"] = "Nueva Proforma";
+}
+
+<link rel="stylesheet" href="~/css/Proforma/ProformaCreate.css" />
+
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>📄</span> Nueva Proforma
+    </h1>
+    <a asp-action="Index" class="back-link">
+        <span>←</span> Volver
+    </a>
+</div>
+
+<!-- Formulario -->
+<div class="form-card">
+    <form asp-action="Create">
+        <div class="section-title">
+            <span>📋</span> Información de la Proforma
+        </div>
+
+        <div class="form-grid">
+            <!-- Empresa -->
+            <div class="form-group">
+                <label asp-for="EmpresaId" class="form-label"></label>
+                <select asp-for="EmpresaId" class="form-select" asp-items="ViewBag.Empresas">
+                    <option value="">Seleccione una empresa</option>
+                </select>
+                <span asp-validation-for="EmpresaId" class="validation-error"></span>
+            </div>
+
+            <!-- Cliente -->
+            <div class="form-group">
+                <label asp-for="ClienteCedula" class="form-label"></label>
+                <select asp-for="ClienteCedula" class="form-select" asp-items="ViewBag.Clientes">
+                    <option value="">Seleccione un cliente</option>
+                </select>
+                <span asp-validation-for="ClienteCedula" class="validation-error"></span>
+            </div>
+
+            <!-- Facturado por -->
+            <div class="form-group">
+                <label asp-for="FacturadoPor" class="form-label"></label>
+                <input asp-for="FacturadoPor" class="form-control" placeholder="Nombre de quien factura" />
+                <span asp-validation-for="FacturadoPor" class="validation-error"></span>
+            </div>
+
+            <!-- Número de cajas -->
+            <div class="form-group">
+                <label asp-for="NumeroCajas" class="form-label"></label>
+                <input asp-for="NumeroCajas" class="form-control" type="number" min="0" placeholder="0" />
+                <span asp-validation-for="NumeroCajas" class="validation-error"></span>
+            </div>
+        </div>
+
+        <!-- Detalle -->
+        <div class="form-group mb-4">
+            <label asp-for="Detalle" class="form-label"></label>
+            <textarea asp-for="Detalle" class="form-control" rows="3" placeholder="Ingrese una nota o detalle adicional..."></textarea>
+            <span asp-validation-for="Detalle" class="validation-error"></span>
+        </div>
+
+        <!-- Fecha (solo lectura) -->
+        <div class="form-group mb-4">
+            <label class="form-label">Fecha</label>
+            <input type="text" class="form-control"
+                   value="@DateTime.Now.ToString("dd/MM/yyyy")"
+                   disabled
+                   readonly />
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-group mb-4">
+            <label asp-for="Observaciones" class="form-label"></label>
+            <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales..."></textarea>
+            <span asp-validation-for="Observaciones" class="validation-error"></span>
+        </div>
+
+        <!-- Botones -->
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn-back">
+                ← Cancelar
+            </a>
+            <button type="submit" class="btn-save">
+                💾 Guardar y agregar productos
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
