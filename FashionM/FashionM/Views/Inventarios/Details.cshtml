@@ -16,6 +16,7 @@
 
 <link rel="stylesheet" href="~/css/Inventario/InventarioDetails.css" />
 
+
 <!-- Header -->
 <div class="page-header">
     <h1 class="page-title">
@@ -25,6 +26,14 @@
         <span>←</span> Volver
     </a>
 </div>
+
+<!-- Botón de Historial -->
+<a asp-controller="HistorialInventario"
+       asp-action="PorProducto"
+       asp-route-codigo="@Model.Codigo"
+       class="btn-historial">
+    📜 Ver Historial del Producto
+</a>
 
 <!-- Card principal - Datos del Producto -->
 <div class="detail-card">
@@ -76,13 +85,6 @@
         </a>
     </div>
 </div>
-
-<a asp-controller="HistorialInventario"
-       asp-action="PorProducto"
-       asp-route-codigo="@Model.Codigo"
-       class="btn btn-sm btn-info">
-    Historial
-</a>
 
 <!-- Card - Variantes del Producto -->
 <div class="detail-card">

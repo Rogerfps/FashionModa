@@ -5,16 +5,19 @@
 
 <link rel="stylesheet" href="~/css/Inventario/InventarioIndex.css" />
 
-<!-- HEADER COMPACTO -->
+
+<!-- HEADER -->
 <div class="neo-header">
     <div class="container d-flex justify-content-between align-items-center px-4">
         <h1 class="title-glow">📦 Inventario</h1>
         <a asp-action="Create" class="btn-neo">➕ Nuevo</a>
     </div>
 </div>
+
+<!-- Botón de Historial General -->
 <a asp-controller="HistorialInventario"
-       asp-action="Index"
-       class="btn btn-sm btn-dark">
+   asp-action="Index"
+   class="btn-historial">
     📜 Historial General
 </a>
 
@@ -28,12 +31,11 @@
                name="search"
                value="@ViewBag.Search"
                class="filter-input flex-grow-1"
-               placeholder="Buscar...">
+               placeholder="Buscar por código, marca, SKU...">
 
         <!-- EMPRESA -->
         <select name="empresa" class="filter-input">
             <option value="">Todas las empresas</option>
-
             @foreach (var e in ViewBag.Empresas)
             {
                 <option value="@e" selected="@(ViewBag.Empresa == e)">
@@ -53,7 +55,7 @@
 
     </form>
 
-    <!-- TABLA COMPACTA -->
+    <!-- TABLA -->
     <div class="table-wrap">
         <div class="table-responsive">
             <table class="modern-table">
@@ -69,13 +71,14 @@
                         <th></th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-5">📭 Sin productos</td>
+                            <td colspan="8" class="text-center py-5">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
+                                <div class="empty-text">No hay productos en inventario</div>
+                            </td>
                         </tr>
                     }
                     else
@@ -83,7 +86,6 @@
                         foreach (var item in Model)
                         {
                             <tr>
-
                                 <!-- FOTO -->
                                 <td>
                                     @if (item.Fotos?.Any() == true)
@@ -102,7 +104,6 @@
                                 <!-- PRODUCTO -->
                                 <td>
                                     <div class="product-line">@item.Marca</div>
-                                    
                                 </td>
 
                                 <!-- SKU -->
@@ -112,12 +113,8 @@
 
                                 <!-- PRECIOS -->
                                 <td>
-                                    <div class="precio-venta">
-                                        ₡@item.PrecioVenta.ToString("N0")
-                                    </div>
-                                    <div class="precio-costo">
-                                        ₡@item.PrecioCosto.ToString("N0")
-                                    </div>
+                                    <div class="precio-venta">₡@item.PrecioVenta.ToString("N0")</div>
+                                    <div class="precio-costo">₡@item.PrecioCosto.ToString("N0")</div>
                                 </td>
 
                                 <!-- TALLAS -->
@@ -130,62 +127,49 @@
                                                 @t.Numero:@t.Cantidad
                                             </span>
                                         }
-
                                         @(item.Tallas.Count() > 3 ? "..." : "")
                                     }
                                 </td>
 
                                 <!-- STOCK -->
                                 <td>
-                                    <span class="stock-badge">
-                                        @item.StockTotal
-                                    </span>
+                                    <span class="stock-badge">@item.StockTotal</span>
                                 </td>
 
                                 <!-- ACCIONES -->
                                 <td>
                                     <div class="action-group">
-
                                         <a asp-action="Details"
                                            asp-route-id="@item.Codigo"
                                            class="btn-action btn-view"
-                                           title="Ver">
+                                           title="Ver detalles">
                                             👁
                                         </a>
 
                                         <a asp-action="Edit"
                                            asp-route-id="@item.Codigo"
                                            class="btn-action btn-edit"
-                                           title="Editar">
+                                           title="Editar producto">
                                             ✏️
                                         </a>
 
                                         <form asp-action="Delete"
                                               method="post"
                                               style="display:inline;"
-                                              onsubmit="return confirm('¿Eliminar?')">
-
+                                              onsubmit="return confirm('¿Eliminar este producto?')">
                                             @Html.AntiForgeryToken()
-
-                                            <input type="hidden"
-                                                   name="codigo"
-                                                   value="@item.Codigo">
-
+                                            <input type="hidden" name="codigo" value="@item.Codigo">
                                             <button type="submit"
                                                     class="btn-action btn-delete"
-                                                    title="Eliminar">
+                                                    title="Eliminar producto">
                                                 🗑
                                             </button>
-
                                         </form>
-
                                     </div>
                                 </td>
-
                             </tr>
                         }
                     }
-
                 </tbody>
             </table>
         </div>
@@ -195,7 +179,6 @@
     @if (ViewBag.TotalPages > 1)
     {
         <div class="pagination-compact">
-
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <a asp-action="Index"
@@ -203,13 +186,9 @@
                    asp-route-search="@ViewBag.Search"
                    asp-route-empresa="@ViewBag.Empresa"
                    class="page-compact @(i == ViewBag.CurrentPage ? "active" : "")">
-
                     @i
-
                 </a>
             }
-
         </div>
     }
-
 </div>

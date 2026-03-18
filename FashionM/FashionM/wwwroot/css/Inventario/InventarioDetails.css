@@ -21,7 +21,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .page-title {
@@ -90,7 +90,31 @@ body {
     gap: 8px;
 }
 
-/* Grid de información */
+/* Botón Historial */
+.btn-historial {
+    background: #e6f0fa;
+    color: var(--info);
+    border: none;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+    .btn-historial:hover {
+        background: var(--info);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+/* Info grid */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -159,16 +183,7 @@ body {
         text-transform: uppercase;
         padding: 0.8rem 0.5rem;
         text-align: center;
-        white-space: nowrap;
     }
-
-        .variantes-table th:first-child {
-            border-radius: 12px 0 0 12px;
-        }
-
-        .variantes-table th:last-child {
-            border-radius: 0 12px 12px 0;
-        }
 
     .variantes-table td {
         padding: 0.8rem 0.5rem;
@@ -191,20 +206,12 @@ body {
         text-align: left;
     }
 
-    .variantes-table .cantidad-cell {
-        font-weight: 500;
-    }
-
     .variantes-table .total-row {
         background: #e6f0fa;
         font-weight: 700;
     }
 
-        .variantes-table .total-row td {
-            border-top: 2px solid var(--deep-blue);
-        }
-
-/* Grid de fotos */
+/* Fotos grid */
 .fotos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -234,10 +241,8 @@ body {
     border-radius: 20px;
     padding: 0.3rem 0.8rem;
     font-size: 0.7rem;
-    font-weight: 500;
     width: 100%;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
     .btn-delete-foto:hover {
@@ -308,7 +313,6 @@ body {
 
     .btn-primary-small:hover {
         background: var(--electric-blue);
-        transform: translateY(-2px);
     }
 
 /* Empty state */
@@ -320,11 +324,9 @@ body {
     color: var(--text-gray);
 }
 
-/* Responsive */
 @@media (max-width: 768px) {
     .info-grid {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
     }
 
     .info-item {
@@ -340,16 +342,12 @@ body {
         flex-direction: column;
     }
 
-    .btn-edit, .btn-back {
-        width: 100%;
-        justify-content: center;
-    }
-
     .page-title {
         font-size: 1.5rem;
     }
 
-    .fotos-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .btn-historial {
+        width: 100%;
+        justify-content: center;
     }
 }
