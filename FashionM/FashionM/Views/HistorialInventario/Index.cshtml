@@ -1,0 +1,82 @@
+﻿@model List<HistorialInventario>
+
+@{
+    ViewData["Title"] = "Historial de Inventario";
+}
+
+<link rel="stylesheet" href="~/css/Historial/Index.css" />
+
+<!-- Header con estadística -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <span>📊</span> Historial General
+        </h1>
+        <div class="stats-badge mt-2">
+            <span>@Model.Count</span> registros encontrados
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de historial -->
+<div class="table-wrapper">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">No hay registros en el historial</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Fecha</th>
+                        <th>Motivo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="producto-cell">@item.CodigoInventario</td>
+
+                            <td>
+                                @if (item.Accion == "CREAR")
+                                {
+                                    <span class="action-badge crear">CREAR</span>
+                                }
+                                else if (item.Accion == "EDITAR")
+                                {
+                                    <span class="action-badge editar">EDITAR</span>
+                                }
+                                else if (item.Accion == "ELIMINAR")
+                                {
+                                    <span class="action-badge eliminar">ELIMINAR</span>
+                                }
+                            </td>
+
+                            <td class="usuario-cell">@item.Usuario</td>
+
+                            <td class="fecha-cell">@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+
+                            <td class="motivo-cell" title="@item.Motivo">@item.Motivo</td>
+
+                            <td>
+                                <a asp-action="Detalle" asp-route-id="@item.Id" class="btn-view">
+                                    👁 Ver detalles
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

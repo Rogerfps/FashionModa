@@ -236,6 +236,43 @@ namespace FashionM.Migrations
                     b.ToTable("Fotos");
                 });
 
+            modelBuilder.Entity("FashionM.Models.HistorialInventario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CodigoInventario")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DatosAntes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DatosDespues")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Motivo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HistorialInventarios");
+                });
+
             modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
                 {
                     b.Property<int>("Id")

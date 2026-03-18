@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FashionM.Controllers
 {
-    [Authorize(Roles = "Admin,Secretaria,Bodega")]
+    [Authorize(Roles = "Admin,Bodega")]
     public class MovimientosInventarioController : Controller
     {
         private readonly AppDbContext _context;

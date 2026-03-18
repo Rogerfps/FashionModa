@@ -1,0 +1,103 @@
+﻿@model HistorialInventario
+
+@{
+    ViewData["Title"] = "Detalle del Historial";
+}
+
+<link rel="stylesheet" href="~/css/Historial/Detalle.css" />
+
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>🔍</span> Detalle del Cambio
+    </h1>
+    <a asp-controller="HistorialInventario"
+           asp-action="Index"
+           class="btn-back">
+        ← Volver al Historial
+    </a>
+</div>
+
+<!-- Información general -->
+<div class="info-card">
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">Producto</span>
+            <span class="info-value">@Model.CodigoInventario</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Acción</span>
+            <span class="info-value">
+                @if (Model.Accion == "CREAR")
+                {
+                    <span class="badge badge-crear">CREAR</span>
+                }
+                else if (Model.Accion == "EDITAR")
+                {
+                    <span class="badge badge-editar">EDITAR</span>
+                }
+                else
+                {
+                    <span class="badge badge-eliminar">ELIMINAR</span>
+                }
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Usuario</span>
+            <span class="info-value">@Model.Usuario</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Fecha</span>
+            <span class="info-value">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+
+        <div class="info-item" style="grid-column: 1 / -1;">
+            <span class="info-label">Motivo</span>
+            <span class="info-value" style="background: #f8fafc; padding: 0.5rem; border-radius: 8px;">@Model.Motivo</span>
+        </div>
+    </div>
+</div>
+
+<!-- Comparación Antes / Después -->
+<div class="comparison-grid">
+    <!-- ANTES -->
+    <div class="comparison-card">
+        <div class="card-header-custom before">
+            <span>⏪</span> Estado Anterior
+        </div>
+        <div class="card-body-custom">
+            @if (!string.IsNullOrEmpty(Model.DatosAntes))
+            {
+                <pre class="data-preview">@Model.DatosAntes</pre>
+            }
+            else
+            {
+                <div class="empty-data">
+                    No hay datos anteriores
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- DESPUÉS -->
+    <div class="comparison-card">
+        <div class="card-header-custom after">
+            <span>⏩</span> Nuevo Estado
+        </div>
+        <div class="card-body-custom">
+            @if (!string.IsNullOrEmpty(Model.DatosDespues))
+            {
+                <pre class="data-preview">@Model.DatosDespues</pre>
+            }
+            else
+            {
+                <div class="empty-data">
+                    No hay datos posteriores
+                </div>
+            }
+        </div>
+    </div>
+</div>

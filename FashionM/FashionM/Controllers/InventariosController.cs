@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace FashionM.Controllers
 {
@@ -29,7 +30,6 @@ namespace FashionM.Controllers
                 .Include(i => i.Fotos)
                 .AsQueryable();
 
-            // 🔎 Buscador
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(i =>
@@ -41,7 +41,6 @@ namespace FashionM.Controllers
                 );
             }
 
-            // 🏢 Filtro empresa
             if (!string.IsNullOrWhiteSpace(empresa))
             {
                 query = query.Where(i => i.Empresa == empresa);
@@ -60,7 +59,6 @@ namespace FashionM.Controllers
             ViewBag.Search = search;
             ViewBag.Empresa = empresa;
 
-            // lista de empresas para dropdown
             ViewBag.Empresas = _context.Inventarios
                 .Select(i => i.Empresa)
                 .Distinct()
@@ -78,20 +76,16 @@ namespace FashionM.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            Inventario inventario,
-            List<IFormFile> imagenes)
+        public async Task<IActionResult> Create(Inventario inventario, List<IFormFile> imagenes)
         {
             inventario.Fotos ??= new List<Foto>();
             inventario.Tallas ??= new List<TallaInventario>();
 
-            // validar tallas
             if (!inventario.Tallas.Any())
             {
                 ModelState.AddModelError("", "Debe agregar al menos una talla");
             }
 
-            // validar codigo duplicado
             if (_context.Inventarios.Any(i => i.Codigo == inventario.Codigo))
             {
                 ModelState.AddModelError("Codigo", "Ya existe un inventario con este código");
@@ -100,17 +94,13 @@ namespace FashionM.Controllers
             if (!ModelState.IsValid)
                 return View(inventario);
 
-            // asignar FK a tallas
             foreach (var talla in inventario.Tallas)
             {
                 talla.InventarioCodigo = inventario.Codigo;
-
-                // seguridad por si vienen null
                 talla.Color ??= "";
                 talla.Detalle ??= "";
             }
 
-            // guardar imagenes
             if (imagenes != null && imagenes.Count > 0)
             {
                 var folder = Path.Combine(_environment.WebRootPath, "images", "inventarios");
@@ -142,20 +132,56 @@ namespace FashionM.Controllers
             _context.Inventarios.Add(inventario);
             await _context.SaveChangesAsync();
 
+            var usuario = User.Identity?.Name ?? "Desconocido";
+
+            await Guardar(
+                inventario.Codigo,
+                "CREAR",
+                usuario,
+                "Creación de producto",
+                null,
+                new
+                {
+                    inventario.Codigo,
+                    inventario.Marca,
+                    inventario.SKU,
+                    inventario.PrecioVenta,
+                    inventario.StockTotal
+                }
+            );
+
             return RedirectToAction(nameof(Index));
         }
 
-        // DELETE INVENTARIO
+        // DELETE
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string codigo)
         {
             var inventario = await _context.Inventarios
                 .Include(i => i.Fotos)
+                .Include(i => i.Tallas)
                 .FirstOrDefaultAsync(i => i.Codigo == codigo);
 
             if (inventario == null)
                 return NotFound();
+
+            var codigoSeguro = inventario.Codigo;
+
+            await Guardar(
+                codigoSeguro,
+                "ELIMINAR",
+                User.Identity?.Name ?? "Sistema",
+                "Eliminación de producto",
+                new
+                {
+                    inventario.Codigo,
+                    inventario.Marca,
+                    inventario.PrecioVenta,
+                    inventario.StockTotal
+                },
+                null
+            );
 
             foreach (var foto in inventario.Fotos)
             {
@@ -174,7 +200,6 @@ namespace FashionM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // EDIT GET
         // EDIT GET
         public async Task<IActionResult> Edit(string id)
         {
@@ -198,6 +223,11 @@ namespace FashionM.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            var inventarioAntes = await _context.Inventarios
+                .AsNoTracking()
+                .Include(i => i.Tallas)
+                .FirstAsync(i => i.Codigo == model.Codigo);
+
             var inventario = await _context.Inventarios
                 .Include(i => i.Tallas)
                 .Include(i => i.Fotos)
@@ -211,7 +241,6 @@ namespace FashionM.Controllers
             inventario.Empresa = model.Empresa;
 
             _context.TallasInventario.RemoveRange(inventario.Tallas);
-
             inventario.Tallas = new List<TallaInventario>();
 
             foreach (var talla in model.Tallas)
@@ -251,23 +280,33 @@ namespace FashionM.Controllers
 
             await _context.SaveChangesAsync();
 
+            var usuario = User.Identity?.Name ?? "Desconocido";
+
+            await Guardar(
+                inventario.Codigo,
+                "EDITAR",
+                usuario,
+                "Edición de producto",
+                new
+                {
+                    inventarioAntes.Codigo,
+                    inventarioAntes.Marca,
+                    inventarioAntes.PrecioVenta,
+                    inventarioAntes.StockTotal
+                },
+                new
+                {
+                    inventario.Codigo,
+                    inventario.Marca,
+                    inventario.PrecioVenta,
+                    inventario.StockTotal
+                }
+            );
+
             return RedirectToAction(nameof(Index));
         }
 
-        // DETAILS
-        public async Task<IActionResult> Details(string id)
-        {
-            var inventario = await _context.Inventarios
-                .Include(i => i.Tallas)
-                .Include(i => i.Fotos)
-                .FirstOrDefaultAsync(i => i.Codigo == id);
-
-            if (inventario == null)
-                return NotFound();
-
-            return View(inventario);
-        }
-
+        // UPDATE STOCK
         [HttpPost]
         public async Task<IActionResult> UpdateStock(string Codigo, List<TallaInventario> Tallas)
         {
@@ -294,31 +333,67 @@ namespace FashionM.Controllers
 
             await _context.SaveChangesAsync();
 
+            var usuario = User.Identity?.Name ?? "Desconocido";
+
+            await Guardar(
+                Codigo,
+                "EDITAR_STOCK",
+                usuario,
+                "Actualización de stock",
+                null,
+                Tallas.Select(t => new
+                {
+                    t.Numero,
+                    t.Cantidad,
+                    t.Color
+                })
+            );
+
             return RedirectToAction("Details", new { id = Codigo });
         }
 
-        // DELETE FOTO
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteFoto(int id, string inventarioCodigo)
+        public async Task<IActionResult> Details(string id)
         {
-            var foto = await _context.Fotos.FindAsync(id);
-
-            if (foto == null)
+            if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var rutaFisica = Path.Combine(
-                _environment.WebRootPath,
-                foto.Ruta.TrimStart('/')
-            );
+            var inventario = await _context.Inventarios
+                .Include(i => i.Tallas)
+                .Include(i => i.Fotos)
+                .FirstOrDefaultAsync(i => i.Codigo == id);
 
-            if (System.IO.File.Exists(rutaFisica))
-                System.IO.File.Delete(rutaFisica);
+            if (inventario == null)
+                return NotFound();
 
-            _context.Fotos.Remove(foto);
-            await _context.SaveChangesAsync();
+            return View(inventario);
+        }
 
-            return RedirectToAction("Details", new { id = inventarioCodigo });
+        // HISTORIAL
+        public async Task Guardar(string codigo, string accion, string usuario, string? motivo, object? antes, object? despues)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(codigo))
+                    return;
+
+                var historial = new HistorialInventario
+                {
+                    CodigoInventario = codigo,
+                    Accion = accion,
+                    Usuario = usuario,
+                    Fecha = DateTime.UtcNow,
+                    Motivo = motivo,
+                    DatosAntes = antes != null ? JsonSerializer.Serialize(antes) : null,
+                    DatosDespues = despues != null ? JsonSerializer.Serialize(despues) : null
+                };
+
+                _context.HistorialInventarios.Add(historial);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // no rompe sistema
+            }
         }
     }
 }

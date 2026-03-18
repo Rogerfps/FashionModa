@@ -1,0 +1,88 @@
+﻿@model List<HistorialInventario>
+
+@{
+    ViewData["Title"] = "Historial del Producto";
+}
+
+<link rel="stylesheet" href="~/css/Historial/PorProducto.css" />
+
+<!-- Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span>📋</span> Historial del Producto
+    </h1>
+    <a asp-controller="Inventarios" asp-action="Index" class="btn-back">
+        ← Volver al Inventario
+    </a>
+</div>
+
+<!-- Información del producto -->
+<div class="product-info-card">
+    <div class="product-icon">
+        📦
+    </div>
+    <div>
+        <div class="product-code">@ViewBag.Codigo</div>
+        <div class="product-label">Código del Producto</div>
+    </div>
+</div>
+
+<!-- Tabla de historial -->
+<div class="table-wrapper">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">No hay historial registrado para este producto</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Fecha</th>
+                        <th>Motivo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.Accion == "CREAR")
+                                {
+                                    <span class="action-badge crear">CREAR</span>
+                                }
+                                else if (item.Accion == "EDITAR")
+                                {
+                                    <span class="action-badge editar">EDITAR</span>
+                                }
+                                else
+                                {
+                                    <span class="action-badge eliminar">ELIMINAR</span>
+                                }
+                            </td>
+
+                            <td class="fw-semibold">@item.Usuario</td>
+
+                            <td class="fecha-cell">@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+
+                            <td class="motivo-cell" title="@item.Motivo">@item.Motivo</td>
+
+                            <td>
+                                <a asp-action="Detalle" asp-route-id="@item.Id" class="btn-view-changes">
+                                    👁 Ver cambios
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

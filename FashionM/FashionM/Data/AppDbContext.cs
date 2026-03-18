@@ -35,6 +35,7 @@ namespace FashionM.Data
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Proforma> Proformas { get; set; }
         public DbSet<ProformaDetalle> ProformaDetalles { get; set; }
+        public DbSet<HistorialInventario> HistorialInventarios { get; set; }
 
 
 
@@ -142,6 +143,13 @@ namespace FashionM.Data
                 .HasForeignKey(d => d.InventarioCodigo)
                 .HasPrincipalKey(i => i.Codigo)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            /*modelBuilder.Entity<HistorialInventario>()
+                .HasOne(h => h.Inventario)
+                .WithMany()
+                .HasForeignKey(h => h.CodigoInventario) No deja hacer delete
+                .HasPrincipalKey(i => i.Codigo)
+                .OnDelete(DeleteBehavior.Restrict);*/
         }
     }
 }

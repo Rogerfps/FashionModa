@@ -1,5 +1,6 @@
 ﻿using FashionM.Data;
 using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +12,7 @@ using QuestPDF.Infrastructure;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin,Secretaria")]
     public class ProformasController : Controller
     {
         private readonly AppDbContext _context;
