@@ -1,0 +1,93 @@
+﻿@model Empresa
+
+@{
+    ViewData["Title"] = "Editar Empresa";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">✏️ Editar Empresa</h2>
+
+    <form asp-action="Edit">
+
+        <!-- 🔴 MUY IMPORTANTE -->
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+
+            <!-- NOMBRE -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <!-- CEDULA -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="CedulaJuridica" class="form-label"></label>
+                <input asp-for="CedulaJuridica" class="form-control" />
+                <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
+            </div>
+
+            <!-- TELEFONO -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="Telefono" class="form-label"></label>
+                <input asp-for="Telefono" class="form-control" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+
+            <!-- DIRECCION -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="Direccion" class="form-label"></label>
+                <input asp-for="Direccion" class="form-control" />
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+
+            <!-- CUENTA BAC -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="CuentaBAC" class="form-label"></label>
+                <input asp-for="CuentaBAC" class="form-control" />
+                <span asp-validation-for="CuentaBAC" class="text-danger"></span>
+            </div>
+
+            <!-- CUENTA BCR -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="CuentaBCR" class="form-label"></label>
+                <input asp-for="CuentaBCR" class="form-control" />
+                <span asp-validation-for="CuentaBCR" class="text-danger"></span>
+            </div>
+
+            <!-- CUENTA BN -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="CuentaBN" class="form-label"></label>
+                <input asp-for="CuentaBN" class="form-control" />
+                <span asp-validation-for="CuentaBN" class="text-danger"></span>
+            </div>
+
+            <!-- SINPE -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="SimpeMovil" class="form-label"></label>
+                <input asp-for="SimpeMovil" class="form-control" />
+                <span asp-validation-for="SimpeMovil" class="text-danger"></span>
+            </div>
+
+        </div>
+
+        <!-- BOTONES -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+                💾 Guardar Cambios
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                ⬅ Volver
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

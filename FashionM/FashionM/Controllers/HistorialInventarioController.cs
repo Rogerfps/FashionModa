@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FashionM.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FashionM.Data;
 
 namespace FashionM.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class HistorialInventarioController : Controller
     {
         private readonly AppDbContext _context;
