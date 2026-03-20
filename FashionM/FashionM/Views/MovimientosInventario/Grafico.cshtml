@@ -1,0 +1,388 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Entradas vs Salidas";
+    
+    // Obtener valores de manera segura
+    int entradas = Model?.Entradas ?? 0;
+    int salidas = Model?.Salidas ?? 0;
+    int total = entradas + salidas;
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    :root {
+    --deep-blue: #0B2447;
+    --ocean-blue: #19376D;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-gray: #64748b;
+    --border-light: #e2e8f0;
+    }
+
+    body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+    }
+
+    /* Header */
+    .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    }
+
+    .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .btn-back {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+    background: var(--deep-blue);
+    color: white;
+    transform: translateY(-2px);
+    }
+
+    /* Card del gráfico */
+    .chart-card {
+    background: var(--pure-white);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+    }
+
+    .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .section-title span {
+    font-size: 1.3rem;
+    }
+
+    /* Canvas */
+    canvas {
+    max-height: 450px;
+    width: 100%;
+    }
+
+    /* Stats rápidos */
+    .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+    }
+
+    .stat-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    }
+
+    .stat-value.entradas {
+    color: var(--success);
+    }
+
+    .stat-value.salidas {
+    color: var(--danger);
+    }
+
+    .stat-value.total {
+    color: var(--deep-blue);
+    }
+
+    .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 0.3rem;
+    }
+
+    /* Empty state */
+    .empty-state {
+    text-align: center;
+    padding: 3rem;
+    }
+
+    .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+    }
+
+    .empty-text {
+    color: var(--text-gray);
+    font-size: 1rem;
+    }
+
+    /* Balance */
+    .balance-card {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    border-radius: 16px;
+    padding: 1.2rem;
+    text-align: center;
+    margin-top: 1rem;
+    }
+
+    .balance-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    }
+
+    .balance-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    }
+
+    .balance-value.positive {
+    color: #34d399;
+    }
+
+    .balance-value.negative {
+    color: #f87171;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+    .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    }
+        
+    .page-title {
+    font-size: 1.5rem;
+    }
+        
+    .stats-grid {
+    grid-template-columns: 1fr;
+    }
+        
+    .chart-card {
+    padding: 1rem;
+    }
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>📊</span> Entradas vs Salidas
+        </h1>
+        <a asp-action="Index" class="btn-back">
+            <span>←</span> Volver al Inventario
+        </a>
+    </div>
+
+    <!-- Card del gráfico -->
+    <div class="chart-card">
+        <div class="section-title">
+            <span>📈</span> Comparativa de Movimientos
+        </div>
+
+        @if (entradas > 0 || salidas > 0)
+        {
+            <canvas id="grafico"></canvas>
+
+            <!-- Stats rápidos -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value entradas">+@entradas</div>
+                    <div class="stat-label">Entradas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value salidas">-@salidas</div>
+                    <div class="stat-label">Salidas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value total">@total</div>
+                    <div class="stat-label">Total movimientos</div>
+                </div>
+            </div>
+
+            <!-- Balance -->
+            <div class="balance-card">
+                <div class="balance-label">Balance Neto</div>
+                <div class="balance-value @(entradas - salidas >= 0 ? "positive" : "negative")">
+                    @(entradas - salidas >= 0 ? "+" : "")@(entradas - salidas)
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-text">No hay datos de movimientos disponibles</div>
+                <div style="margin-top: 1rem;">
+                    <a asp-action="Index" class="btn-back" style="display: inline-flex;">
+                        ← Volver al Inventario
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    // Obtener valores de manera segura
+    const entradas = @entradas;
+    const salidas = @salidas;
+
+    if (entradas > 0 || salidas > 0) {
+    const ctx = document.getElementById('grafico').getContext('2d');
+        
+    new Chart(ctx, {
+    type: 'bar',
+    data: {
+    labels: ['Entradas', 'Salidas'],
+    datasets: [{
+    label: 'Cantidad de Unidades',
+    data: [entradas, salidas],
+    backgroundColor: ['rgba(16, 185, 129, 0.7)', 'rgba(239, 68, 68, 0.7)'],
+    borderColor: ['#10b981', '#ef4444'],
+    borderWidth: 2,
+    borderRadius: 8,
+    barPercentage: 0.6,
+    categoryPercentage: 0.7
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    legend: {
+    display: true,
+    position: 'top',
+    labels: {
+    font: {
+    family: 'Inter',
+    size: 12
+    },
+    color: '#1e293b'
+    }
+    },
+    tooltip: {
+    backgroundColor: '#0B2447',
+    titleFont: {
+    family: 'Inter',
+    size: 12
+    },
+    bodyFont: {
+    family: 'Inter',
+    size: 11
+    },
+    callbacks: {
+    label: function(context) {
+    return context.dataset.label + ': ' + context.raw + ' unidades';
+    }
+    }
+    }
+    },
+    scales: {
+    y: {
+    beginAtZero: true,
+    title: {
+    display: true,
+    text: 'Cantidad de Unidades',
+    font: {
+    family: 'Inter',
+    size: 11,
+    weight: '500'
+    },
+    color: '#64748b'
+    },
+    grid: {
+    color: '#e2e8f0',
+    drawBorder: true
+    },
+    ticks: {
+    font: {
+    family: 'Inter',
+    size: 11
+    },
+    stepSize: 1
+    }
+    },
+    x: {
+    title: {
+    display: true,
+    text: 'Tipo de Movimiento',
+    font: {
+    family: 'Inter',
+    size: 11,
+    weight: '500'
+    },
+    color: '#64748b'
+    },
+    grid: {
+    display: false
+    },
+    ticks: {
+    font: {
+    family: 'Inter',
+    size: 12,
+    weight: '500'
+    }
+    }
+    }
+    }
+    }
+    });
+    }
+</script>

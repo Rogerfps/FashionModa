@@ -395,5 +395,25 @@ namespace FashionM.Controllers
                 // no rompe sistema
             }
         }
+
+        public IActionResult GraficoStockPorMarca()
+        {
+            var data = _context.Inventarios
+                .Include(i => i.Tallas)
+                .AsEnumerable() // importante por el Sum de propiedad calculada
+                .GroupBy(i => i.Marca)
+                .Select(g => new
+                {
+                    Marca = g.Key,
+                    Stock = g.Sum(i => i.StockTotal)
+                })
+                .OrderByDescending(x => x.Stock)
+                .ToList();
+
+            ViewBag.Marcas = data.Select(x => x.Marca).ToList();
+            ViewBag.Stock = data.Select(x => x.Stock).ToList();
+
+            return View();
+        }
     }
 }

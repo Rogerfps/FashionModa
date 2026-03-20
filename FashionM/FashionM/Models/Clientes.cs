@@ -66,6 +66,5 @@ namespace FashionM.Models
 // Add-Migration ProveedorEmpresa
 
 /*
- Necesito hacer lo mismo con las fotos, tomar las fotos segun el codigo y añadirlas al pedido proveedor
-
+ Necesito hacer un grafico de entradas vs salidas
  */

@@ -1,0 +1,184 @@
+﻿@{
+    ViewData["Title"] = "Stock por Marca";
+    
+    // Convertir los datos a listas tipadas para evitar problemas con dynamic
+    var marcas = ViewBag.Marcas as List<string> ?? new List<string>();
+    var stock = ViewBag.Stock as List<int> ?? new List<int>();
+    
+    // Calcular estadísticas de manera segura
+    int totalMarcas = marcas.Count;
+    int totalUnidades = stock.Sum();
+    int maximoStock = stock.Any() ? stock.Max() : 0;
+    double promedioStock = stock.Any() ? stock.Average() : 0;
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="~/css/Inventario/GraficoStockPorMarca.css" />
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>📊</span> Stock por Marca
+        </h1>
+        <a asp-action="Index" class="btn-back">
+            <span>←</span> Volver al Inventario
+        </a>
+    </div>
+
+    <!-- Card del gráfico -->
+    <div class="chart-card">
+        <div class="section-title">
+            <span>📈</span> Distribución de Stock por Marca
+        </div>
+
+        @if (marcas.Any() && stock.Any())
+        {
+            <canvas id="graficoStock"></canvas>
+
+            <!-- Stats rápidos -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">@totalMarcas</div>
+                    <div class="stat-label">Marcas registradas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">@totalUnidades</div>
+                    <div class="stat-label">Total unidades</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">@maximoStock</div>
+                    <div class="stat-label">Máximo stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">@promedioStock.ToString("F0")</div>
+                    <div class="stat-label">Promedio por marca</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-text">No hay datos disponibles para mostrar</div>
+                <div style="margin-top: 1rem;">
+                    <a asp-action="Index" class="btn-back" style="display: inline-flex;">
+                        ← Volver al Inventario
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    // Obtener datos de manera segura
+    const labels = @Html.Raw(Json.Serialize(marcas));
+    const data = @Html.Raw(Json.Serialize(stock));
+
+    if (labels && labels.length > 0 && data && data.length > 0) {
+    const ctx = document.getElementById('graficoStock').getContext('2d');
+        
+    new Chart(ctx, {
+    type: 'bar',
+    data: {
+    labels: labels,
+    datasets: [{
+    label: 'Unidades en Stock',
+    data: data,
+    backgroundColor: 'rgba(11, 36, 71, 0.7)',
+    borderColor: '#0B2447',
+    borderWidth: 1,
+    borderRadius: 8,
+    barPercentage: 0.7,
+    categoryPercentage: 0.8
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    legend: {
+    display: true,
+    position: 'top',
+    labels: {
+    font: {
+    family: 'Inter',
+    size: 12
+    },
+    color: '#1e293b'
+    }
+    },
+    tooltip: {
+    backgroundColor: '#0B2447',
+    titleFont: {
+    family: 'Inter',
+    size: 12
+    },
+    bodyFont: {
+    family: 'Inter',
+    size: 11
+    },
+    callbacks: {
+    label: function(context) {
+    return 'Stock: ' + context.raw + ' unidades';
+    }
+    }
+    }
+    },
+    scales: {
+    y: {
+    beginAtZero: true,
+    title: {
+    display: true,
+    text: 'Cantidad de Unidades',
+    font: {
+    family: 'Inter',
+    size: 11,
+    weight: '500'
+    },
+    color: '#64748b'
+    },
+    grid: {
+    color: '#e2e8f0',
+    drawBorder: true
+    },
+    ticks: {
+    font: {
+    family: 'Inter',
+    size: 11
+    },
+    stepSize: 1
+    }
+    },
+    x: {
+    title: {
+    display: true,
+    text: 'Marcas',
+    font: {
+    family: 'Inter',
+    size: 11,
+    weight: '500'
+    },
+    color: '#64748b'
+    },
+    grid: {
+    display: false
+    },
+    ticks: {
+    font: {
+    family: 'Inter',
+    size: 11
+    },
+    rotation: labels.length > 8 ? 45 : 0,
+    autoSkip: true,
+    maxRotation: 45,
+    minRotation: 0
+    }
+    }
+    }
+    }
+    });
+    }
+</script>

@@ -192,6 +192,23 @@ namespace FashionM.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> Grafico()
+        {
+            var data = await _context.HistorialInventarios
+                .ToListAsync();
+
+            var entradas = data.Count(h => h.Accion == "CREAR");
+            var salidas = data.Count(h => h.Accion == "ELIMINAR");
+
+            var model = new
+            {
+                Entradas = entradas,
+                Salidas = salidas
+            };
+
+            return View(model);
+        }
     }
 }
 
