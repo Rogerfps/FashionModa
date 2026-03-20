@@ -398,9 +398,11 @@ namespace FashionM.Controllers
 
         public IActionResult GraficoStockPorMarca()
         {
-            var data = _context.Inventarios
+            var inventarios = _context.Inventarios
                 .Include(i => i.Tallas)
-                .AsEnumerable() // importante por el Sum de propiedad calculada
+                .ToList();
+
+            var stockPorMarca = inventarios
                 .GroupBy(i => i.Marca)
                 .Select(g => new
                 {
@@ -410,8 +412,21 @@ namespace FashionM.Controllers
                 .OrderByDescending(x => x.Stock)
                 .ToList();
 
-            ViewBag.Marcas = data.Select(x => x.Marca).ToList();
-            ViewBag.Stock = data.Select(x => x.Stock).ToList();
+            var stockPorEmpresa = inventarios
+                .GroupBy(i => i.Empresa)
+                .Select(g => new
+                {
+                    Empresa = g.Key,
+                    Stock = g.Sum(i => i.StockTotal)
+                })
+                .OrderByDescending(x => x.Stock)
+                .ToList();
+
+            ViewBag.Marcas = stockPorMarca.Select(x => x.Marca).ToList();
+            ViewBag.StockMarca = stockPorMarca.Select(x => x.Stock).ToList();
+
+            ViewBag.Empresas = stockPorEmpresa.Select(x => x.Empresa).ToList();
+            ViewBag.StockEmpresa = stockPorEmpresa.Select(x => x.Stock).ToList();
 
             return View();
         }

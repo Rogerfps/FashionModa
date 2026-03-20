@@ -1,15 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "Stock por Marca";
+    ViewData["Title"] = "Stock por Marca y Empresa";
     
-    // Convertir los datos a listas tipadas para evitar problemas con dynamic
+    // Convertir los datos a listas tipadas
     var marcas = ViewBag.Marcas as List<string> ?? new List<string>();
-    var stock = ViewBag.Stock as List<int> ?? new List<int>();
+    var stockMarca = ViewBag.StockMarca as List<int> ?? new List<int>();
+    var empresas = ViewBag.Empresas as List<string> ?? new List<string>();
+    var stockEmpresa = ViewBag.StockEmpresa as List<int> ?? new List<int>();
     
-    // Calcular estadísticas de manera segura
+    // Calcular estadísticas
     int totalMarcas = marcas.Count;
-    int totalUnidades = stock.Sum();
-    int maximoStock = stock.Any() ? stock.Max() : 0;
-    double promedioStock = stock.Any() ? stock.Average() : 0;
+    int totalEmpresas = empresas.Count;
+    int totalUnidades = stockMarca.Sum();
+    int maximoStockMarca = stockMarca.Any() ? stockMarca.Max() : 0;
+    int maximoStockEmpresa = stockEmpresa.Any() ? stockEmpresa.Max() : 0;
 }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,24 +23,29 @@
     <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">
-            <span>📊</span> Stock por Marca
+            <span>📊</span> Stock por Marca y Empresa
         </h1>
         <a asp-action="Index" class="btn-back">
             <span>←</span> Volver al Inventario
         </a>
     </div>
 
-    <!-- Card del gráfico -->
-    <div class="chart-card">
+    <!-- Tabs -->
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="showTab('marca')">📦 Por Marca</button>
+        <button class="tab-btn" onclick="showTab('empresa')">🏢 Por Empresa</button>
+    </div>
+
+    <!-- Gráfico por Marca -->
+    <div id="tabMarca" class="chart-card active">
         <div class="section-title">
             <span>📈</span> Distribución de Stock por Marca
         </div>
 
-        @if (marcas.Any() && stock.Any())
+        @if (marcas.Any() && stockMarca.Any())
         {
-            <canvas id="graficoStock"></canvas>
+            <canvas id="graficoMarca"></canvas>
 
-            <!-- Stats rápidos -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value">@totalMarcas</div>
@@ -48,11 +56,11 @@
                     <div class="stat-label">Total unidades</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">@maximoStock</div>
+                    <div class="stat-value">@maximoStockMarca</div>
                     <div class="stat-label">Máximo stock</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">@promedioStock.ToString("F0")</div>
+                    <div class="stat-value">@(stockMarca.Any() ? stockMarca.Average().ToString("F0") : "0")</div>
                     <div class="stat-label">Promedio por marca</div>
                 </div>
             </div>
@@ -60,36 +68,98 @@
         else
         {
             <div class="empty-state">
-                <div class="empty-icon">📊</div>
-                <div class="empty-text">No hay datos disponibles para mostrar</div>
-                <div style="margin-top: 1rem;">
-                    <a asp-action="Index" class="btn-back" style="display: inline-flex;">
-                        ← Volver al Inventario
-                    </a>
+                <div class="empty-icon">📦</div>
+                <div class="empty-text">No hay datos de stock por marca disponibles</div>
+            </div>
+        }
+    </div>
+
+    <!-- Gráfico por Empresa -->
+    <div id="tabEmpresa" class="chart-card">
+        <div class="section-title">
+            <span>🏢</span> Distribución de Stock por Empresa
+        </div>
+
+        @if (empresas.Any() && stockEmpresa.Any())
+        {
+            <canvas id="graficoEmpresa"></canvas>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">@totalEmpresas</div>
+                    <div class="stat-label">Empresas registradas</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value">@totalUnidades</div>
+                    <div class="stat-label">Total unidades</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">@maximoStockEmpresa</div>
+                    <div class="stat-label">Máximo stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">@(stockEmpresa.Any() ? stockEmpresa.Average().ToString("F0") : "0")</div>
+                    <div class="stat-label">Promedio por empresa</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">🏢</div>
+                <div class="empty-text">No hay datos de stock por empresa disponibles</div>
             </div>
         }
     </div>
 </div>
 
 <script>
-    // Obtener datos de manera segura
-    const labels = @Html.Raw(Json.Serialize(marcas));
-    const data = @Html.Raw(Json.Serialize(stock));
+    // Datos para el gráfico de marcas
+    const marcasLabels = @Html.Raw(Json.Serialize(marcas));
+    const marcasData = @Html.Raw(Json.Serialize(stockMarca));
+    
+    // Datos para el gráfico de empresas
+    const empresasLabels = @Html.Raw(Json.Serialize(empresas));
+    const empresasData = @Html.Raw(Json.Serialize(stockEmpresa));
 
-    if (labels && labels.length > 0 && data && data.length > 0) {
-    const ctx = document.getElementById('graficoStock').getContext('2d');
+    let chartMarca = null;
+    let chartEmpresa = null;
+
+    // Función para mostrar pestaña
+    function showTab(tab) {
+    // Cambiar clases activas en tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    if (tab === 'marca') {
+    document.querySelector('.tab-btn:first-child').classList.add('active');
+    } else {
+    document.querySelector('.tab-btn:last-child').classList.add('active');
+    }
         
-    new Chart(ctx, {
+    // Mostrar/ocultar cards
+    document.getElementById('tabMarca').classList.toggle('active', tab === 'marca');
+    document.getElementById('tabEmpresa').classList.toggle('active', tab === 'empresa');
+        
+    // Redimensionar gráficos
+    setTimeout(() => {
+    if (chartMarca) chartMarca.resize();
+    if (chartEmpresa) chartEmpresa.resize();
+    }, 100);
+    }
+
+    // Crear gráfico de marcas
+    if (marcasLabels && marcasLabels.length > 0 && marcasData && marcasData.length > 0) {
+    const ctxMarca = document.getElementById('graficoMarca').getContext('2d');
+        
+    chartMarca = new Chart(ctxMarca, {
     type: 'bar',
     data: {
-    labels: labels,
+    labels: marcasLabels,
     datasets: [{
     label: 'Unidades en Stock',
-    data: data,
+    data: marcasData,
     backgroundColor: 'rgba(11, 36, 71, 0.7)',
     borderColor: '#0B2447',
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 8,
     barPercentage: 0.7,
     categoryPercentage: 0.8
@@ -103,26 +173,17 @@
     display: true,
     position: 'top',
     labels: {
-    font: {
-    family: 'Inter',
-    size: 12
-    },
+    font: { family: 'Inter', size: 12 },
     color: '#1e293b'
     }
     },
     tooltip: {
     backgroundColor: '#0B2447',
-    titleFont: {
-    family: 'Inter',
-    size: 12
-    },
-    bodyFont: {
-    family: 'Inter',
-    size: 11
-    },
+    titleFont: { family: 'Inter', size: 12 },
+    bodyFont: { family: 'Inter', size: 11 },
     callbacks: {
     label: function(context) {
-    return 'Stock: ' + context.raw + ' unidades';
+    return context.dataset.label + ': ' + context.raw + ' unidades';
     }
     }
     }
@@ -133,48 +194,99 @@
     title: {
     display: true,
     text: 'Cantidad de Unidades',
-    font: {
-    family: 'Inter',
-    size: 11,
-    weight: '500'
-    },
+    font: { family: 'Inter', size: 11, weight: '500' },
     color: '#64748b'
     },
-    grid: {
-    color: '#e2e8f0',
-    drawBorder: true
-    },
-    ticks: {
-    font: {
-    family: 'Inter',
-    size: 11
-    },
-    stepSize: 1
-    }
+    grid: { color: '#e2e8f0' },
+    ticks: { font: { family: 'Inter', size: 11 }, stepSize: 1 }
     },
     x: {
     title: {
     display: true,
     text: 'Marcas',
-    font: {
-    family: 'Inter',
-    size: 11,
-    weight: '500'
-    },
+    font: { family: 'Inter', size: 11, weight: '500' },
     color: '#64748b'
     },
-    grid: {
-    display: false
-    },
+    grid: { display: false },
     ticks: {
-    font: {
-    family: 'Inter',
-    size: 11
-    },
-    rotation: labels.length > 8 ? 45 : 0,
+    font: { family: 'Inter', size: 11 },
+    rotation: marcasLabels.length > 8 ? 45 : 0,
     autoSkip: true,
-    maxRotation: 45,
-    minRotation: 0
+    maxRotation: 45
+    }
+    }
+    }
+    }
+    });
+    }
+
+    // Crear gráfico de empresas
+    if (empresasLabels && empresasLabels.length > 0 && empresasData && empresasData.length > 0) {
+    const ctxEmpresa = document.getElementById('graficoEmpresa').getContext('2d');
+        
+    chartEmpresa = new Chart(ctxEmpresa, {
+    type: 'bar',
+    data: {
+    labels: empresasLabels,
+    datasets: [{
+    label: 'Unidades en Stock',
+    data: empresasData,
+    backgroundColor: 'rgba(87, 108, 188, 0.7)',
+    borderColor: '#576CBC',
+    borderWidth: 2,
+    borderRadius: 8,
+    barPercentage: 0.7,
+    categoryPercentage: 0.8
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    legend: {
+    display: true,
+    position: 'top',
+    labels: {
+    font: { family: 'Inter', size: 12 },
+    color: '#1e293b'
+    }
+    },
+    tooltip: {
+    backgroundColor: '#0B2447',
+    titleFont: { family: 'Inter', size: 12 },
+    bodyFont: { family: 'Inter', size: 11 },
+    callbacks: {
+    label: function(context) {
+    return context.dataset.label + ': ' + context.raw + ' unidades';
+    }
+    }
+    }
+    },
+    scales: {
+    y: {
+    beginAtZero: true,
+    title: {
+    display: true,
+    text: 'Cantidad de Unidades',
+    font: { family: 'Inter', size: 11, weight: '500' },
+    color: '#64748b'
+    },
+    grid: { color: '#e2e8f0' },
+    ticks: { font: { family: 'Inter', size: 11 }, stepSize: 1 }
+    },
+    x: {
+    title: {
+    display: true,
+    text: 'Empresas',
+    font: { family: 'Inter', size: 11, weight: '500' },
+    color: '#64748b'
+    },
+    grid: { display: false },
+    ticks: {
+    font: { family: 'Inter', size: 11 },
+    rotation: empresasLabels.length > 8 ? 45 : 0,
+    autoSkip: true,
+    maxRotation: 45
     }
     }
     }

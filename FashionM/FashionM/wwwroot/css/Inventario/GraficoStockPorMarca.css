@@ -57,7 +57,38 @@ body {
         transform: translateY(-2px);
     }
 
-/* Card del gráfico */
+/* Tabs */
+.tabs-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 30px;
+}
+
+    .tab-btn:hover {
+        color: var(--deep-blue);
+        background: #f1f5f9;
+    }
+
+    .tab-btn.active {
+        color: var(--deep-blue);
+        background: #e6f0fa;
+    }
+
+/* Cards de gráficos */
 .chart-card {
     background: var(--pure-white);
     border-radius: 24px;
@@ -65,7 +96,12 @@ body {
     box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
     border: 1px solid var(--border-light);
     margin-bottom: 2rem;
+    display: none;
 }
+
+    .chart-card.active {
+        display: block;
+    }
 
 .section-title {
     font-size: 1.1rem;
@@ -85,14 +121,14 @@ body {
 
 /* Canvas */
 canvas {
-    max-height: 500px;
+    max-height: 450px;
     width: 100%;
 }
 
-/* Stats rápidos */
+/* Stats grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-top: 1.5rem;
 }
@@ -118,10 +154,11 @@ canvas {
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-gray);
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    margin-top: 0.3rem;
 }
 
 /* Empty state */
@@ -154,10 +191,15 @@ canvas {
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .chart-card {
         padding: 1rem;
+    }
+
+    .tab-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
     }
 }
