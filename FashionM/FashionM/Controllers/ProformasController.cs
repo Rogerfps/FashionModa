@@ -27,13 +27,49 @@ namespace FashionM.Controllers
         // ==========================
         // LISTADO
         // ==========================
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string buscar, int? empresaId)
         {
-            var proformas = await _context.Proformas
+            var query = _context.Proformas
                 .Include(p => p.Empresa)
                 .Include(p => p.Cliente)
+                .AsQueryable();
+
+            // 🔍 FILTRO POR NUMERO
+            if (!string.IsNullOrEmpty(buscar))
+            {
+                buscar = buscar.ToLower();
+
+                query = query.Where(p =>
+                    // 🔢 Buscar por número de proforma
+                    p.Id.ToString().Contains(buscar)
+
+                    // 👤 Nombre cliente
+                    || p.Cliente.Nombre.ToLower().Contains(buscar)
+
+                    // 👤 Apellidos
+                    || p.Cliente.Apellidos.ToLower().Contains(buscar)
+
+                    // 🆔 Código cliente
+                    || p.Cliente.Codigo.ToLower().Contains(buscar)
+                );
+            }
+
+            // 🏢 FILTRO POR EMPRESA
+            if (empresaId.HasValue)
+            {
+                query = query.Where(p => p.EmpresaId == empresaId.Value);
+            }
+
+            var proformas = await query
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
+
+            // 🔽 PARA EL DROPDOWN
+            ViewBag.Empresas = await _context.Empresas.ToListAsync();
+
+            // 🔽 MANTENER VALORES
+            ViewBag.Buscar = buscar;
+            ViewBag.EmpresaId = empresaId;
 
             return View(proformas);
         }
@@ -274,7 +310,7 @@ namespace FashionM.Controllers
                     page.Content().Column(col =>
                     {
                         // 🔷 BARRA SUPERIOR (branding)
-                        col.Item().Background(accentColor).Height(8);
+                        col.Item().Background(accentColor).Height(15);
 
                         // 🔷 CONTENIDO PRINCIPAL
                         col.Item().Padding(25).Column(content =>
@@ -306,7 +342,7 @@ namespace FashionM.Controllers
                             // 🔷 BLOQUES (EMPRESA / CLIENTE)
                             content.Item().Row(row =>
                             {
-                                row.RelativeItem().Border(1).BorderColor("#e5e7eb").Padding(12).Column(c =>
+                                row.RelativeItem().Border(1).BorderColor("#e5e7eb").Padding(20).Column(c =>
                                 {
                                     c.Item().Text("EMPRESA")
                                         .Bold()
@@ -331,7 +367,7 @@ namespace FashionM.Controllers
                                     c.Item().Text($"{proforma.Cliente.Nombre} {proforma.Cliente.Apellidos}")
                                         .Bold().FontSize(12);
 
-                                    c.Item().Text($"Código: {proforma.Cliente.Codigo}");
+                                    //c.Item().Text($"Código: {proforma.Cliente.Codigo}");
                                     c.Item().Text($"Tel: {proforma.Cliente.Telefonos}");
                                     c.Item().Text(proforma.Cliente.Direccion);
                                     c.Item().Text($"Agente: {proforma.Cliente.Agente}");
@@ -364,7 +400,7 @@ namespace FashionM.Controllers
                                 {
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Código").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Color").Bold();
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Talla").Bold();
+                                    //header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Talla").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Cant").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Precio").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Subtotal").Bold();
@@ -374,7 +410,7 @@ namespace FashionM.Controllers
                                 {
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.InventarioCodigo);
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Color);
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Talla);
+                                    //table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Talla);
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text(item.Cantidad.ToString());
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.PrecioUnitario:N2}");
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.SubTotal:N2}");

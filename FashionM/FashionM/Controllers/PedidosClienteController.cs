@@ -29,13 +29,22 @@ namespace FashionM.Controllers
                 .Include(p => p.Cliente)
                 .AsQueryable();
 
-            // 🔍 BÚSQUEDA GENERAL
+            // 🔍 BÚSQUEDA GENERAL + ID
             if (!string.IsNullOrWhiteSpace(buscar))
             {
+                buscar = buscar.Trim();
+
+                // 🔹 Intentar convertir a número
+                bool esNumero = int.TryParse(buscar, out int idBuscado);
+
                 pedidos = pedidos.Where(p =>
-                    p.Cliente.Nombre.Contains(buscar) ||
-                    p.Cliente.Apellidos.Contains(buscar) ||
-                    p.Cliente.Cedula.ToString().Contains(buscar)
+                    // 🔹 Buscar por ID si es número
+                    (esNumero && p.Id == idBuscado)
+
+                    // 🔹 O por cliente
+                    || p.Cliente.Nombre.Contains(buscar)
+                    || p.Cliente.Apellidos.Contains(buscar)
+                    || p.Cliente.Cedula.ToString().Contains(buscar)
                 );
             }
 
@@ -61,8 +70,6 @@ namespace FashionM.Controllers
                 pedidos = pedidos.Where(p => p.Semana == semana.Value);
             }
 
-            
-
             // 🔽 TOTAL
             int totalRegistros = await pedidos.CountAsync();
 
@@ -79,7 +86,7 @@ namespace FashionM.Controllers
             // 🏢 LISTA DE EMPRESAS 
             ViewBag.Empresas = _context.PedidosCliente
                 .Where(p => !string.IsNullOrWhiteSpace(p.Empresa))
-                .AsEnumerable()                 
+                .AsEnumerable()
                 .SelectMany(p => p.Empresa.Split('|'))
                 .Select(e => e.Trim())
                 .Distinct()
@@ -88,7 +95,7 @@ namespace FashionM.Controllers
 
             return View(lista);
         }
-        
+
 
         // =====================================================
         // DETALLE DEL PEDIDO

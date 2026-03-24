@@ -18,6 +18,8 @@ namespace FashionM.Models
 
         public int Cantidad { get; set; }
 
+        
+
         [ValidateNever]
         public string InventarioCodigo { get; set; }
 

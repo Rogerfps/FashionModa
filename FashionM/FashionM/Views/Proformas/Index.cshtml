@@ -17,6 +17,49 @@
         </a>
     </div>
 
+    <form method="get" class="mb-3">
+
+        <div class="row">
+
+            <!-- 🔍 BUSCAR POR NUMERO -->
+            <div class="col-md-4">
+                <input type="text" name="buscar" class="form-control"
+                       placeholder="Buscar por # Proforma"
+                       value="@ViewBag.Buscar" />
+            </div>
+
+            <!-- 🏢 FILTRO EMPRESA -->
+            <div class="col-md-4">
+                <select name="empresaId" class="form-control">
+                    <option value="">-- Todas las empresas --</option>
+
+                    @foreach (var emp in ViewBag.Empresas)
+                    {
+                        <option value="@emp.Id"
+                                selected="@(ViewBag.EmpresaId != null && ViewBag.EmpresaId == emp.Id ? "selected" : null)">
+                            @emp.Nombre
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- 🔘 BOTONES -->
+            <div class="col-md-4">
+
+                <button type="submit" class="btn btn-primary">
+                    🔍 Buscar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpiar
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
     <!-- Tabla -->
     <div class="table-wrapper">
         <div class="table-responsive">
