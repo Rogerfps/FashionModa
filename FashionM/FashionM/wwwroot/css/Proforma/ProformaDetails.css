@@ -1,90 +1,236 @@
-﻿:root {
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
     --deep-blue: #0B2447;
     --electric-blue: #576CBC;
     --light-bg: #F5F9FF;
     --pure-white: #FFFFFF;
     --success: #10b981;
     --warning: #f59e0b;
+    --danger: #ef4444;
     --text-gray: #64748b;
     --border-light: #e2e8f0;
 }
 
 body {
     background: var(--light-bg);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Header minimalista */
-.page-header {
+/* Contenedor principal */
+.proforma-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.page-title {
+.header-title {
     font-size: 2rem;
-    font-weight: 600;
-    color: var(--deep-blue);
-    margin: 0;
-    letter-spacing: -0.02em;
-}
-
-    .page-title span {
-        font-size: 1.8rem;
-        margin-right: 0.5rem;
-    }
-
-.btn-outline {
-    border: 1px solid var(--deep-blue);
-    color: var(--deep-blue);
-    background: transparent;
-    padding: 0.5rem 1.2rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.2s;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-    .btn-outline:hover {
+.btn-back {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+    .btn-back:hover {
         background: var(--deep-blue);
         color: white;
     }
 
-/* Layout principal */
-.proforma-container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* Header de la proforma */
-.proforma-header {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+/* Card */
+.card {
+    background: var(--pure-white);
+    border-radius: 20px;
     border: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
 }
 
-.proforma-numero {
-    font-size: 1.5rem;
+.card-header {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+    .card-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Grid de información */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-gray);
+    letter-spacing: 0.3px;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--deep-blue);
+    word-break: break-word;
+}
+
+/* Row de datos */
+.data-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.data-col {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Detalle especial */
+.detalle-box {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-left: 3px solid var(--electric-blue);
+}
+
+/* ========== TABLA CORREGIDA ========== */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+    .product-table th,
+    .product-table td {
+        padding: 0.75rem 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .product-table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-gray);
+        letter-spacing: 0.3px;
+        border-bottom: 2px solid var(--border-light);
+    }
+
+    .product-table tbody tr:hover {
+        background-color: #fafcff;
+    }
+
+    /* Alineación numérica */
+    .product-table td:last-child,
+    .product-table th:last-child,
+    .product-table td:nth-last-child(2),
+    .product-table th:nth-last-child(2),
+    .product-table td:nth-last-child(3),
+    .product-table th:nth-last-child(3) {
+        text-align: right;
+    }
+
+    .product-table td:first-child,
+    .product-table th:first-child {
+        text-align: left;
+    }
+
+.text-right {
+    text-align: right;
+}
+
+.fw-bold {
     font-weight: 600;
     color: var(--deep-blue);
 }
 
-.proforma-fecha {
-    color: var(--text-gray);
-    font-size: 0.9rem;
+/* Total */
+.total-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-light);
 }
 
-.btn-pdf-simple {
+.total-box {
+    text-align: right;
+}
+
+.total-label {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    margin-bottom: 0.25rem;
+}
+
+.total-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--deep-blue);
+}
+
+/* Botones */
+.btn-pdf {
     background: var(--success);
     color: white;
     padding: 0.6rem 1.5rem;
@@ -93,211 +239,90 @@ body {
     font-size: 0.9rem;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-/* Grid de información */
-.info-grid-modern {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.info-card-modern {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid var(--border-light);
-}
-
-.info-card-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.info-row-modern {
-    display: flex;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-}
-
-.info-row-label {
-    width: 100px;
-    color: var(--text-gray);
-}
-
-.info-row-value {
-    flex: 1;
-    color: var(--deep-blue);
-    font-weight: 500;
-}
-
-/* Detalle especial */
-.detalle-section {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    border-left: 3px solid var(--electric-blue);
-}
-
-/* Tabla de productos */
-.productos-section {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid var(--border-light);
-    margin-bottom: 2rem;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-    .section-header h3 {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--deep-blue);
-        margin: 0;
+    .btn-pdf:hover {
+        opacity: 0.9;
     }
 
-.table-modern {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
-
-    .table-modern th {
-        text-align: left;
-        padding: 0.8rem 0.5rem;
-        color: var(--text-gray);
-        font-weight: 500;
-        font-size: 0.8rem;
-        border-bottom: 1px solid var(--border-light);
-    }
-
-    .table-modern td {
-        padding: 0.8rem 0.5rem;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .table-modern tbody tr:hover {
-        background: #f8fafc;
-    }
-
-    .table-modern .total-row {
-        background: #f8fafc;
-        font-weight: 600;
-    }
-
-        .table-modern .total-row td {
-            border-top: 2px solid var(--border-light);
-        }
-
-.text-right {
-    text-align: right;
-}
-
-.text-bold {
-    font-weight: 600;
-    color: var(--deep-blue);
-}
-
-/* Total general */
-.total-general {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 2rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 2px solid var(--border-light);
-}
-
-.total-general-label {
-    font-size: 1.1rem;
-    color: var(--text-gray);
-}
-
-.total-general-value {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--deep-blue);
-}
-
-/* Botones de acción */
-.action-bar {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-}
-
-.btn-secondary-modern {
-    background: #f1f5f9;
-    color: var(--deep-blue);
-    border: none;
-    border-radius: 50px;
-    padding: 0.6rem 2rem;
-    font-size: 0.9rem;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-warning-modern {
+.btn-edit-products {
     background: #fef3c7;
     color: var(--warning);
-    border: none;
+    padding: 0.5rem 1.2rem;
     border-radius: 50px;
-    padding: 0.6rem 2rem;
-    font-size: 0.9rem;
     text-decoration: none;
+    font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    transition: all 0.2s;
+}
+
+    .btn-edit-products:hover {
+        background: var(--warning);
+        color: white;
+    }
+
+.action-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Alert */
+.alert-empty {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--warning);
 }
 
 /* Responsive */
 @@media (max-width: 768px) {
-    .info-grid-modern {
+    .proforma-container {
+        padding: 1rem;
+    }
+
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+    }
+
+    .info-grid {
         grid-template-columns: 1fr;
     }
 
-    .proforma-header {
+    .data-row {
         flex-direction: column;
         gap: 1rem;
-        text-align: center;
+    }
+
+    .product-table th,
+    .product-table td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .total-value {
+        font-size: 1.4rem;
     }
 
     .action-bar {
         flex-direction: column;
     }
 
-    .btn-secondary-modern, .btn-warning-modern, .btn-pdf-simple {
+    .btn-pdf,
+    .btn-edit-products,
+    .btn-back {
         width: 100%;
         justify-content: center;
-    }
-
-    .total-general {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-end;
-    }
-
-    .page-title {
-        font-size: 1.5rem;
     }
 }

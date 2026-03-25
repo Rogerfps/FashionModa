@@ -8,184 +8,179 @@
 
 <div class="proforma-container">
 
-    <!-- Header -->
-    <div class="page-header">
-        <h1 class="page-title">
+    <!-- HEADER -->
+    <div class="header-section">
+        <h1 class="header-title">
             <span>📄</span> Proforma #@Model.Id
         </h1>
-        <a asp-action="Index" class="btn-outline">
+        <a asp-action="Index" class="btn-back">
             ← Volver
         </a>
     </div>
 
-    <!-- Cabecera -->
-    <div class="proforma-header">
-        <div>
-            <div class="proforma-numero">Proforma #@Model.Id</div>
-            <div class="proforma-fecha">
-                @Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
-            </div>
-        </div>
-        <a asp-action="GenerarPDF" asp-route-id="@Model.Id" class="btn-pdf-simple">
-            📄 Descargar PDF
-        </a>
-    </div>
-
-    <!-- Empresa y Cliente -->
-    <div class="info-grid-modern">
-
-        <!-- Empresa -->
-        <div class="info-card-modern">
-            <div class="info-card-title">🏢 Empresa</div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Nombre</span>
-                <span class="info-row-value">@Model.Empresa?.Nombre</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Cédula</span>
-                <span class="info-row-value">@Model.Empresa?.CedulaJuridica</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Teléfono</span>
-                <span class="info-row-value">@Model.Empresa?.Telefono</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Dirección</span>
-                <span class="info-row-value">@Model.Empresa?.Direccion</span>
-            </div>
-        </div>
-
-        <!-- Cliente -->
-        <div class="info-card-modern">
-            <div class="info-card-title">👤 Cliente</div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Código</span>
-                <span class="info-row-value">@Model.Cliente?.Codigo</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Nombre</span>
-                <span class="info-row-value">
-                    @Model.Cliente?.Nombre @Model.Cliente?.Apellidos
-                </span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Comercio</span>
-                <span class="info-row-value">@Model.Cliente?.Comercio</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Teléfono</span>
-                <span class="info-row-value">@Model.Cliente?.Telefonos</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Transporte</span>
-                <span class="info-row-value">@Model.Cliente?.Transporte</span>
-            </div>
-
-            <div class="info-row-modern">
-                <span class="info-row-label">Agente</span>
-                <span class="info-row-value">@Model.Cliente?.Agente</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detalles -->
-    <div class="info-card-modern" style="margin-bottom: 2rem;">
-        <div class="info-card-title">📋 Detalles de la Proforma</div>
-
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+    <!-- CABECERA CON FECHA Y PDF -->
+    <div class="card">
+        <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-                <div class="text-muted small">Facturado por</div>
-                <div class="fw-semibold">@Model.FacturadoPor</div>
+                <div style="font-size: 1.2rem; font-weight: 600; color: var(--deep-blue);">
+                    Proforma #@Model.Id
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-gray);">
+                    @Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </div>
             </div>
-
-            <div>
-                <div class="text-muted small">Número de Cajas</div>
-                <div class="fw-semibold">@Model.NumeroCajas</div>
-            </div>
+            <a asp-action="GenerarPDF" asp-route-id="@Model.Id" class="btn-pdf">
+                📄 Descargar PDF
+            </a>
         </div>
-
-        @if (!string.IsNullOrWhiteSpace(Model.Detalle))
-        {
-            <div class="detalle-section">
-                <strong>Detalle</strong>
-                <div>@Model.Detalle</div>
-            </div>
-        }
     </div>
 
-    <!-- Productos -->
-    <div class="productos-section">
+    <!-- INFORMACIÓN: EMPRESA Y CLIENTE -->
+    <div class="card">
+        <div class="card-header">
+            <h3>🏢 Empresa</h3>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">@Model.Empresa?.Nombre</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Cédula Jurídica</span>
+                    <span class="info-value">@Model.Empresa?.CedulaJuridica</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono</span>
+                    <span class="info-value">@Model.Empresa?.Telefono</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Dirección</span>
+                    <span class="info-value">@Model.Empresa?.Direccion</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="section-header">
+    <div class="card">
+        <div class="card-header">
+            <h3>👤 Cliente</h3>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Código</span>
+                    <span class="info-value">@Model.Cliente?.Codigo</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Comercio</span>
+                    <span class="info-value">@Model.Cliente?.Comercio</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono</span>
+                    <span class="info-value">@Model.Cliente?.Telefonos</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Transporte</span>
+                    <span class="info-value">@Model.Cliente?.Transporte</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Agente</span>
+                    <span class="info-value">@Model.Cliente?.Agente</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETALLES DE LA PROFORMA -->
+    <div class="card">
+        <div class="card-header">
+            <h3>📋 Detalles de la Proforma</h3>
+        </div>
+        <div class="card-body">
+            <div class="data-row">
+                <div class="data-col">
+                    <div class="info-label">Facturado por</div>
+                    <div class="info-value">@Model.FacturadoPor</div>
+                </div>
+                <div class="data-col">
+                    <div class="info-label">Número de Cajas</div>
+                    <div class="info-value">@Model.NumeroCajas</div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Detalle))
+            {
+                <div class="detalle-box">
+                    <strong style="display: block; margin-bottom: 0.5rem;">Detalle</strong>
+                    @Model.Detalle
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- TABLA DE PRODUCTOS -->
+    <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <h3>🛒 Productos</h3>
-
-            <a asp-action="AgregarProducto" asp-route-id="@Model.Id"
-               class="btn-outline"
-               style="border-color: var(--warning); color: var(--warning);">
+            <a asp-action="AgregarProducto" asp-route-id="@Model.Id" class="btn-edit-products">
                 ✏️ Editar productos
             </a>
         </div>
+        <div class="card-body">
+            @if (Model.Detalles != null && Model.Detalles.Any())
+            {
+                <div class="table-responsive">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Color</th>
+                                <th>Talla</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Detalles)
+                            {
+                                <tr>
+                                    <td>@item.InventarioCodigo</td>
+                                    <td>@item.Color</td>
+                                    <td>@item.Talla</td>
+                                    <td class="text-right">@item.Cantidad</td>
+                                    <td class="text-right">₡ @item.PrecioUnitario.ToString("N2")</td>
+                                    <td class="text-right fw-bold">₡ @item.SubTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
-        @if (Model.Detalles != null && Model.Detalles.Any())
-        {
-            <table class="table-modern">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Color</th>
-                        <th>Talla</th>
-                        <th class="text-right">Cantidad</th>
-                        <th class="text-right">Precio Unit.</th>
-                        <th class="text-right">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Detalles)
-                    {
-                        <tr>
-                            <td>@item.InventarioCodigo</td>
-                            <td>@item.Color</td>
-                            <td>@item.Talla</td>
-                            <td class="text-right">@item.Cantidad</td>
-                            <td class="text-right">
-                                ₡ @item.PrecioUnitario.ToString("N2")
-                            </td>
-                            <td class="text-right text-bold">
-                                ₡ @item.SubTotal.ToString("N2")
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="total-general">
-                <span class="total-general-label">Total General</span>
-                <span class="total-general-value">
-                    ₡ @Model.Total.ToString("N2")
-                </span>
-            </div>
-        }
-        else
-        {
-            <div class="alert-modern">
-                Esta proforma no tiene productos aún.
-            </div>
-        }
-
+                <div class="total-section">
+                    <div class="total-box">
+                        <div class="total-label">Total General</div>
+                        <div class="total-value">₡ @Model.Total.ToString("N2")</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert-empty">
+                    ⚠️ Esta proforma no tiene productos registrados aún.
+                </div>
+            }
+        </div>
     </div>
 
-    <!-- Acciones -->
+    <!-- ACCIONES -->
     <div class="action-bar">
-        <a asp-action="Index" class="btn-secondary-modern">
+        <a asp-action="Index" class="btn-back">
             ← Volver al listado
         </a>
     </div>
