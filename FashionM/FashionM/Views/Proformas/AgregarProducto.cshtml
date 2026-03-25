@@ -17,7 +17,7 @@
         </a>
     </div>
 
-    <!-- Información de la proforma -->
+    <!-- Información -->
     <div class="info-card">
         <div class="info-grid">
             <div class="info-item">
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Formulario para agregar producto -->
+    <!-- FORM -->
     <div class="form-card">
         <div class="section-title">
             <span>➕</span> Agregar Nuevo Producto
@@ -44,45 +44,72 @@
         <form asp-action="AgregarProducto" method="post">
             <input type="hidden" name="proformaId" value="@Model.Id" />
 
+            <!-- 🔥 PRECIO OCULTO -->
+            <input type="hidden" name="precio" id="precioHidden" />
+
             <div class="row g-3">
-                <div class="col-md-3">
+
+                <!-- PRODUCTO -->
+                <div class="col-md-3 position-relative">
                     <label class="form-label">Producto</label>
-                    <select name="codigo" class="form-select" required>
+
+                    <input type="text" id="productoBuscar" class="form-control"
+                           placeholder="Buscar código o marca..." autocomplete="off" />
+
+                    <input type="hidden" name="codigo" id="codigoProducto" required />
+
+                    <div id="listaProductos" class="list-group"></div>
+                </div>
+
+                <!-- COLOR -->
+                <div class="col-md-2">
+                    <label class="form-label">Color</label>
+                    <select name="color" id="colorSelect" class="form-select" required>
                         <option value="">Seleccione</option>
-                        @foreach (var item in ViewBag.Productos)
-                        {
-                            <option value="@item.Codigo">
-                                @item.Codigo
-                            </option>
-                        }
                     </select>
                 </div>
 
+                <!-- DETALLE -->
                 <div class="col-md-2">
-                    <label class="form-label">Color</label>
-                    <input type="text" name="color" class="form-control" required placeholder="Ej: Negro" />
+                    <label class="form-label">Detalle</label>
+                    <select name="detalle" id="detalleSelect" class="form-select" required>
+                        <option value="">Seleccione</option>
+                    </select>
                 </div>
 
+                <!-- TALLA -->
                 <div class="col-md-2">
                     <label class="form-label">Talla</label>
-                    <input type="text" name="talla" class="form-control" required placeholder="Ej: 38" />
+                    <select name="talla" id="tallaSelect" class="form-select" required>
+                        <option value="">Seleccione</option>
+                    </select>
                 </div>
 
+                <!-- 🔥 PRECIO VISUAL -->
                 <div class="col-md-2">
-                    <label class="form-label">Cantidad</label>
-                    <input type="number" name="cantidad" class="form-control" required min="1" placeholder="1" />
+                    <label class="form-label">Precio</label>
+                    <div id="precioPreview" class="form-control" style="background:#f1f5f9;">
+                        ₡ 0
+                    </div>
                 </div>
 
-                <div class="col-md-3 d-flex align-items-end">
+                <!-- CANTIDAD -->
+                <div class="col-md-1">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" name="cantidad" class="form-control" min="1" required />
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn-add">
-                        ➕ Agregar a la Proforma
+                        ➕ Agregar
                     </button>
                 </div>
+
             </div>
         </form>
     </div>
 
-    <!-- Mensajes de error -->
+    <!-- ERROR -->
     @if (TempData["Error"] != null)
     {
         <div class="alert-modern">
@@ -90,9 +117,9 @@
         </div>
     }
 
-    <!-- Tabla de productos -->
+    <!-- TABLA -->
     <div class="table-wrapper">
-        <div class="section-title" style="margin-bottom: 1rem;">
+        <div class="section-title">
             <span>📋</span> Productos en la Proforma
         </div>
 
@@ -117,7 +144,7 @@
                             <td>@item.Talla</td>
                             <td class="text-center">@item.Cantidad</td>
                             <td class="text-right">₡ @item.PrecioUnitario.ToString("N2")</td>
-                            <td class="text-right fw-bold" style="color: var(--deep-blue);">₡ @item.SubTotal.ToString("N2")</td>
+                            <td class="text-right fw-bold">₡ @item.SubTotal.ToString("N2")</td>
                         </tr>
                     }
                 </tbody>
@@ -130,10 +157,147 @@
         </div>
     </div>
 
-    <!-- Botón volver -->
+    <!-- VOLVER -->
     <div class="action-bar">
         <a asp-action="Index" class="btn-back-modern">
             ← Volver a Proformas
         </a>
     </div>
 </div>
+
+@section Scripts {
+
+<script>
+let timeout = null;
+let precioSeleccionado = 0;
+
+const input = document.getElementById("productoBuscar");
+const lista = document.getElementById("listaProductos");
+const hidden = document.getElementById("codigoProducto");
+
+const color = document.getElementById("colorSelect");
+const detalle = document.getElementById("detalleSelect");
+const talla = document.getElementById("tallaSelect");
+
+const precioPreview = document.getElementById("precioPreview");
+const precioHidden = document.getElementById("precioHidden");
+
+let variantes = [];
+
+// LIMPIAR
+input.addEventListener("input", () => {
+    hidden.value = "";
+});
+
+// BUSCAR PRODUCTO
+input.addEventListener("keyup", function () {
+    clearTimeout(timeout);
+
+    let term = this.value;
+
+    timeout = setTimeout(() => {
+
+        if (term.length < 1) {
+            lista.innerHTML = "";
+            return;
+        }
+
+        fetch(`/Proformas/BuscarProductos?term=${term}`)
+            .then(r => r.json())
+            .then(data => {
+
+                lista.innerHTML = "";
+
+                data.forEach(p => {
+                    let item = document.createElement("a");
+                    item.className = "list-group-item list-group-item-action";
+                    item.innerHTML = `<strong>${p.codigo}</strong> - ${p.marca}`;
+
+                    item.onclick = () => {
+                        input.value = p.codigo;
+                        hidden.value = p.codigo;
+                        lista.innerHTML = "";
+
+                        cargarVariantes(p.codigo);
+                    };
+
+                    lista.appendChild(item);
+                });
+            });
+
+    }, 300);
+});
+
+// CARGAR VARIANTES
+function cargarVariantes(codigo) {
+    fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}`)
+        .then(r => r.json())
+        .then(data => {
+            variantes = data;
+
+            llenar(color, [...new Set(data.map(x => x.color))]);
+
+            detalle.innerHTML = `<option value="">Seleccione</option>`;
+            talla.innerHTML = `<option value="">Seleccione</option>`;
+
+            precioPreview.innerText = "₡ 0";
+            precioHidden.value = "";
+        });
+}
+
+// CASCADA
+color.addEventListener("change", () => {
+    let c = color.value;
+
+    let detalles = variantes
+        .filter(v => v.color === c)
+        .map(v => v.detalle);
+
+    llenar(detalle, [...new Set(detalles)]);
+});
+
+detalle.addEventListener("change", () => {
+    let c = color.value;
+    let d = detalle.value;
+
+    let tallas = variantes
+        .filter(v => v.color === c && v.detalle === d)
+        .map(v => v.talla);
+
+    llenar(talla, [...new Set(tallas)]);
+});
+
+// 🔥 PRECIO POR VARIANTE
+talla.addEventListener("change", () => {
+
+    let c = color.value;
+    let d = detalle.value;
+    let t = talla.value;
+
+    let variante = variantes.find(v =>
+        v.color === c &&
+        v.detalle === d &&
+        v.talla == t
+    );
+
+    if (variante) {
+        precioSeleccionado = variante.precio;
+
+        precioPreview.innerText = "₡ " + variante.precio.toLocaleString();
+        precioHidden.value = variante.precio;
+    }
+});
+
+// UTIL
+function llenar(select, items) {
+    select.innerHTML = `<option value="">Seleccione</option>`;
+
+    items.forEach(i => {
+        let o = document.createElement("option");
+        o.value = i;
+        o.text = i;
+        select.appendChild(o);
+    });
+}
+</script>
+}

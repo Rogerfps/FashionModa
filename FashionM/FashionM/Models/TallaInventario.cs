@@ -18,7 +18,7 @@ namespace FashionM.Models
 
         public int Cantidad { get; set; }
 
-        
+        public decimal Precio { get; set; } = 0;
 
         [ValidateNever]
         public string InventarioCodigo { get; set; }

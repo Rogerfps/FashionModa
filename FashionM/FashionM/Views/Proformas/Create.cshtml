@@ -34,20 +34,56 @@
             </div>
 
             <!-- Cliente -->
-            <div class="form-group">
-                <label asp-for="ClienteCedula" class="form-label"></label>
-                <select asp-for="ClienteCedula" class="form-select" asp-items="ViewBag.Clientes">
-                    <option value="">Seleccione un cliente</option>
-                </select>
+            <div class="form-group position-relative">
+                <label class="form-label">Cliente</label>
+
+                <!-- Input de búsqueda -->
+                <input type="text" id="clienteBuscar" class="form-control"
+                       placeholder="Buscar por cédula, nombre o comercio..."
+                       autocomplete="off" />
+
+                <!-- Valor real que se guarda -->
+                <input type="hidden" asp-for="ClienteCedula" id="ClienteCedula" />
+
+                <!-- Lista dinámica -->
+                <div id="listaClientes" class="list-group"></div>
+
                 <span asp-validation-for="ClienteCedula" class="validation-error"></span>
             </div>
 
             <!-- Facturado por -->
             <div class="form-group">
-                <label asp-for="FacturadoPor" class="form-label"></label>
-                <input asp-for="FacturadoPor" class="form-control" placeholder="Nombre de quien factura" />
-                <span asp-validation-for="FacturadoPor" class="validation-error"></span>
-            </div>
+                    <label asp-for="FacturadoPor" class="form-label"></label>
+
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" asp-for="FacturadoPor" value="A.s" />
+                            <span>A.s</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="FacturadoPor" value="K.s" />
+                            <span>K.s</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="FacturadoPor" value="Y.s" />
+                            <span>Y.s</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="FacturadoPor" value="N.s" />
+                            <span>N.s</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="FacturadoPor" value="R.fps" />
+                            <span>R.fps</span>
+                        </label>
+                    </div>
+
+                    <span asp-validation-for="FacturadoPor" class="validation-error"></span>
+                </div>
 
             <!-- Número de cajas -->
             <div class="form-group">
@@ -64,21 +100,14 @@
             <span asp-validation-for="Detalle" class="validation-error"></span>
         </div>
 
-        <!-- Fecha (solo lectura) -->
+        <!-- Fecha -->
         <div class="form-group mb-4">
             <label class="form-label">Fecha</label>
             <input type="text" class="form-control"
                    value="@DateTime.Now.ToString("dd/MM/yyyy")"
-                   disabled
-                   readonly />
+                   disabled readonly />
         </div>
-
-        <!-- Observaciones -->
-        <div class="form-group mb-4">
-            <label asp-for="Observaciones" class="form-label"></label>
-            <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales..."></textarea>
-            <span asp-validation-for="Observaciones" class="validation-error"></span>
-        </div>
+        
 
         <!-- Botones -->
         <div class="action-buttons">
@@ -96,4 +125,61 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+<script>
+let timeout = null;
+
+const input = document.getElementById("clienteBuscar");
+const lista = document.getElementById("listaClientes");
+const hidden = document.getElementById("ClienteCedula");
+
+// 🔥 Limpia cédula si el usuario escribe manualmente
+input.addEventListener("input", function () {
+    hidden.value = "";
+});
+
+input.addEventListener("keyup", function () {
+    clearTimeout(timeout);
+
+    let term = this.value;
+
+    timeout = setTimeout(() => {
+
+        if (term.length < 1) {
+            lista.innerHTML = "";
+            return;
+        }
+
+        fetch(`/Proformas/BuscarClientes?term=${term}`)
+            .then(res => res.json())
+            .then(data => {
+                lista.innerHTML = "";
+
+                if (data.length === 0) {
+                    lista.innerHTML = `<div class="list-group-item">Sin resultados</div>`;
+                    return;
+                }
+
+                data.forEach(cliente => {
+                    let item = document.createElement("a");
+                    item.className = "list-group-item list-group-item-action";
+
+                    item.innerHTML = `
+                        <strong>${cliente.nombre}</strong><br>
+                        <small>${cliente.cedula} - ${cliente.comercio ?? ''}</small>
+                    `;
+
+                    item.onclick = () => {
+                        input.value = `${cliente.nombre} - ${cliente.cedula}`;
+                        hidden.value = cliente.cedula;
+                        lista.innerHTML = "";
+                    };
+
+                    lista.appendChild(item);
+                });
+            });
+
+    }, 300);
+});
+</script>
 }

@@ -251,7 +251,8 @@ namespace FashionM.Controllers
                     Numero = talla.Numero,
                     Cantidad = talla.Cantidad,
                     Color = talla.Color,
-                    Detalle = talla.Detalle ?? ""
+                    Detalle = talla.Detalle ?? "",
+                    Precio = talla.Precio > 0 ? talla.Precio : inventario.PrecioVenta
                 });
             }
 
@@ -430,5 +431,7 @@ namespace FashionM.Controllers
 
             return View();
         }
+
+        
     }
 }

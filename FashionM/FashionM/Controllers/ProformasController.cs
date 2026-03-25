@@ -164,7 +164,9 @@ namespace FashionM.Controllers
                 return RedirectToAction("AgregarProducto", new { id = proformaId });
             }
 
-            decimal precio = inventario.PrecioVenta;
+            decimal precio = tallaInventario.Precio > 0
+                ? tallaInventario.Precio
+                : inventario.PrecioVenta;
 
             var detalle = new ProformaDetalle
             {
@@ -275,7 +277,7 @@ namespace FashionM.Controllers
             {
                 "cocalza plus" => "cocalza.png",
                 "fashion shoes s.a" => "fashion.png",
-                "jade" => "jade.png",
+                "lsg moda s.a" => "lsg.jpg",
                 "maxiplus" => "maxiplus.png",
                 _ => "default.png"
             };
@@ -392,7 +394,6 @@ namespace FashionM.Controllers
                                     columns.RelativeColumn();
                                     columns.RelativeColumn();
                                     columns.RelativeColumn();
-                                    columns.RelativeColumn();
                                 });
 
                                 // HEADER
@@ -479,6 +480,74 @@ namespace FashionM.Controllers
             }).GeneratePdf();
 
             return File(pdf, "application/pdf", $"Proforma_{proforma.Id}.pdf");
+        }
+
+        [HttpGet]
+        public IActionResult BuscarClientes(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            term = term.ToLower();
+
+            var clientes = _context.Clientes
+                .AsEnumerable() // 🔥 evita problemas de EF
+                .Where(c =>
+                    c.Cedula.ToString().Contains(term) ||
+                    (c.Nombre + " " + c.Apellidos).ToLower().Contains(term) ||
+                    (c.Comercio ?? "").ToLower().Contains(term)
+                )
+                .OrderBy(c => c.Nombre)
+                .Take(10)
+                .Select(c => new
+                {
+                    cedula = c.Cedula,
+                    nombre = c.Nombre + " " + c.Apellidos,
+                    comercio = c.Comercio
+                })
+                .ToList();
+
+            return Json(clientes);
+        }
+
+        [HttpGet]
+        public IActionResult BuscarProductos(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            var productos = _context.Inventarios
+                .Where(i =>
+                    i.Codigo.Contains(term) ||
+                    i.Marca.Contains(term)
+                )
+                .OrderBy(i => i.Codigo)
+                .Take(10)
+                .Select(i => new
+                {
+                    codigo = i.Codigo,
+                    marca = i.Marca
+                })
+                .ToList();
+
+            return Json(productos);
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerVariantes(string codigo)
+        {
+            var variantes = _context.TallasInventario
+                .Where(t => t.InventarioCodigo == codigo)
+                .Select(t => new
+                {
+                    color = t.Color,
+                    detalle = t.Detalle,
+                    talla = t.Numero,
+                    precio = t.Precio
+                })
+                .ToList();
+
+            return Json(variantes);
         }
     }
 }

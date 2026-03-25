@@ -7,7 +7,8 @@
 <link rel="stylesheet" href="~/css/Proforma/ProformaDetails.css" />
 
 <div class="proforma-container">
-    <!-- Header con número de proforma -->
+
+    <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">
             <span>📄</span> Proforma #@Model.Id
@@ -17,34 +18,41 @@
         </a>
     </div>
 
-    <!-- Cabecera con fecha y botón PDF -->
+    <!-- Cabecera -->
     <div class="proforma-header">
         <div>
             <div class="proforma-numero">Proforma #@Model.Id</div>
-            <div class="proforma-fecha">@Model.Fecha.ToLocalTime().ToString("dd MMMM yyyy")</div>
+            <div class="proforma-fecha">
+                @Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+            </div>
         </div>
         <a asp-action="GenerarPDF" asp-route-id="@Model.Id" class="btn-pdf-simple">
             📄 Descargar PDF
         </a>
     </div>
 
-    <!-- Grid de información: Empresa y Cliente -->
+    <!-- Empresa y Cliente -->
     <div class="info-grid-modern">
+
         <!-- Empresa -->
         <div class="info-card-modern">
             <div class="info-card-title">🏢 Empresa</div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Nombre</span>
                 <span class="info-row-value">@Model.Empresa?.Nombre</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Cédula</span>
                 <span class="info-row-value">@Model.Empresa?.CedulaJuridica</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Teléfono</span>
                 <span class="info-row-value">@Model.Empresa?.Telefono</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Dirección</span>
                 <span class="info-row-value">@Model.Empresa?.Direccion</span>
@@ -54,26 +62,34 @@
         <!-- Cliente -->
         <div class="info-card-modern">
             <div class="info-card-title">👤 Cliente</div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Código</span>
                 <span class="info-row-value">@Model.Cliente?.Codigo</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Nombre</span>
-                <span class="info-row-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</span>
+                <span class="info-row-value">
+                    @Model.Cliente?.Nombre @Model.Cliente?.Apellidos
+                </span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Comercio</span>
                 <span class="info-row-value">@Model.Cliente?.Comercio</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Teléfono</span>
                 <span class="info-row-value">@Model.Cliente?.Telefonos</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Transporte</span>
                 <span class="info-row-value">@Model.Cliente?.Transporte</span>
             </div>
+
             <div class="info-row-modern">
                 <span class="info-row-label">Agente</span>
                 <span class="info-row-value">@Model.Cliente?.Agente</span>
@@ -81,74 +97,97 @@
         </div>
     </div>
 
-    <!-- Información adicional de la proforma -->
+    <!-- Detalles -->
     <div class="info-card-modern" style="margin-bottom: 2rem;">
         <div class="info-card-title">📋 Detalles de la Proforma</div>
+
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
             <div>
-                <div style="font-size:0.8rem; color:var(--text-gray);">Facturado por</div>
-                <div style="font-weight:500;">@Model.FacturadoPor</div>
+                <div class="text-muted small">Facturado por</div>
+                <div class="fw-semibold">@Model.FacturadoPor</div>
             </div>
+
             <div>
-                <div style="font-size:0.8rem; color:var(--text-gray);">Número de Cajas</div>
-                <div style="font-weight:500;">@Model.NumeroCajas</div>
+                <div class="text-muted small">Número de Cajas</div>
+                <div class="fw-semibold">@Model.NumeroCajas</div>
             </div>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Model.Detalle))
         {
             <div class="detalle-section">
-                <strong style="display:block; margin-bottom:0.5rem;">Detalle</strong>
-                @Model.Detalle
+                <strong>Detalle</strong>
+                <div>@Model.Detalle</div>
             </div>
         }
     </div>
 
     <!-- Productos -->
     <div class="productos-section">
+
         <div class="section-header">
             <h3>🛒 Productos</h3>
-            <a asp-action="AgregarProducto" asp-route-id="@Model.Id" class="btn-outline" style="border-color: var(--warning); color: var(--warning);">
+
+            <a asp-action="AgregarProducto" asp-route-id="@Model.Id"
+               class="btn-outline"
+               style="border-color: var(--warning); color: var(--warning);">
                 ✏️ Editar productos
             </a>
         </div>
 
-        <table class="table-modern">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Color</th>
-                    <th>Talla</th>
-                    <th class="text-right">Cantidad</th>
-                    <th class="text-right">Precio Unit.</th>
-                    <th class="text-right">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Detalles)
-                {
+        @if (Model.Detalles != null && Model.Detalles.Any())
+        {
+            <table class="table-modern">
+                <thead>
                     <tr>
-                        <td>@item.InventarioCodigo</td>
-                        <td>@item.Color</td>
-                        <td>@item.Talla</td>
-                        <td class="text-right">@item.Cantidad</td>
-                        <td class="text-right">₡ @item.PrecioUnitario.ToString("N2")</td>
-                        <td class="text-right text-bold">₡ @item.SubTotal.ToString("N2")</td>
+                        <th>Código</th>
+                        <th>Color</th>
+                        <th>Talla</th>
+                        <th class="text-right">Cantidad</th>
+                        <th class="text-right">Precio Unit.</th>
+                        <th class="text-right">Subtotal</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Detalles)
+                    {
+                        <tr>
+                            <td>@item.InventarioCodigo</td>
+                            <td>@item.Color</td>
+                            <td>@item.Talla</td>
+                            <td class="text-right">@item.Cantidad</td>
+                            <td class="text-right">
+                                ₡ @item.PrecioUnitario.ToString("N2")
+                            </td>
+                            <td class="text-right text-bold">
+                                ₡ @item.SubTotal.ToString("N2")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-        <div class="total-general">
-            <span class="total-general-label">Total General</span>
-            <span class="total-general-value">₡ @Model.Total.ToString("N2")</span>
-        </div>
+            <div class="total-general">
+                <span class="total-general-label">Total General</span>
+                <span class="total-general-value">
+                    ₡ @Model.Total.ToString("N2")
+                </span>
+            </div>
+        }
+        else
+        {
+            <div class="alert-modern">
+                Esta proforma no tiene productos aún.
+            </div>
+        }
+
     </div>
 
-    <!-- Barra de acciones -->
+    <!-- Acciones -->
     <div class="action-bar">
         <a asp-action="Index" class="btn-secondary-modern">
             ← Volver al listado
         </a>
     </div>
+
 </div>

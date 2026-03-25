@@ -12,6 +12,7 @@
     --border-light: #e2e8f0;
 }
 
+/* Base */
 body {
     background: var(--light-bg);
     font-family: 'Inter', sans-serif;
@@ -28,7 +29,7 @@ body {
 .page-title {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
@@ -47,18 +48,27 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    transition: 0.2s;
 }
 
+    .back-link:hover {
+        background: var(--deep-blue);
+        color: white;
+    }
+
 /* Cards */
-.info-card {
+.info-card,
+.form-card,
+.table-wrapper {
     background: var(--pure-white);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     border: 1px solid var(--border-light);
     margin-bottom: 1.5rem;
 }
 
+/* Info */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -87,16 +97,7 @@ body {
     color: var(--deep-blue);
 }
 
-/* Formulario de agregar */
-.form-card {
-    background: var(--pure-white);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    border: 1px solid var(--border-light);
-    margin-bottom: 1.5rem;
-}
-
+/* Section */
 .section-title {
     font-size: 1.1rem;
     font-weight: 600;
@@ -111,9 +112,9 @@ body {
         font-size: 1.3rem;
     }
 
+/* Form */
 .form-label {
-    display: block;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--deep-blue);
     margin-bottom: 0.3rem;
@@ -121,24 +122,40 @@ body {
     letter-spacing: 0.3px;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     width: 100%;
     border: 2px solid var(--border-light);
     border-radius: 10px;
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 0.9rem;
     font-size: 0.9rem;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     background: #fafcff;
 }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
         border-color: var(--electric-blue);
         outline: none;
         box-shadow: 0 0 0 3px rgba(87, 108, 188, 0.1);
     }
 
+/* 🔥 AUTOCOMPLETE (IMPORTANTE) */
+#listaProductos {
+    position: absolute;
+    width: 100%;
+    z-index: 9999;
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Botón */
 .btn-add {
-    background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--success), #34d399);
     color: white;
     border: none;
     border-radius: 10px;
@@ -160,7 +177,7 @@ body {
         box-shadow: 0 8px 16px -6px rgba(16, 185, 129, 0.3);
     }
 
-/* Alerta */
+/* Alert */
 .alert-modern {
     background: #fee2e2;
     border: 1px solid #fecaca;
@@ -179,15 +196,7 @@ body {
         font-size: 1.2rem;
     }
 
-/* Tabla de productos */
-.table-wrapper {
-    background: var(--pure-white);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    border: 1px solid var(--border-light);
-}
-
+/* Tabla */
 .productos-table {
     width: 100%;
     border-collapse: collapse;
@@ -201,7 +210,6 @@ body {
         font-size: 0.7rem;
         text-transform: uppercase;
         padding: 0.8rem 0.5rem;
-        white-space: nowrap;
     }
 
         .productos-table th:first-child {
@@ -218,14 +226,14 @@ body {
     }
 
     .productos-table tbody tr:hover {
-        background: rgba(87, 108, 188, 0.02);
+        background: rgba(87, 108, 188, 0.03);
     }
 
-/* Footer de total */
+/* Total */
 .total-footer {
     background: #f8fafc;
     border-top: 2px solid var(--border-light);
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     text-align: right;
     margin-top: 1rem;
     border-radius: 0 0 16px 16px;
@@ -251,7 +259,6 @@ body {
 .btn-back-modern {
     background: #f1f5f9;
     color: var(--deep-blue);
-    border: none;
     border-radius: 30px;
     padding: 0.6rem 2rem;
     font-size: 0.9rem;
@@ -268,10 +275,10 @@ body {
     }
 
 /* Responsive */
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
+
     .info-grid {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
     }
 
     .row > div {

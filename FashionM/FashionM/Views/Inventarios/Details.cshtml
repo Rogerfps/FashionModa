@@ -105,36 +105,55 @@
                     <tr>
                         <th>Color</th>
                         <th>Detalle</th>
+
                         @foreach (var talla in tallas)
                         {
                             <th class="text-center">@talla</th>
                         }
+
+                        <th>Precio</th>
                         <th>Total</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @foreach (var g in grupos)
                     {
+                        var precio = g.First().Precio;
+
                         <tr>
                             <td class="color-cell">@g.Key.Color</td>
                             <td class="detalle-cell">@g.Key.Detalle</td>
+
                             @foreach (var talla in tallas)
                             {
                                 var item = g.FirstOrDefault(x => x.Numero == talla);
                                 <td class="cantidad-cell">@(item?.Cantidad ?? 0)</td>
                             }
-                            <td class="fw-bold" style="color: var(--deep-blue);">@g.Sum(x => x.Cantidad)</td>
+
+                            <td class="fw-bold text-success">
+                                ₡@precio.ToString("N0")
+                            </td>
+
+                            <td class="fw-bold" style="color: var(--deep-blue);">
+                                @g.Sum(x => x.Cantidad)
+                            </td>
                         </tr>
                     }
                 </tbody>
+
                 <tfoot>
                     <tr class="total-row">
                         <td colspan="2" class="fw-bold">Totales</td>
+
                         @foreach (var talla in tallas)
                         {
                             var totalTalla = Model.Tallas.Where(x => x.Numero == talla).Sum(x => x.Cantidad);
                             <td class="fw-bold">@totalTalla</td>
                         }
+
+                        <td></td>
+
                         <td class="fw-bold">@Model.StockTotal</td>
                     </tr>
                 </tfoot>
