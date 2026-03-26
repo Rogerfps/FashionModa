@@ -17,22 +17,20 @@
         </a>
     </div>
 
-    <form method="get" class="mb-3">
-
-        <div class="row">
-
-            <!-- 🔍 BUSCAR POR NUMERO -->
+    <!-- Filtros -->
+    <div class="filters-container">
+        <form method="get" class="row g-3">
             <div class="col-md-4">
-                <input type="text" name="buscar" class="form-control"
-                       placeholder="Buscar por # Proforma"
+                <input type="text" 
+                       name="buscar" 
+                       class="filter-input"
+                       placeholder="🔍 Buscar por # Proforma..."
                        value="@ViewBag.Buscar" />
             </div>
 
-            <!-- 🏢 FILTRO EMPRESA -->
             <div class="col-md-4">
-                <select name="empresaId" class="form-control">
+                <select name="empresaId" class="filter-input">
                     <option value="">-- Todas las empresas --</option>
-
                     @foreach (var emp in ViewBag.Empresas)
                     {
                         <option value="@emp.Id"
@@ -43,22 +41,16 @@
                 </select>
             </div>
 
-            <!-- 🔘 BOTONES -->
-            <div class="col-md-4">
-
-                <button type="submit" class="btn btn-primary">
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn-primary">
                     🔍 Buscar
                 </button>
-
-                <a asp-action="Index" class="btn btn-secondary">
-                    Limpiar
+                <a asp-action="Index" class="btn-secondary">
+                    ✖ Limpiar
                 </a>
-
             </div>
-
-        </div>
-
-    </form>
+        </form>
+    </div>
 
     <!-- Tabla -->
     <div class="table-wrapper">
@@ -72,8 +64,7 @@
                         <th>Cliente</th>
                         <th>Total</th>
                         <th>Acciones</th>
-                    </tr>
-                </thead>
+                    </thead>
                 <tbody>
                     @if (!Model.Any())
                     {
@@ -90,7 +81,7 @@
                     {
                         foreach (var item in Model)
                         {
-                            <tr>
+                             <tr>
                                 <td class="fw-semibold">@item.Id</td>
                                 <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                                 <td>
@@ -132,10 +123,10 @@
                                         </a>
 
                                         <form asp-action="Delete" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
-
                                             <button type="submit"
-                                                    class="btn btn-danger btn-sm"
+                                                    class="btn-delete"
                                                     onclick="return confirm('¿Eliminar esta proforma?');">
                                                 🗑 Eliminar
                                             </button>
