@@ -228,21 +228,9 @@ namespace FashionM.Controllers
         // ==========================
         // ELIMINAR
         // ==========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
-        {
-            var proforma = await _context.Proformas
-                .Include(p => p.Cliente)
-                .Include(p => p.Empresa)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (proforma == null)
-                return NotFound();
-
-            return View(proforma);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var proforma = await _context.Proformas
                 .Include(p => p.Detalles)

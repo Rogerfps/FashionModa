@@ -19,73 +19,81 @@
         </h1>
 
         <p class="hero-subtitle">
-            Sistema de administracion
+            Sistema de administracion y pedidos
         </p>
 
         <!-- Módulos en grid -->
         <div class="modules-grid">
 
+            <!-- Clientes -->
             <a asp-controller="Clientes" asp-action="Index" class="module-card">
                 <div class="module-icon">👥</div>
                 <div class="module-content">
                     <div class="module-title">Clientes</div>
-                    <div class="module-desc">Administracion de cartera de clientes</div>
+                    <div class="module-desc">Administración de cartera de clientes</div>
                 </div>
             </a>
 
+            <!-- Proveedores -->
             <a asp-controller="Proveedores" asp-action="Index" class="module-card">
-                <div class="module-icon">🚚</div>
+                <div class="module-icon">🏭</div>
                 <div class="module-content">
                     <div class="module-title">Proveedores</div>
-                    <div class="module-desc">Gestion tus proveedores</div>
+                    <div class="module-desc">Gestión de tus proveedores</div>
                 </div>
             </a>
 
+            <!-- Inventario -->
             <a asp-controller="Inventarios" asp-action="Index" class="module-card">
                 <div class="module-icon">📦</div>
                 <div class="module-content">
                     <div class="module-title">Inventario</div>
-                    <div class="module-desc">Gestion de inventarios</div>
+                    <div class="module-desc">Gestión de inventarios</div>
                 </div>
             </a>
 
+            <!-- Movimientos de Inventario -->
             <a asp-controller="MovimientosInventario" asp-action="Index" class="module-card">
-                <div class="module-icon">📦</div>
+                <div class="module-icon">🔄</div>
                 <div class="module-content">
-                    <div class="module-title">MovimientoInventario</div>
-                    <div class="module-desc">Gestion de inventarios</div>
+                    <div class="module-title">Movimientos</div>
+                    <div class="module-desc">Entradas y salidas de inventario</div>
                 </div>
             </a>
 
+            <!-- Pedidos Clientes -->
             <a asp-controller="PedidoCliente" asp-action="Index" class="module-card">
-                <div class="module-icon">📋</div>
+                <div class="module-icon">🛒</div>
                 <div class="module-content">
-                    <div class="module-title">Pedidos</div>
-                    <div class="module-desc">Control de pedidos</div>
-                </div>  
-            </a>
-
-            <a asp-controller="PedidoProveedor" asp-action="Index" class="module-card">
-                <div class="module-icon">📋</div>
-                <div class="module-content">
-                    <div class="module-title">PedidosProveedor</div>
-                    <div class="module-desc">Paso 0 y Paso 1</div>
+                    <div class="module-title">Pedidos Clientes</div>
+                    <div class="module-desc">Control de pedidos de clientes</div>
                 </div>
             </a>
-            
+
+            <!-- Pedidos Proveedores -->
+            <a asp-controller="PedidoProveedor" asp-action="Index" class="module-card">
+                <div class="module-icon">🚛</div>
+                <div class="module-content">
+                    <div class="module-title">Pedidos Proveedores</div>
+                    <div class="module-desc">Órdenes a proveedores</div>
+                </div>
+            </a>
+     
+            <!-- Proformas -->
             <a asp-controller="Proformas" asp-action="Index" class="module-card">
-                <div class="module-icon">📋</div>
+                <div class="module-icon">📄</div>
                 <div class="module-content">
                     <div class="module-title">Proformas</div>
-                    <div class="module-desc">Para hacer</div>
+                    <div class="module-desc">Cotizaciones y presupuestos</div>
                 </div>
             </a>
 
+            <!-- Empresas -->
             <a asp-controller="Empresas" asp-action="Index" class="module-card">
-                <div class="module-icon">📋</div>
+                <div class="module-icon">🏢</div>
                 <div class="module-content">
                     <div class="module-title">Empresas</div>
-                    <div class="module-desc">Para hacer</div>
+                    <div class="module-desc">Gestión de empresas asociadas</div>
                 </div>
             </a>
 

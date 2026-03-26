@@ -1,0 +1,87 @@
+﻿@model Empresa
+
+@{
+    ViewData["Title"] = "Eliminar Empresa";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-danger">🗑 Eliminar Empresa</h2>
+
+    <div class="alert alert-warning">
+        ⚠️ ¿Estás seguro que deseas eliminar esta empresa? Esta acción no se puede deshacer.
+    </div>
+
+    <!-- DATOS DE LA EMPRESA -->
+    <div class="card mb-3">
+
+        <div class="card-header">
+            Información de la Empresa
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-2">
+                    <strong>Nombre:</strong><br />
+                    @Model.Nombre
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Cédula Jurídica:</strong><br />
+                    @Model.CedulaJuridica
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Teléfono:</strong><br />
+                    @Model.Telefono
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Dirección:</strong><br />
+                    @Model.Direccion
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Cuenta BAC:</strong><br />
+                    @Model.CuentaBAC
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Cuenta BCR:</strong><br />
+                    @Model.CuentaBCR
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Cuenta Banco Nacional:</strong><br />
+                    @Model.CuentaBN
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>SINPE:</strong><br />
+                    @Model.SimpeMovil
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FORM ELIMINAR -->
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <button type="submit" class="btn btn-danger">
+            🗑 Confirmar Eliminación
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            ⬅ Cancelar
+        </a>
+
+    </form>
+
+</div>

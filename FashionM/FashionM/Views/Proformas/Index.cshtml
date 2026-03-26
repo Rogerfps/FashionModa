@@ -131,12 +131,15 @@
                                             🛒 Productos
                                         </a>
 
-                                        <a asp-action="Delete" asp-route-id="@item.Id"
-                                           class="btn-action btn-delete"
-                                           title="Eliminar proforma"
-                                           onclick="return confirm('¿Eliminar esta proforma?')">
-                                            🗑 Eliminar
-                                        </a>
+                                        <form asp-action="Delete" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@item.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('¿Eliminar esta proforma?');">
+                                                🗑 Eliminar
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
