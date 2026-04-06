@@ -224,66 +224,84 @@
     </div>
 
     <!-- Tabla -->
-    <div class="table-wrapper">
-        <div class="table-responsive">
-            <table class="modern-table">
-                <thead>
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cédula Jurídica</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
                     <tr>
-                        <th>Nombre</th>
-                        <th>Cédula Jurídica</th>
-                        <th>Teléfono</th>
-                        <th>Acciones</th>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-icon">🏢</div>
+                                <div class="empty-text">No hay empresas registradas</div>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Any())
+                }
+                else
+                {
+                    foreach (var item in Model)
                     {
                         <tr>
-                            <td colspan="4">
-                                <div class="empty-state">
-                                    <div class="empty-icon">🏢</div>
-                                    <div class="empty-text">No hay empresas registradas</div>
+                            <td class="fw-semibold">
+                                <span class="empresa-badge">@item.Nombre</span>
+                            </td>
+
+                            <td>@item.CedulaJuridica</td>
+
+                            <td>
+                                <span class="telefono-badge">
+                                    📞 @item.Telefono
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-group">
+
+                                    <!-- 👁 VER DETALLE -->
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn-action btn-view"
+                                       title="Ver detalle">
+                                        👁 Ver
+                                    </a>
+
+                                    <!-- ✏️ EDITAR -->
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn-action btn-edit"
+                                       title="Editar empresa">
+                                        ✏️ Editar
+                                    </a>
+
+                                    <!-- 🗑 ELIMINAR -->
+                                    <form asp-action="Delete" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit"
+                                                class="btn-action btn-delete"
+                                                title="Eliminar empresa"
+                                                onclick="return confirm('¿Seguro que deseas eliminar esta empresa?');">
+                                            🗑 Eliminar
+                                        </button>
+                                    </form>
+
                                 </div>
                             </td>
                         </tr>
                     }
-                    else
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="fw-semibold">
-                                    <span class="empresa-badge">@item.Nombre</span>
-                                </td>
-                                <td>@item.CedulaJuridica</td>
-                                <td>
-                                    <span class="telefono-badge">📞 @item.Telefono</span>
-                                </td>
-                                <td>
-                                    <div class="action-group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id"
-                                           class="btn-action btn-edit"
-                                           title="Editar empresa">
-                                            ✏️ Editar
-                                        </a>
-
-                                        <form asp-action="Delete" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit"
-                                                    class="btn-action btn-delete"
-                                                    title="Eliminar empresa"
-                                                    onclick="return confirm('¿Seguro que deseas eliminar esta empresa?');">
-                                                🗑 Eliminar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
+</div>
 </div>

@@ -1,0 +1,181 @@
+﻿@model Empresa
+
+@{
+    ViewData["Title"] = "Detalle Empresa";
+}
+
+<link rel="stylesheet" href="~/css/Empresa/EmpresaDetails.css" />
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .btn-back {
+        text-decoration: none;
+        background: #f1f5f9;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+
+    .card-modern {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .info-item.full {
+            grid-column: span 2;
+        }
+
+    .label {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .value {
+        font-weight: 600;
+    }
+
+    .table-modern {
+        width: 100%;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .action-bar {
+        margin-top: 20px;
+    }
+
+    .btn-edit {
+        background: #3b82f6;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+    }
+
+</style>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">
+            🏢 @Model.Nombre
+        </h1>
+
+        <a asp-action="Index" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <!-- INFO PRINCIPAL -->
+    <div class="card-modern">
+
+        <div class="section-title">Información General</div>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+                <span class="label">Cédula Jurídica</span>
+                <span class="value">@Model.CedulaJuridica</span>
+            </div>
+
+            <div class="info-item">
+                <span class="label">Teléfono</span>
+                <span class="value">@Model.Telefono</span>
+            </div>
+
+            <div class="info-item full">
+                <span class="label">Dirección</span>
+                <span class="value">@Model.Direccion</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CUENTAS -->
+    <div class="card-modern">
+
+        <div class="section-title">Cuentas Bancarias</div>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+                <span class="label">BAC</span>
+                <span class="value">@Model.CuentaBAC</span>
+            </div>
+
+            <div class="info-item">
+                <span class="label">BCR</span>
+                <span class="value">@Model.CuentaBCR</span>
+            </div>
+
+            <div class="info-item">
+                <span class="label">BN</span>
+                <span class="value">@Model.CuentaBN</span>
+            </div>
+
+            <div class="info-item">
+                <span class="label">SINPE Móvil</span>
+                <span class="value">@Model.SimpeMovil</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="action-bar">
+
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-edit">
+            ✏️ Editar
+        </a>
+
+        <form asp-action="Delete" method="post" style="display:inline;">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn-delete"
+                    onclick="return confirm('¿Eliminar empresa?')">
+                🗑 Eliminar
+            </button>
+        </form>
+
+    </div>
+
+</div>

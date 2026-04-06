@@ -21,10 +21,10 @@
     <div class="filters-container">
         <form method="get" class="row g-3">
             <div class="col-md-4">
-                <input type="text" 
-                       name="buscar" 
+                <input type="text"
+                       name="buscar"
                        class="filter-input"
-                       placeholder="🔍 Buscar por # Proforma..."
+                       placeholder="🔍 Buscar por # Proforma (Número)..."
                        value="@ViewBag.Buscar" />
             </div>
 
@@ -58,13 +58,15 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th># Proforma</th>
                         <th>Fecha</th>
                         <th>Empresa</th>
                         <th>Cliente</th>
                         <th>Total</th>
                         <th>Acciones</th>
-                    </thead>
+                    </tr>
+                </thead>
+
                 <tbody>
                     @if (!Model.Any())
                     {
@@ -81,9 +83,16 @@
                     {
                         foreach (var item in Model)
                         {
-                             <tr>
-                                <td class="fw-semibold">@item.Id</td>
+                            <tr>
+                                <!-- 🔥 CAMBIO CLAVE -->
+                                <td class="fw-semibold">
+                                    <span class="proforma-badge">
+                                        #@item.Numero
+                                    </span>
+                                </td>
+
                                 <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.Empresa?.Nombre))
                                     {
@@ -94,6 +103,7 @@
                                         <span class="text-muted">—</span>
                                     }
                                 </td>
+
                                 <td>
                                     @if (item.Cliente != null)
                                     {
@@ -107,18 +117,20 @@
                                         <span class="text-muted">—</span>
                                     }
                                 </td>
+
                                 <td class="total-monto">₡ @item.Total.ToString("N2")</td>
+
                                 <td>
                                     <div class="action-group">
                                         <a asp-action="Details" asp-route-id="@item.Id"
-                                           class="btn-action btn-view"
-                                           title="Ver detalles">
+                                               class="btn-action btn-view"
+                                               title="Ver detalles">
                                             👁 Ver
                                         </a>
 
                                         <a asp-action="AgregarProducto" asp-route-id="@item.Id"
-                                           class="btn-action btn-productos"
-                                           title="Agregar productos">
+                                               class="btn-action btn-productos"
+                                               title="Agregar productos">
                                             🛒 Productos
                                         </a>
 
@@ -137,6 +149,7 @@
                         }
                     }
                 </tbody>
+
             </table>
         </div>
     </div>

@@ -116,10 +116,8 @@ namespace FashionM.Data
                 .HasForeignKey(d => d.MovimientoInventarioId);
 
             modelBuilder.Entity<Proforma>()
-            .HasOne(p => p.Empresa)
-            .WithMany(e => e.Proformas)
-            .HasForeignKey(p => p.EmpresaId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasIndex(p => new { p.EmpresaId, p.Numero })
+                .IsUnique();
 
             // Proforma -> Cliente
             modelBuilder.Entity<Proforma>()

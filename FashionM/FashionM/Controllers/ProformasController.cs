@@ -34,27 +34,18 @@ namespace FashionM.Controllers
                 .Include(p => p.Cliente)
                 .AsQueryable();
 
-            // 🔍 FILTRO POR NUMERO
             if (!string.IsNullOrEmpty(buscar))
             {
                 buscar = buscar.ToLower();
 
                 query = query.Where(p =>
-                    // 🔢 Buscar por número de proforma
-                    p.Id.ToString().Contains(buscar)
-
-                    // 👤 Nombre cliente
+                    p.Numero.ToString().Contains(buscar) // 🔥 CAMBIO
                     || p.Cliente.Nombre.ToLower().Contains(buscar)
-
-                    // 👤 Apellidos
                     || p.Cliente.Apellidos.ToLower().Contains(buscar)
-
-                    // 🆔 Código cliente
                     || p.Cliente.Codigo.ToLower().Contains(buscar)
                 );
             }
 
-            // 🏢 FILTRO POR EMPRESA
             if (empresaId.HasValue)
             {
                 query = query.Where(p => p.EmpresaId == empresaId.Value);
@@ -64,10 +55,7 @@ namespace FashionM.Controllers
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
 
-            // 🔽 PARA EL DROPDOWN
             ViewBag.Empresas = await _context.Empresas.ToListAsync();
-
-            // 🔽 MANTENER VALORES
             ViewBag.Buscar = buscar;
             ViewBag.EmpresaId = empresaId;
 
@@ -80,8 +68,6 @@ namespace FashionM.Controllers
         public IActionResult Create()
         {
             ViewBag.Empresas = new SelectList(_context.Empresas, "Id", "Nombre");
-            ViewBag.Clientes = new SelectList(_context.Clientes, "Cedula", "Nombre");
-
             return View(new Proforma());
         }
 
@@ -95,11 +81,15 @@ namespace FashionM.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Empresas = new SelectList(_context.Empresas, "Id", "Nombre", proforma.EmpresaId);
-                ViewBag.Clientes = new SelectList(_context.Clientes, "Cedula", "Nombre", proforma.ClienteCedula);
-
                 return View(proforma);
             }
 
+            // 🔥 NUMERO POR EMPRESA
+            var ultimoNumero = await _context.Proformas
+                .Where(p => p.EmpresaId == proforma.EmpresaId)
+                .MaxAsync(p => (int?)p.Numero) ?? 0;
+
+            proforma.Numero = ultimoNumero + 1;
             proforma.Fecha = DateTime.UtcNow;
 
             _context.Add(proforma);
@@ -109,7 +99,7 @@ namespace FashionM.Controllers
         }
 
         // ==========================
-        // AGREGAR PRODUCTOS
+        // AGREGAR PRODUCTOS (GET)
         // ==========================
         public async Task<IActionResult> AgregarProducto(int id)
         {
@@ -122,67 +112,99 @@ namespace FashionM.Controllers
             if (proforma == null)
                 return NotFound();
 
-            ViewBag.Productos = await _context.Inventarios
-                .OrderBy(i => i.Codigo)
-                .ToListAsync();
-
             return View(proforma);
         }
 
         // ==========================
-        // AGREGAR PRODUCTO POST
+        // AGREGAR PRODUCTO (POST)
         // ==========================
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarProducto(
             int proformaId,
             string codigo,
             string color,
-            string talla,
-            int cantidad)
+            string detalle,
+            string[] tallas,
+            int[] cantidades)
         {
+            // 🔥 VALIDACIONES BÁSICAS
+            if (string.IsNullOrWhiteSpace(codigo) ||
+                string.IsNullOrWhiteSpace(color))
+                
+            {
+                TempData["Error"] = "Debe completar todos los campos del producto";
+                return RedirectToAction("AgregarProducto", new { id = proformaId });
+            }
+
+            if (tallas == null || cantidades == null || tallas.Length == 0)
+            {
+                TempData["Error"] = "Debe ingresar al menos una talla con cantidad";
+                return RedirectToAction("AgregarProducto", new { id = proformaId });
+            }
+
             var inventario = await _context.Inventarios
                 .FirstOrDefaultAsync(i => i.Codigo == codigo);
 
             if (inventario == null)
                 return NotFound();
 
-            var tallaInventario = await _context.TallasInventario
-                .FirstOrDefaultAsync(t =>
-                    t.InventarioCodigo == codigo &&
-                    t.Color == color &&
-                    t.Numero == talla);
+            bool agregoAlgo = false;
 
-            if (tallaInventario == null)
+            // 🔥 LOOP SEGURO
+            for (int i = 0; i < tallas.Length; i++)
             {
-                TempData["Error"] = "Talla no encontrada";
-                return RedirectToAction("AgregarProducto", new { id = proformaId });
+                // evitar desbordes
+                if (i >= cantidades.Length)
+                    break;
+
+                int cantidad = cantidades[i];
+
+                if (cantidad <= 0)
+                    continue;
+
+                var tallaInventario = await _context.TallasInventario
+                    .FirstOrDefaultAsync(t =>
+                        t.InventarioCodigo == codigo &&
+                        t.Color == color &&
+                        (t.Detalle ?? "").Trim() == (detalle ?? "").Trim() &&
+                        (t.Numero ?? "").Trim() == (tallas[i] ?? "").Trim());
+
+                if (tallaInventario == null)
+                    continue;
+
+                if (tallaInventario.Cantidad < cantidad)
+                    continue;
+
+                decimal precio = tallaInventario.Precio > 0
+                    ? tallaInventario.Precio
+                    : inventario.PrecioVenta;
+
+                var detalleProforma = new ProformaDetalle
+                {
+                    ProformaId = proformaId,
+                    InventarioCodigo = codigo,
+                    Color = color,
+                    Talla = tallas[i],
+                    Cantidad = cantidad,
+                    PrecioUnitario = precio,
+                    SubTotal = precio * cantidad
+                };
+
+                // 🔽 DESCONTAR STOCK
+                tallaInventario.Cantidad -= cantidad;
+
+                _context.ProformaDetalles.Add(detalleProforma);
+
+                agregoAlgo = true;
             }
 
-            if (tallaInventario.Cantidad < cantidad)
+            // 🔥 VALIDAR SI NO AGREGÓ NADA
+            if (!agregoAlgo)
             {
-                TempData["Error"] = "Stock insuficiente";
+                TempData["Error"] = "No se agregaron productos. Verifique cantidades o stock.";
                 return RedirectToAction("AgregarProducto", new { id = proformaId });
             }
-
-            decimal precio = tallaInventario.Precio > 0
-                ? tallaInventario.Precio
-                : inventario.PrecioVenta;
-
-            var detalle = new ProformaDetalle
-            {
-                ProformaId = proformaId,
-                InventarioCodigo = codigo,
-                Color = color,
-                Talla = talla,
-                Cantidad = cantidad,
-                PrecioUnitario = precio,
-                SubTotal = precio * cantidad
-            };
-
-            // rebajar inventario
-            tallaInventario.Cantidad -= cantidad;
-
-            _context.ProformaDetalles.Add(detalle);
 
             await _context.SaveChangesAsync();
 
@@ -226,7 +248,7 @@ namespace FashionM.Controllers
         }
 
         // ==========================
-        // ELIMINAR
+        // DELETE
         // ==========================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -240,12 +262,14 @@ namespace FashionM.Controllers
                 return NotFound();
 
             _context.Proformas.Remove(proforma);
-
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
+        // ==========================
+        // PDF
+        // ==========================
         public async Task<IActionResult> GenerarPDF(int id)
         {
             var proforma = await _context.Proformas
@@ -271,24 +295,33 @@ namespace FashionM.Controllers
             };
 
             // 🔽 RUTA DEL LOGO
-            var logoPath = Path.Combine(
-                _env.WebRootPath,
-                "images",
-                logo
-            );
+            var logoPath = Path.Combine(_env.WebRootPath, "images", logo);
 
-            // Validar si existe
             if (!System.IO.File.Exists(logoPath))
             {
-                logoPath = Path.Combine(
-                    _env.WebRootPath,
-                    "images",
-                    "default.png"
-                );
+                logoPath = Path.Combine(_env.WebRootPath, "images", "default.png");
             }
 
-            var primaryColor = "#0f172a";   // oscuro elegante
-            var accentColor = "#2563eb";    // azul moderno
+            // 🔥 AGRUPAR DETALLES (AQUÍ ESTÁ LA MAGIA)
+            var detallesAgrupados = proforma.Detalles
+                .GroupBy(d => new
+                {
+                    d.InventarioCodigo,
+                    d.Color,
+                    d.PrecioUnitario
+                })
+                .Select(g => new
+                {
+                    Codigo = g.Key.InventarioCodigo,
+                    Color = g.Key.Color,
+                    Cantidad = g.Sum(x => x.Cantidad),
+                    PrecioUnitario = g.Key.PrecioUnitario,
+                    SubTotal = g.Sum(x => x.SubTotal)
+                })
+                .ToList();
+
+            var primaryColor = "#0f172a";
+            var accentColor = "#2563eb";
             var lightGray = "#f8fafc";
 
             var pdf = Document.Create(container =>
@@ -299,10 +332,8 @@ namespace FashionM.Controllers
 
                     page.Content().Column(col =>
                     {
-                        // 🔷 BARRA SUPERIOR (branding)
                         col.Item().Background(accentColor).Height(15);
 
-                        // 🔷 CONTENIDO PRINCIPAL
                         col.Item().Padding(25).Column(content =>
                         {
                             content.Spacing(20);
@@ -314,31 +345,19 @@ namespace FashionM.Controllers
 
                                 row.RelativeItem().AlignRight().Column(c =>
                                 {
-                                    c.Item().Text("PROFORMA")
-                                        .FontSize(28)
-                                        .Bold()
-                                        .FontColor(primaryColor);
-
-                                    c.Item().Text($"N° {proforma.Id}")
-                                        .FontSize(25)
-                                        .FontColor("#6b7280");
-
+                                    c.Item().Text("PROFORMA").FontSize(28).Bold().FontColor(primaryColor);
+                                    c.Item().Text($"N° {proforma.Numero}").FontSize(25).FontColor("#6b7280");
                                     c.Item().Text(proforma.Fecha.ToLocalTime().ToString("dd/MM/yyyy"))
-                                        .FontSize(12)
-                                        .FontColor("#6b7280");
+                                        .FontSize(12).FontColor("#6b7280");
                                 });
                             });
 
-                            // 🔷 BLOQUES (EMPRESA / CLIENTE)
+                            // 🔷 EMPRESA / CLIENTE
                             content.Item().Row(row =>
                             {
                                 row.RelativeItem().Border(1).BorderColor("#e5e7eb").Padding(20).Column(c =>
                                 {
-                                    c.Item().Text("EMPRESA")
-                                        .Bold()
-                                        .FontSize(10)
-                                        .FontColor("#6b7280");
-
+                                    c.Item().Text("EMPRESA").Bold().FontSize(10).FontColor("#6b7280");
                                     c.Item().Text(proforma.Empresa.Nombre).Bold().FontSize(12);
                                     c.Item().Text($"Cédula: {proforma.Empresa.CedulaJuridica}");
                                     c.Item().Text($"Tel: {proforma.Empresa.Telefono}");
@@ -349,22 +368,17 @@ namespace FashionM.Controllers
 
                                 row.RelativeItem().Border(1).BorderColor("#e5e7eb").Padding(12).Column(c =>
                                 {
-                                    c.Item().Text("CLIENTE")
-                                        .Bold()
-                                        .FontSize(10)
-                                        .FontColor("#6b7280");
+                                    c.Item().Text("CLIENTE").Bold().FontSize(10).FontColor("#6b7280");
 
                                     c.Item().Text($"{proforma.Cliente.Nombre} {proforma.Cliente.Apellidos}")
                                         .Bold().FontSize(12);
-
-                                    //c.Item().Text($"Código: {proforma.Cliente.Codigo}");
                                     c.Item().Text($"Tel: {proforma.Cliente.Telefonos}");
                                     c.Item().Text(proforma.Cliente.Direccion);
                                     c.Item().Text($"Agente: {proforma.Cliente.Agente}");
                                 });
                             });
 
-                            // 🔷 INFO EXTRA EN LÍNEA
+                            // 🔷 INFO EXTRA
                             content.Item().Row(row =>
                             {
                                 row.RelativeItem().Text($"Facturado por: {proforma.FacturadoPor}");
@@ -372,7 +386,7 @@ namespace FashionM.Controllers
                                 row.RelativeItem().Text($"Transporte: {proforma.Cliente.Transporte}");
                             });
 
-                            // 🔷 TABLA
+                            // 🔷 TABLA (MISMO DISEÑO, SOLO CAMBIA DATA)
                             content.Item().Table(table =>
                             {
                                 table.ColumnsDefinition(columns =>
@@ -384,54 +398,45 @@ namespace FashionM.Controllers
                                     columns.RelativeColumn();
                                 });
 
-                                // HEADER
                                 table.Header(header =>
                                 {
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Código").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Color").Bold();
-                                    //header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Talla").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Cant").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Precio").Bold();
                                     header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Subtotal").Bold();
                                 });
 
-                                foreach (var item in proforma.Detalles)
+                                foreach (var item in detallesAgrupados)
                                 {
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.InventarioCodigo);
+                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Codigo);
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Color);
-                                    //table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Talla);
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text(item.Cantidad.ToString());
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.PrecioUnitario:N2}");
                                     table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.SubTotal:N2}");
                                 }
                             });
 
-                            // 🔷 TOTAL PROFESIONAL (tipo factura real)
+                            // 🔷 TOTAL
                             content.Item().AlignRight().Width(250).Column(total =>
                             {
                                 total.Item().BorderTop(2).BorderColor("#e5e7eb");
 
                                 total.Item().Row(row =>
                                 {
-                                    row.RelativeItem().Text("TOTAL")
-                                        .Bold()
-                                        .FontSize(12);
+                                    row.RelativeItem().Text("TOTAL").Bold().FontSize(12);
 
                                     row.RelativeItem().AlignRight().Text($"₡ {proforma.Total:N2}")
-                                        .Bold()
-                                        .FontSize(18)
-                                        .FontColor(primaryColor);
+                                        .Bold().FontSize(18).FontColor(primaryColor);
                                 });
                             });
 
+                            // 🔷 DETALLE
                             if (!string.IsNullOrWhiteSpace(proforma.Detalle))
                             {
                                 content.Item().Column(det =>
                                 {
-                                    det.Item().Text("DETALLE")
-                                        .Bold()
-                                        .FontSize(11)
-                                        .FontColor("#6b7280");
+                                    det.Item().Text("DETALLE").Bold().FontSize(11).FontColor("#6b7280");
 
                                     det.Item().Background("#f9fafb")
                                         .Border(1)
@@ -445,9 +450,7 @@ namespace FashionM.Controllers
                             // 🔷 CUENTAS
                             content.Item().Background(lightGray).Padding(10).Column(c =>
                             {
-                                c.Item().Text("CUENTAS BANCARIAS")
-                                    .Bold()
-                                    .FontSize(11);
+                                c.Item().Text("CUENTAS BANCARIAS").Bold().FontSize(11);
 
                                 c.Item().Text($"BAC: {proforma.Empresa.CuentaBAC}");
                                 c.Item().Text($"BCR: {proforma.Empresa.CuentaBCR}");
@@ -457,7 +460,6 @@ namespace FashionM.Controllers
                         });
                     });
 
-                    // 🔷 FOOTER SERIO
                     page.Footer()
                         .Padding(10)
                         .AlignCenter()
@@ -470,6 +472,9 @@ namespace FashionM.Controllers
             return File(pdf, "application/pdf", $"Proforma_{proforma.Id}.pdf");
         }
 
+        // ==========================
+        // BUSQUEDAS
+        // ==========================
         [HttpGet]
         public IActionResult BuscarClientes(string term)
         {
@@ -479,13 +484,12 @@ namespace FashionM.Controllers
             term = term.ToLower();
 
             var clientes = _context.Clientes
-                .AsEnumerable() // 🔥 evita problemas de EF
+                .AsEnumerable()
                 .Where(c =>
                     c.Cedula.ToString().Contains(term) ||
                     (c.Nombre + " " + c.Apellidos).ToLower().Contains(term) ||
                     (c.Comercio ?? "").ToLower().Contains(term)
                 )
-                .OrderBy(c => c.Nombre)
                 .Take(10)
                 .Select(c => new
                 {
@@ -505,11 +509,7 @@ namespace FashionM.Controllers
                 return Json(new List<object>());
 
             var productos = _context.Inventarios
-                .Where(i =>
-                    i.Codigo.Contains(term) ||
-                    i.Marca.Contains(term)
-                )
-                .OrderBy(i => i.Codigo)
+                .Where(i => i.Codigo.Contains(term) || i.Marca.Contains(term))
                 .Take(10)
                 .Select(i => new
                 {

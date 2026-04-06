@@ -66,5 +66,6 @@ namespace FashionM.Models
 // Add-Migration ProveedorEmpresa
 
 /*
- Necesito hacer un grafico de entradas vs salidas
+ Se debe realizar un modulo de ventas donde esten varios modulos relacionados con el fin de unificar, para esto comenzamos con el modulo de proformas y seguidamente vamos con el
+modulo de factuacion, para esto es necesario tener una serie de archivos importantes con el fin de poder conectarse a hacienda. 
  */

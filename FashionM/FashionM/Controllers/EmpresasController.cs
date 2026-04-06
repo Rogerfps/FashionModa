@@ -44,6 +44,19 @@ namespace FashionM.Controllers
             return View(empresa);
         }
 
+        // DETAILS
+        public async Task<IActionResult> Details(int id)
+        {
+            var empresa = await _context.Empresas
+                .Include(e => e.Proformas)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (empresa == null)
+                return NotFound();
+
+            return View(empresa);
+        }
+
         // EDIT GET
         public async Task<IActionResult> Edit(int id)
         {

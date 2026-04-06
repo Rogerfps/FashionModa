@@ -11,7 +11,7 @@
     <!-- HEADER -->
     <div class="header-section">
         <h1 class="header-title">
-            <span>📄</span> Proforma #@Model.Id
+            <span>📄</span> Proforma #@Model.Numero
         </h1>
         <a asp-action="Index" class="btn-back">
             ← Volver
@@ -23,7 +23,7 @@
         <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
                 <div style="font-size: 1.2rem; font-weight: 600; color: var(--deep-blue);">
-                    Proforma #@Model.Id
+                    Proforma #@Model.Numero
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-gray);">
                     @Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")

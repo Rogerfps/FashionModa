@@ -6,6 +6,7 @@ namespace FashionM.Models
     {
         [Key]
         public int Id { get; set; }
+        public int Numero { get; set; }
 
         public DateTime Fecha { get; set; } = DateTime.Now;
 
