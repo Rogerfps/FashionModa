@@ -168,7 +168,7 @@
                     return;
                 }
 
-                fetch(`/Proformas/BuscarProductos?term=${term}`)
+                fetch(`/Proformas/BuscarProductos?term=${term}&proformaId=@Model.Id`)
                     .then(r => r.json())
                     .then(data => {
 
@@ -196,12 +196,12 @@
 
         // CARGAR VARIANTES
         function cargarVariantes(codigo) {
-            fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}`)
+            fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}&proformaId=@Model.Id`)
                 .then(r => r.json())
                 .then(data => {
                     variantes = data;
 
-                    llenar(color, [...new Set(data.map(x => x.color))]);
+                    llenarSelect(color, [...new Set(data.map(x => x.color))], "Seleccione");
 
                     detalle.innerHTML = `<option value="">(Sin detalle)</option>`;
                     document.getElementById("tablaTallas").innerHTML = "";
@@ -218,11 +218,19 @@
 
             let unicos = [...new Set(detalles)];
 
-            llenar(detalle, unicos);
+            llenarSelect(detalle, unicos, "(Sin detalle)");
 
+            // 🔥 AUTO si solo hay uno
             if (unicos.length === 1) {
                 detalle.value = unicos[0];
                 detalle.dispatchEvent(new Event("change"));
+            }
+
+            // 🔥 SI NO HAY DETALLE → mostrar todo
+            if (unicos.length === 0) {
+                renderTallas(
+                    variantes.filter(v => v.color === c)
+                );
             }
         });
 
@@ -282,8 +290,14 @@
             document.getElementById("tablaTallas").innerHTML = html;
         }
 
-        // 🔥 FIX REAL (CLAVE)
+        // VALIDACIÓN FINAL
         document.getElementById("formProforma").addEventListener("submit", function (e) {
+
+            if (!hidden.value) {
+                e.preventDefault();
+                alert("Debe seleccionar un producto válido");
+                return;
+            }
 
             let inputsCantidad = document.querySelectorAll("input[name^='cantidades']");
             let inputsTalla = document.querySelectorAll("input[name^='tallas']");
@@ -326,8 +340,8 @@
         });
 
         // UTIL
-        function llenar(select, items) {
-            select.innerHTML = `<option value="">(Sin detalle)</option>`;
+        function llenarSelect(select, items, textoDefault) {
+            select.innerHTML = `<option value="">${textoDefault}</option>`;
 
             items.forEach(i => {
                 let o = document.createElement("option");

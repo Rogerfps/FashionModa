@@ -5,7 +5,6 @@
 
 <link rel="stylesheet" href="~/css/Inventario/InventarioIndex.css" />
 
-
 <!-- HEADER -->
 <div class="neo-header">
     <div class="container d-flex justify-content-between align-items-center px-4">
@@ -14,12 +13,13 @@
     </div>
 </div>
 
-<!-- Botón de Historial General -->
+<!-- Botones -->
 <a asp-controller="HistorialInventario"
-   asp-action="Index"
-   class="btn-historial">
+       asp-action="Index"
+       class="btn-historial">
     📜 Historial General
 </a>
+
 <a asp-controller="Inventarios"
        asp-action="GraficoStockPorMarca"
        class="btn-historial">
@@ -28,17 +28,15 @@
 
 <div class="container-fluid px-4" style="max-width: 1400px;">
 
-    <!-- FILTRO COMPACTO -->
+    <!-- FILTRO -->
     <form asp-action="Index" method="get" class="filter-container d-flex gap-2">
 
-        <!-- BUSCAR -->
         <input type="text"
                name="search"
                value="@ViewBag.Search"
                class="filter-input flex-grow-1"
                placeholder="Buscar por código, marca, SKU...">
 
-        <!-- EMPRESA -->
         <select name="empresa" class="filter-input">
             <option value="">Todas las empresas</option>
             @foreach (var e in ViewBag.Empresas)
@@ -49,10 +47,8 @@
             }
         </select>
 
-        <!-- BOTON BUSCAR -->
         <button type="submit" class="btn-filter">🔍</button>
 
-        <!-- LIMPIAR -->
         @if (!string.IsNullOrEmpty(ViewBag.Search) || !string.IsNullOrEmpty(ViewBag.Empresa))
         {
             <a asp-action="Index" class="btn-filter" style="background:#ef4444;">✖</a>
@@ -60,125 +56,148 @@
 
     </form>
 
-    <!-- TABLA -->
-    <div class="table-wrap">
-        <div class="table-responsive">
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th style="width:120px"></th>
-                        <th>Código</th>
-                        <th>Producto</th>
-                        <th>SKU</th>
-                        <th>Precios</th>
-                        <th>Tallas</th>
-                        <th>Stock</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Any())
-                    {
+    <!-- 🔥 FORM MULTIPLE DELETE -->
+    <form asp-action="DeleteMultiple" method="post" id="formDeleteMultiple">
+        @Html.AntiForgeryToken()
+
+        <!-- BOTÓN -->
+        <button type="submit" class="btn btn-danger mb-3">
+            🗑 Eliminar seleccionados
+        </button>
+
+        <!-- TABLA -->
+        <div class="table-wrap">
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
                         <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
-                                <div class="empty-text">No hay productos en inventario</div>
-                            </td>
+                            <!-- CHECK ALL -->
+                            <th style="width:40px;">
+                                <input type="checkbox" id="checkAll" />
+                            </th>
+
+                            <th style="width:120px"></th>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>SKU</th>
+                            <th>Precios</th>
+                            <th>Tallas</th>
+                            <th>Stock</th>
+                            <th></th>
                         </tr>
-                    }
-                    else
-                    {
-                        foreach (var item in Model)
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Any())
                         {
                             <tr>
-                                <!-- FOTO -->
-                                <td>
-                                    @if (item.Fotos?.Any() == true)
-                                    {
-                                        <img src="@item.Fotos.First().Ruta" class="product-img">
-                                    }
-                                    else
-                                    {
-                                        <div class="no-img">📷</div>
-                                    }
-                                </td>
-
-                                <!-- CODIGO -->
-                                <td class="fw-semibold">@item.Codigo</td>
-
-                                <!-- PRODUCTO -->
-                                <td>
-                                    <div class="product-line">@item.Marca</div>
-                                </td>
-
-                                <!-- SKU -->
-                                <td>
-                                    <span style="font-family:monospace">@item.SKU</span>
-                                </td>
-
-                                <!-- PRECIOS -->
-                                <td>
-                                    <div class="precio-venta">₡@item.PrecioVenta.ToString("N0")</div>
-                                    <div class="precio-costo">₡@item.PrecioCosto.ToString("N0")</div>
-                                </td>
-
-                                <!-- TALLAS -->
-                                <td>
-                                    @if (item.Tallas?.Any() == true)
-                                    {
-                                        @foreach (var t in item.Tallas.OrderBy(t => t.Numero).Take(3))
-                                        {
-                                            <span class="talla-badge">
-                                                @t.Numero:@t.Cantidad
-                                            </span>
-                                        }
-                                        @(item.Tallas.Count() > 3 ? "..." : "")
-                                    }
-                                </td>
-
-                                <!-- STOCK -->
-                                <td>
-                                    <span class="stock-badge">@item.StockTotal</span>
-                                </td>
-
-                                <!-- ACCIONES -->
-                                <td>
-                                    <div class="action-group">
-                                        <a asp-action="Details"
-                                           asp-route-id="@item.Codigo"
-                                           class="btn-action btn-view"
-                                           title="Ver detalles">
-                                            👁
-                                        </a>
-
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.Codigo"
-                                           class="btn-action btn-edit"
-                                           title="Editar producto">
-                                            ✏️
-                                        </a>
-
-                                        <form asp-action="Delete"
-                                              method="post"
-                                              style="display:inline;"
-                                              onsubmit="return confirm('¿Eliminar este producto?')">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="codigo" value="@item.Codigo">
-                                            <button type="submit"
-                                                    class="btn-action btn-delete"
-                                                    title="Eliminar producto">
-                                                🗑
-                                            </button>
-                                        </form>
-                                    </div>
+                                <td colspan="9" class="text-center py-5">
+                                    <div style="font-size: 2rem;">📭</div>
+                                    <div>No hay productos en inventario</div>
                                 </td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <!-- CHECK -->
+                                    <td>
+                                        <input type="checkbox"
+                                               name="codigos"
+                                               value="@item.Codigo"
+                                               class="checkItem" />
+                                    </td>
+
+                                    <!-- FOTO -->
+                                    <td>
+                                        @if (item.Fotos?.Any() == true)
+                                        {
+                                            <img src="@item.Fotos.First().Ruta" class="product-img">
+                                        }
+                                        else
+                                        {
+                                            <div class="no-img">📷</div>
+                                        }
+                                    </td>
+
+                                    <!-- CODIGO -->
+                                    <td class="fw-semibold">@item.Codigo</td>
+
+                                    <!-- PRODUCTO -->
+                                    <td>
+                                        <div class="product-line">@item.Marca</div>
+                                    </td>
+
+                                    <!-- SKU -->
+                                    <td>
+                                        <span style="font-family:monospace">@item.SKU</span>
+                                    </td>
+
+                                    <!-- PRECIOS -->
+                                    <td>
+                                        <div class="precio-venta">₡@item.PrecioVenta.ToString("N0")</div>
+                                        <div class="precio-costo">₡@item.PrecioCosto.ToString("N0")</div>
+                                    </td>
+
+                                    <!-- TALLAS -->
+                                    <td>
+                                        @if (item.Tallas?.Any() == true)
+                                        {
+                                            @foreach (var t in item.Tallas.OrderBy(t => t.Numero).Take(3))
+                                            {
+                                                <span class="talla-badge">
+                                                    @t.Numero:@t.Cantidad
+                                                </span>
+                                            }
+                                            @(item.Tallas.Count() > 3 ? "..." : "")
+                                        }
+                                    </td>
+
+                                    <!-- STOCK -->
+                                    <td>
+                                        <span class="stock-badge">@item.StockTotal</span>
+                                    </td>
+
+                                    <!-- ACCIONES -->
+                                    <td>
+                                        <div class="action-group">
+                                            <a asp-action="Details"
+                                                   asp-route-id="@item.Codigo"
+                                                   class="btn-action btn-view">
+                                                👁
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                                   asp-route-id="@item.Codigo"
+                                                   class="btn-action btn-edit">
+                                                ✏️
+                                            </a>
+
+                                            <form asp-action="Delete"
+                                                  method="post"
+                                                  style="display:inline;"
+                                                  onsubmit="return confirm('¿Eliminar este producto?')">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="codigo" value="@item.Codigo">
+                                                <button type="submit" class="btn-action btn-delete">
+                                                    🗑
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+
+    </form>
 
     <!-- PAGINACIÓN -->
     @if (ViewBag.TotalPages > 1)
@@ -187,13 +206,43 @@
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <a asp-action="Index"
-                   asp-route-page="@i"
-                   asp-route-search="@ViewBag.Search"
-                   asp-route-empresa="@ViewBag.Empresa"
-                   class="page-compact @(i == ViewBag.CurrentPage ? "active" : "")">
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-empresa="@ViewBag.Empresa"
+                       class="page-compact @(i == ViewBag.CurrentPage ? "active" : "")">
                     @i
                 </a>
             }
         </div>
     }
 </div>
+
+<!-- JS -->
+<script>
+    document.getElementById("checkAll").addEventListener("change", function () {
+        let checked = this.checked;
+        document.querySelectorAll(".checkItem").forEach(x => x.checked = checked);
+    });
+
+    document.getElementById("formDeleteMultiple").addEventListener("submit", function (e) {
+        let selected = document.querySelectorAll(".checkItem:checked");
+
+        if (selected.length === 0) {
+            alert("Selecciona al menos un producto");
+            e.preventDefault();
+            return;
+        }
+
+        // 🔥 convertir a query string manual (evita problemas de binding)
+        let params = new URLSearchParams();
+
+        selected.forEach(x => {
+            params.append("codigos", x.value);
+        });
+
+        // redirigir a GET correctamente
+        window.location.href = "/Inventarios/DeleteMultiple?" + params.toString();
+
+        e.preventDefault();
+    });
+</script>

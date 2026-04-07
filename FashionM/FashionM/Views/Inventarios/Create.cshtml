@@ -56,8 +56,33 @@
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Empresa"></label>
-                    <input asp-for="Empresa" class="form-control" />
+                    <label class="form-label">Empresa</label>
+
+                    <div class="radio-group">
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="Empresa" value="Cocalza Plus S.A" required />
+                            <span>Cocalza Plus S.A</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="Empresa" value="Fashion Shoes S.A" />
+                            <span>Fashion Shoes S.A</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="Empresa" value="LSG Moda S.A" />
+                            <span>LSG Moda S.A</span>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" asp-for="Empresa" value="Maxi Plus 23 S.A" />
+                            <span>Maxi Plus 23 S.A</span>
+                        </label>
+
+                    </div>
+
+                    <span asp-validation-for="Empresa" class="validation-error"></span>
                 </div>
 
             </div>

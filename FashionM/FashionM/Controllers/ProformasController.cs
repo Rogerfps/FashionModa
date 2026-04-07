@@ -287,7 +287,7 @@ namespace FashionM.Controllers
             // 🔽 SELECCIONAR LOGO
             string logo = nombreEmpresa switch
             {
-                "cocalza plus" => "cocalza.png",
+                "cocalza plus s.a" => "cocalza.png",
                 "fashion shoes s.a" => "fashion.png",
                 "lsg moda s.a" => "lsg.jpg",
                 "maxiplus" => "maxiplus.png",
@@ -503,13 +503,25 @@ namespace FashionM.Controllers
         }
 
         [HttpGet]
-        public IActionResult BuscarProductos(string term)
+        public IActionResult BuscarProductos(string term, int proformaId)
         {
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
+            // 🔥 Obtener la empresa de la proforma
+            var empresaNombre = _context.Proformas
+                .Where(p => p.Id == proformaId)
+                .Select(p => p.Empresa.Nombre)
+                .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(empresaNombre))
+                return Json(new List<object>());
+
             var productos = _context.Inventarios
-                .Where(i => i.Codigo.Contains(term) || i.Marca.Contains(term))
+                .Where(i =>
+                    i.Empresa.ToLower().Trim() == empresaNombre.ToLower().Trim() && // 🔥 filtro correcto
+                    (i.Codigo.Contains(term) || i.Marca.Contains(term))
+                )
                 .Take(10)
                 .Select(i => new
                 {
@@ -522,16 +534,17 @@ namespace FashionM.Controllers
         }
 
         [HttpGet]
-        public IActionResult ObtenerVariantes(string codigo)
+        public IActionResult ObtenerVariantes(string codigo, int proformaId)
         {
             var variantes = _context.TallasInventario
                 .Where(t => t.InventarioCodigo == codigo)
                 .Select(t => new
                 {
-                    color = t.Color,
-                    detalle = t.Detalle,
+                    color = t.Color ?? "",
+                    detalle = t.Detalle ?? "",
                     talla = t.Numero,
-                    precio = t.Precio
+                    precio = t.Precio,
+                    stock = t.Cantidad
                 })
                 .ToList();
 

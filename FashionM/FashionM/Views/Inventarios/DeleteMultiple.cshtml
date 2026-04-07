@@ -1,0 +1,45 @@
+﻿@model List<FashionM.Models.Inventario>
+
+<div class="container mt-4" style="max-width: 900px;">
+
+    <h2 class="text-danger mb-3">🗑 Confirmar Eliminación</h2>
+
+    <div class="alert alert-danger">
+        Vas a eliminar <strong>@Model.Count</strong> productos.
+    </div>
+
+    <form asp-action="DeleteMultipleConfirmed" method="post">
+        @Html.AntiForgeryToken()
+
+        @foreach (var item in Model)
+        {
+            <input type="hidden" name="codigos" value="@item.Codigo" />
+        }
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Marca</th>
+                    <th>SKU</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Marca</td>
+                        <td>@item.SKU</td>
+                        <td>@item.StockTotal</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button class="btn btn-danger">Confirmar eliminación</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+
+    </form>
+</div>

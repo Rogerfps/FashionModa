@@ -36,8 +36,47 @@
                 <span asp-validation-for="CodigoCabys" class="text-danger"></span>
             </div>
 
-            <label>Empresa</label>
-            <input asp-for="Empresa" class="form-control mb-2" />
+            <div class="mb-3">
+                <label class="form-label">Empresa</label>
+
+                <div class="radio-group">
+
+                    <label class="radio-option">
+                        <input type="radio"
+                               name="Empresa"
+                               value="Cocalza Plus S.A"
+                        @(Model.Empresa == "Cocalza Plus S.A" ? "checked" : "") />
+                        <span>Cocalza Plus S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio"
+                               name="Empresa"
+                               value="Fashion Shoes S.A"
+                        @(Model.Empresa == "Fashion Shoes S.A" ? "checked" : "") />
+                        <span>Fashion Shoes S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio"
+                               name="Empresa"
+                               value="LSG Moda S.A"
+                        @(Model.Empresa == "LSG Moda S.A" ? "checked" : "") />
+                        <span>LSG Moda S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio"
+                               name="Empresa"
+                               value="Maxi Plus 23 S.A"
+                        @(Model.Empresa == "Maxi Plus 23 S.A" ? "checked" : "") />
+                        <span>Maxi Plus 23 S.A</span>
+                    </label>
+
+                </div>
+
+                <span asp-validation-for="Empresa" class="text-danger"></span>
+            </div>
 
             <div class="row mb-3">
                 <div class="col">

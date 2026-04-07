@@ -397,6 +397,53 @@ namespace FashionM.Controllers
             }
         }
 
+        // DELETE MULTIPLE - CONFIRMAR
+        [HttpGet]
+        public async Task<IActionResult> DeleteMultiple(List<string> codigos)
+        {
+            if (codigos == null || !codigos.Any())
+                return RedirectToAction(nameof(Index));
+
+            var inventarios = await _context.Inventarios
+                .Where(i => codigos.Contains(i.Codigo))
+                .ToListAsync();
+
+            return View(inventarios);
+        }
+
+        // DELETE MULTIPLE - EJECUTAR
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteMultipleConfirmed(List<string> codigos)
+        {
+            if (codigos == null || !codigos.Any())
+                return RedirectToAction(nameof(Index));
+
+            var inventarios = await _context.Inventarios
+                .Where(i => codigos.Contains(i.Codigo))
+                .Include(i => i.Fotos)
+                .ToListAsync();
+
+            foreach (var inv in inventarios)
+            {
+                foreach (var foto in inv.Fotos)
+                {
+                    var ruta = Path.Combine(
+                        _environment.WebRootPath,
+                        foto.Ruta.Replace("/", Path.DirectorySeparatorChar.ToString())
+                    );
+
+                    if (System.IO.File.Exists(ruta))
+                        System.IO.File.Delete(ruta);
+                }
+            }
+
+            _context.Inventarios.RemoveRange(inventarios);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
         public IActionResult GraficoStockPorMarca()
         {
             var inventarios = _context.Inventarios
