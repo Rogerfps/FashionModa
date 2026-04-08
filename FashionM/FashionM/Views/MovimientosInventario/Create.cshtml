@@ -6,7 +6,6 @@
 
 @{
     var tallas = new List<string> { "A", "B" };
-
     for (int i = 15; i <= 45; i++)
     {
         tallas.Add(i.ToString());
@@ -15,41 +14,51 @@
 
 <link rel="stylesheet" href="~/css/MovimientoInventario/Create.css" />
 
+<style>
+    .list-group {
+        position: absolute;
+        width: 100%;
+        z-index: 1000;
+    }
+</style>
+
 <div class="container mt-4">
-    <!-- Header -->
+
+    <!-- HEADER -->
     <div class="page-header">
-        <h1 class="page-title">
-            <span>📦</span> Registrar Movimiento
-        </h1>
-        <a asp-action="Index" class="back-link">
-            <span>←</span> Volver
-        </a>
+        <h1 class="page-title">📦 Registrar Movimiento</h1>
+        <a asp-action="Index" class="back-link">← Volver</a>
     </div>
 
-    <!-- Formulario -->
+    <!-- FORM -->
     <div class="form-card">
-        <form asp-action="Create" method="post">
-            <div class="section-title">
-                <span>📋</span> Información del Movimiento
-            </div>
+        <form asp-action="Create" method="post" id="formMovimiento">
 
-            <!-- Grid principal -->
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="section-title">📋 Información del Movimiento</div>
+
             <div class="form-grid">
-                <div class="form-group">
+
+                <!-- 🔥 AUTOCOMPLETE REAL -->
+                <div class="form-group position-relative">
                     <label class="form-label">Producto</label>
-                    <select asp-for="InventarioCodigo" class="form-select">
-                        <option value="">-- Seleccionar producto --</option>
-                        @foreach (var p in ViewBag.Inventarios)
-                        {
-                            <option value="@p.Codigo">
-                                @p.Marca (@p.Codigo)
-                            </option>
-                        }
-                    </select>
+
+                    <input type="text"
+                           id="productoBuscar"
+                           class="form-control"
+                           placeholder="Buscar código o marca..."
+                           autocomplete="off" />
+
+                    <input type="hidden"
+                           asp-for="InventarioCodigo"
+                           id="codigoProducto" />
+
+                    <div id="listaProductos" class="list-group"></div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tipo de Movimiento</label>
+                    <label class="form-label">Tipo</label>
                     <select asp-for="Tipo" class="form-select">
                         <option value="Entrada">➕ Entrada</option>
                         <option value="Salida">➖ Salida</option>
@@ -57,92 +66,159 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Detalle del Movimiento</label>
+                    <label class="form-label">Detalle</label>
                     <input asp-for="Detalle"
                            class="form-control"
-                           placeholder="Ej: Compra proveedor / Venta cliente">
-                    </div>
+                           placeholder="Ej: Compra proveedor / Venta cliente" />
                 </div>
 
-                <!-- Información adicional del producto -->
-                <div class="section-title">
-                    <span>🎨</span> Información del Producto
+            </div>
+
+            <!-- INFO PRODUCTO -->
+            <div class="section-title">🎨 Información del Producto</div>
+
+            <div class="info-adicional-grid">
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <input id="colorInput" class="form-control" placeholder="Ej: Negro, Rojo" />
                 </div>
 
-                <div class="info-adicional-grid">
-                    <div class="form-group">
-                        <label class="form-label">Color</label>
-                        <input id="colorInput" class="form-control" placeholder="Ej: Negro, Rojo, Azul">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Detalle</label>
-                        <input id="detalleInput" class="form-control" placeholder="Ej: Cuero, Sintético">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Detalle</label>
+                    <input id="detalleInput" class="form-control" placeholder="Ej: Cuero" />
                 </div>
+            </div>
 
-                <!-- Numeración -->
-                <div class="section-title">
-                    <span>👟</span> Numeración
-                </div>
+            <!-- TALLAS -->
+            <div class="section-title">👟 Numeración</div>
 
-                <div class="tabla-wrapper">
-                    <table class="tallas-table">
-                        <thead>
+            <div class="tabla-wrapper">
+                <table class="tallas-table">
+                    <thead>
+                        <tr>
+                            <th>Talla</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < tallas.Count; i++)
+                        {
                             <tr>
-                                <th style="width:150px">Talla</th>
-                                <th style="width:200px">Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < tallas.Count; i++)
-                            {
-                                <tr>
-                                    <td class="talla-label">
-                                        @tallas[i]
-                                        <input type="hidden"
-                                               name="Detalles[@i].Numero"
-                                               value="@tallas[i]" />
-                                        <input type="hidden"
-                                               name="Detalles[@i].Color"
-                                               class="colorHidden" />
-                                        <input type="hidden"
-                                               name="Detalles[@i].Detalle"
-                                               class="detalleHidden" />
-                                    </td>
-                                    <td>
-                                        <input type="number"
-                                               name="Detalles[@i].Cantidad"
-                                               class="cantidad-input"
-                                               min="0"
-                                               value="0"
-                                               placeholder="0" />
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                                <td>
+                                    @tallas[i]
 
-                <!-- Botones -->
-                <div class="action-buttons">
-                    <button type="submit" class="btn-save">
-                        <span>💾</span> Guardar Movimiento
-                    </button>
-                    <a asp-action="Index" class="btn-cancel">
-                        <span>←</span> Cancelar
-                    </a>
-                </div>
-            </form>
-        </div>
+                                    <input type="hidden"
+                                           name="Detalles[@i].Numero"
+                                           value="@tallas[i]" />
+
+                                    <input type="hidden"
+                                           name="Detalles[@i].Color"
+                                           class="colorHidden" />
+
+                                    <input type="hidden"
+                                           name="Detalles[@i].Detalle"
+                                           class="detalleHidden" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           name="Detalles[@i].Cantidad"
+                                           class="form-control"
+                                           min="0"
+                                           value="0" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BOTONES -->
+            <div class="action-buttons">
+                <button type="submit" class="btn-save">💾 Guardar Movimiento</button>
+                <a asp-action="Index" class="btn-cancel">← Cancelar</a>
+            </div>
+
+        </form>
     </div>
 
+</div>
+
+@section Scripts {
+
     <script>
-        document.querySelector("form").addEventListener("submit", function () {
-            const color = document.getElementById("colorInput").value;
-            const detalle = document.getElementById("detalleInput").value;
+        let timeout = null;
+
+        const input = document.getElementById("productoBuscar");
+        const lista = document.getElementById("listaProductos");
+        const hidden = document.getElementById("codigoProducto");
+
+        // 🔥 BUSCAR PRODUCTOS (AJAX REAL)
+        input.addEventListener("keyup", function () {
+            clearTimeout(timeout);
+
+            let term = this.value;
+
+            timeout = setTimeout(() => {
+
+                if (term.length < 1) {
+                    lista.innerHTML = "";
+                    return;
+                }
+
+                fetch(`/MovimientosInventario/BuscarInventarios?term=${term}`)
+                    .then(r => r.json())
+                    .then(data => {
+
+                        lista.innerHTML = "";
+
+                        if (data.length === 0) {
+                            lista.innerHTML = `<div class="list-group-item">Sin resultados</div>`;
+                            return;
+                        }
+
+                        data.forEach(p => {
+                            let item = document.createElement("a");
+                            item.className = "list-group-item list-group-item-action";
+                            item.innerHTML = `<strong>${p.codigo}</strong> - ${p.marca}`;
+
+                            item.onclick = () => {
+                                input.value = p.codigo;
+                                hidden.value = p.codigo;
+                                lista.innerHTML = "";
+                            };
+
+                            lista.appendChild(item);
+                        });
+                    });
+
+            }, 300);
+        });
+
+        // cerrar lista
+        document.addEventListener("click", function (e) {
+            if (!input.contains(e.target) && !lista.contains(e.target)) {
+                lista.innerHTML = "";
+            }
+        });
+
+        // 🔥 COLOR / DETALLE
+        const colorInput = document.getElementById("colorInput");
+        const detalleInput = document.getElementById("detalleInput");
+
+        function actualizarHidden() {
+            const color = colorInput.value;
+            const detalle = detalleInput.value;
 
             document.querySelectorAll(".colorHidden").forEach(e => e.value = color);
             document.querySelectorAll(".detalleHidden").forEach(e => e.value = detalle);
-        });
+        }
+
+        colorInput.addEventListener("input", actualizarHidden);
+        detalleInput.addEventListener("input", actualizarHidden);
+
+        document.getElementById("formMovimiento")
+            .addEventListener("submit", actualizarHidden);
     </script>
+
+}

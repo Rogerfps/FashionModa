@@ -48,7 +48,10 @@ namespace FashionM.Controllers
         public IActionResult Create()
         {
             ViewBag.Inventarios = _context.Inventarios
-                .OrderBy(i => i.Marca)
+                .Select(i => new {
+                    codigo = i.Codigo,
+                    marca = i.Marca
+                })
                 .ToList();
 
             return View();
@@ -63,83 +66,33 @@ namespace FashionM.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Inventarios = _context.Inventarios.ToList();
+                ViewBag.Inventarios = _context.Inventarios
+                    .Select(i => new {
+                        codigo = i.Codigo,
+                        marca = i.Marca
+                    })
+                    .ToList();
+
                 return View(movimiento);
             }
 
-            var inventario = await _context.Inventarios
-                .Include(i => i.Tallas)
-                .FirstOrDefaultAsync(i => i.Codigo == movimiento.InventarioCodigo);
-
-            if (inventario == null)
-                return NotFound();
-
-            // validar que exista al menos una cantidad
             if (!movimiento.Detalles.Any(d => d.Cantidad > 0))
             {
                 ModelState.AddModelError("", "Debe ingresar al menos una cantidad.");
-                ViewBag.Inventarios = _context.Inventarios.ToList();
+
+                ViewBag.Inventarios = _context.Inventarios
+                    .Select(i => new {
+                        codigo = i.Codigo,
+                        marca = i.Marca
+                    })
+                    .ToList();
+
                 return View(movimiento);
-            }
-
-            foreach (var detalle in movimiento.Detalles.Where(d => d.Cantidad > 0))
-            {
-                var talla = inventario.Tallas
-                    .FirstOrDefault(t =>
-                        t.Numero == detalle.Numero &&
-                        t.Color == detalle.Color &&
-                        t.Detalle == detalle.Detalle
-                    );
-
-                // si la variante no existe
-                if (talla == null)
-                {
-                    if (movimiento.Tipo == "Salida")
-                    {
-                        ModelState.AddModelError("",
-                            $"La variante no existe: {detalle.Color} {detalle.Detalle} talla {detalle.Numero}");
-
-                        ViewBag.Inventarios = _context.Inventarios.ToList();
-                        return View(movimiento);
-                    }
-
-                    // crear nueva variante para entradas
-                    talla = new TallaInventario
-                    {
-                        InventarioCodigo = inventario.Codigo,
-                        Color = detalle.Color,
-                        Detalle = detalle.Detalle,
-                        Numero = detalle.Numero,
-                        Cantidad = 0
-                    };
-
-                    inventario.Tallas.Add(talla);
-                }
-
-                // aplicar movimiento
-                if (movimiento.Tipo == "Entrada")
-                {
-                    talla.Cantidad += detalle.Cantidad;
-                }
-                else if (movimiento.Tipo == "Salida")
-                {
-                    if (talla.Cantidad < detalle.Cantidad)
-                    {
-                        ModelState.AddModelError("",
-                            $"Stock insuficiente en {detalle.Color} {detalle.Detalle} talla {detalle.Numero}");
-
-                        ViewBag.Inventarios = _context.Inventarios.ToList();
-                        return View(movimiento);
-                    }
-
-                    talla.Cantidad -= detalle.Cantidad;
-                }
             }
 
             movimiento.Fecha = DateTime.UtcNow;
 
             _context.MovimientosInventario.Add(movimiento);
-
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -208,6 +161,25 @@ namespace FashionM.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult BuscarInventarios(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            var productos = _context.Inventarios
+                .Where(i => i.Codigo.Contains(term) || i.Marca.Contains(term))
+                .Take(10)
+                .Select(i => new
+                {
+                    codigo = i.Codigo,
+                    marca = i.Marca
+                })
+                .ToList();
+
+            return Json(productos);
         }
     }
 }
