@@ -7,21 +7,67 @@
 <link rel="stylesheet" href="~/css/MovimientoInventario/Index.css" />
 
 <div class="container mt-4">
+
     <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">
             <span>📦</span> Movimientos de Inventario
         </h1>
-        <a asp-action="Create" class="btn-neo">
-            <span>➕</span> Nuevo Movimiento
-        </a>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn-neo">
+                <span>➕</span> Nuevo Movimiento
+            </a>
+
+            <a asp-action="Grafico" class="btn btn-success">
+                📊 Gráfico
+            </a>
+        </div>
     </div>
 
-    <a asp-controller="MovimientosInventario"
-           asp-action="Grafico"
-           class="btn btn-success">
-        📊 Ver Gráfico
-    </a>
+    <!-- 🔍 FILTROS -->
+    <form method="get" class="filtros-form mb-3">
+        <div class="row g-2">
+
+            <!-- Empresa -->
+            <div class="col-md-3">
+                <select name="empresa" class="form-control">
+                    <option value="">Todas las empresas</option>
+
+                    @foreach (var e in ViewBag.Empresas)
+                    {
+                        <option value="@e" selected="@(e == ViewBag.Empresa ? "selected" : null)">
+                            @e
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- Fecha Inicio -->
+            <div class="col-md-3">
+                <input type="date" name="fechaInicio" class="form-control"
+                       value="@ViewBag.FechaInicio" />
+            </div>
+
+            <!-- Fecha Fin -->
+            <div class="col-md-3">
+                <input type="date" name="fechaFin" class="form-control"
+                       value="@ViewBag.FechaFin" />
+            </div>
+
+            <!-- Botones -->
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    🔍 Filtrar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary w-100">
+                    ❌
+                </a>
+            </div>
+
+        </div>
+    </form>
 
     <!-- Tabla -->
     <div class="table-wrapper">
@@ -30,6 +76,7 @@
                 <thead>
                     <tr>
                         <th>Fecha</th>
+                        <th>Empresa</th>
                         <th>Marca</th>
                         <th>Código</th>
                         <th>Tipo</th>
@@ -42,7 +89,7 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="empty-state">
                                     <div class="empty-icon">📭</div>
                                     <div class="empty-text">No hay movimientos registrados</div>
@@ -54,12 +101,18 @@
                     {
                         foreach (var item in Model)
                         {
-                            var total = item.Detalles.Sum(d => d.Cantidad);
+                            var total = item.Detalles?.Sum(d => d.Cantidad) ?? 0;
 
                             <tr>
-                                <td class="fecha-cell">@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fecha-cell">
+                                    @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                                </td>
 
-                                <td class="fw-semibold">@item.Inventario?.Marca</td>
+                                <td>@item.Empresa</td>
+
+                                <td class="fw-semibold">
+                                    @(item.Inventario?.Marca ?? "N/A")
+                                </td>
 
                                 <td>@item.InventarioCodigo</td>
 
@@ -76,23 +129,27 @@
                                 </td>
 
                                 <td>
-                                    @foreach (var d in item.Detalles)
+                                    @foreach (var d in item.Detalles ?? new List<MovimientoDetalle>())
                                     {
-                                        <span class="detalle-badge">
-                                            @d.Numero (@d.Cantidad)
-                                        </span>
+                                        if (d.Cantidad > 0)
+                                        {
+                                            <span class="detalle-badge">
+                                                @d.Numero (@d.Cantidad)
+                                            </span>
+                                        }
                                     }
                                 </td>
 
                                 <td>
                                     <div class="action-group">
                                         <a asp-action="Details" asp-route-id="@item.Id"
-                                           class="btn-action btn-view" title="Ver detalles">
+                                               class="btn-action btn-view" title="Ver detalles">
                                             👁
                                         </a>
+
                                         <a asp-action="Delete" asp-route-id="@item.Id"
-                                           class="btn-action btn-delete" title="Eliminar movimiento"
-                                           onclick="return confirm('¿Eliminar este movimiento?')">
+                                               class="btn-action btn-delete"
+                                               onclick="return confirm('¿Eliminar este movimiento?')">
                                             🗑
                                         </a>
                                     </div>
@@ -105,16 +162,20 @@
         </div>
     </div>
 
-    <!-- PAGINACION -->
+    <!-- 🔢 PAGINACIÓN (CON FILTROS) -->
     @if (ViewBag.TotalPages > 1)
     {
         <ul class="pagination-modern">
+
             @if (ViewBag.CurrentPage > 1)
             {
                 <li class="page-item">
                     <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage - 1)">
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-empresa="@ViewBag.Empresa"
+                           asp-route-fechaInicio="@ViewBag.FechaInicio"
+                           asp-route-fechaFin="@ViewBag.FechaFin">
                         ←
                     </a>
                 </li>
@@ -124,8 +185,11 @@
             {
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
                     <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@i">
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-empresa="@ViewBag.Empresa"
+                           asp-route-fechaInicio="@ViewBag.FechaInicio"
+                           asp-route-fechaFin="@ViewBag.FechaFin">
                         @i
                     </a>
                 </li>
@@ -135,12 +199,16 @@
             {
                 <li class="page-item">
                     <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage + 1)">
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-empresa="@ViewBag.Empresa"
+                           asp-route-fechaInicio="@ViewBag.FechaInicio"
+                           asp-route-fechaFin="@ViewBag.FechaFin">
                         →
                     </a>
                 </li>
             }
+
         </ul>
     }
 </div>

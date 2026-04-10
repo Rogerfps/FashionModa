@@ -58,11 +58,16 @@
 
             <div class="col-md-3">
                 <label class="form-label">Empresa</label>
-                <input type="text"
-                       name="empresa"
-                       value="@ViewBag.Empresa"
-                       class="form-control"
-                       placeholder="Nombre empresa" />
+                <select name="empresa" class="form-control">
+                    <option value="">Todas las empresas</option>
+
+                    @foreach (var e in ViewBag.Empresas)
+                    {
+                        <option value="@e" selected="@(e == ViewBag.Empresa ? "selected" : null)">
+                            @e
+                        </option>
+                    }
+                </select>
             </div>
 
             <div class="col-md-2">

@@ -25,10 +25,10 @@ namespace FashionM.Controllers
         // LISTA DE PEDIDOS GENERADOS
         // =====================================================
         public async Task<IActionResult> Index(
-            int? pedidoId,
-            string empresa,
-            int? semana,
-            int page = 1)
+    int? pedidoId,
+    string empresa,
+    int? semana,
+    int page = 1)
         {
             int pageSize = 25;
 
@@ -62,7 +62,7 @@ namespace FashionM.Controllers
             }
 
             // =========================
-            // TOTAL PARA PAGINACIÓN
+            // PAGINACIÓN
             // =========================
             var totalRecords = await query.CountAsync();
 
@@ -71,6 +71,15 @@ namespace FashionM.Controllers
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            // 👇 IMPORTANTE: lista fija de empresas
+            ViewBag.Empresas = new List<string>
+            {
+                "Cocalza Plus S.A",
+                "Fashion Shoes S.A",
+                "LSG MODA S.A",
+                "Maxi Plus 23"
+            };
 
             ViewBag.Page = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);

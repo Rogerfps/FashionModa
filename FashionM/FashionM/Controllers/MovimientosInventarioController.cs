@@ -20,14 +20,47 @@ namespace FashionM.Controllers
         // ===============================
         // LISTA DE MOVIMIENTOS
         // ===============================
-        public IActionResult Index(int page = 1)
+        public IActionResult Index(string? empresa, DateTime? fechaInicio, DateTime? fechaFin, int page = 1)
         {
             int pageSize = 10;
 
             var query = _context.MovimientosInventario
                 .Include(m => m.Inventario)
                 .Include(m => m.Detalles)
-                .OrderByDescending(m => m.Fecha);
+                .AsQueryable();
+
+            ViewBag.Empresas = new List<string>
+            {
+                "Cocalza Plus S.A",
+                "Fashion Shoes S.A",
+                "LSG Moda S.A",
+                "Maxi Plus 23 S.A"
+            };
+
+            // 🔹 Filtro por empresa
+            if (!string.IsNullOrEmpty(empresa))
+            {
+                if (!string.IsNullOrEmpty(empresa))
+                {
+                    query = query.Where(m => m.Empresa == empresa);
+                }
+            }
+
+            // 🔹 Filtro por fecha inicio
+            if (fechaInicio.HasValue)
+            {
+                var fechaInicioUtc = DateTime.SpecifyKind(fechaInicio.Value, DateTimeKind.Utc);
+                query = query.Where(m => m.Fecha >= fechaInicioUtc);
+            }
+
+            if (fechaFin.HasValue)
+            {
+                var fechaFinUtc = DateTime.SpecifyKind(fechaFin.Value, DateTimeKind.Utc).Date.AddDays(1);
+                query = query.Where(m => m.Fecha < fechaFinUtc);
+            }
+
+            // 🔹 Orden
+            query = query.OrderByDescending(m => m.Fecha);
 
             int totalItems = query.Count();
 
@@ -35,6 +68,11 @@ namespace FashionM.Controllers
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
+
+            // 🔹 ViewBag para mantener filtros en la vista
+            ViewBag.Empresa = empresa;
+            ViewBag.FechaInicio = fechaInicio?.ToString("yyyy-MM-dd");
+            ViewBag.FechaFin = fechaFin?.ToString("yyyy-MM-dd");
 
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -51,6 +89,13 @@ namespace FashionM.Controllers
                 .Select(i => new {
                     codigo = i.Codigo,
                     marca = i.Marca
+                })
+                .ToList();
+
+            ViewBag.Empresas = _context.Empresas
+                .Select(e => new {
+                    id = e.Id,
+                    nombre = e.Nombre
                 })
                 .ToList();
 
@@ -73,6 +118,13 @@ namespace FashionM.Controllers
                     })
                     .ToList();
 
+                ViewBag.Empresas = _context.Empresas
+                    .Select(e => new {
+                        id = e.Id,
+                        nombre = e.Nombre
+                    })
+                    .ToList();
+
                 return View(movimiento);
             }
 
@@ -84,6 +136,13 @@ namespace FashionM.Controllers
                     .Select(i => new {
                         codigo = i.Codigo,
                         marca = i.Marca
+                    })
+                    .ToList();
+
+                ViewBag.Empresas = _context.Empresas
+                    .Select(e => new {
+                        id = e.Id,
+                        nombre = e.Nombre
                     })
                     .ToList();
 

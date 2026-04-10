@@ -6,8 +6,8 @@
 
 <link rel="stylesheet" href="~/css/MovimientoInventario/Details.css" />
 
-
 <div class="container mt-4">
+    
     <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">
@@ -21,6 +21,7 @@
     <!-- Card principal -->
     <div class="detail-card">
         <div class="info-grid">
+
             <!-- Fecha -->
             <div class="info-item">
                 <div class="info-label">Fecha y Hora</div>
@@ -39,6 +40,12 @@
                 </div>
             </div>
 
+            <!-- Empresa (NUEVO) -->
+            <div class="info-item">
+                <div class="info-label">Empresa</div>
+                <div class="info-value">@Model.Empresa</div>
+            </div>
+
             <!-- Código -->
             <div class="info-item">
                 <div class="info-label">Código Producto</div>
@@ -48,8 +55,11 @@
             <!-- Marca -->
             <div class="info-item">
                 <div class="info-label">Marca</div>
-                <div class="info-value">@Model.Inventario?.Marca</div>
+                <div class="info-value">
+                    @(Model.Inventario != null ? Model.Inventario.Marca : "N/A")
+                </div>
             </div>
+
         </div>
 
         <!-- Detalle adicional -->
@@ -76,7 +86,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var d in Model.Detalles.Where(x => x.Cantidad > 0))
+                @foreach (var d in Model.Detalles?.Where(x => x.Cantidad > 0) ?? new List<MovimientoDetalle>())
                 {
                     <tr>
                         <td class="fw-semibold">@d.Numero</td>
@@ -96,16 +106,23 @@
             <tfoot>
                 <tr>
                     <td class="fw-bold">Total</td>
-                    <td class="fw-bold">@Model.Detalles.Sum(x => x.Cantidad)</td>
+                    <td class="fw-bold">
+                        @(Model.Detalles?.Sum(x => x.Cantidad) ?? 0)
+                    </td>
                 </tr>
             </tfoot>
         </table>
     </div>
 
-    <!-- Botón Volver -->
+    <!-- Botones -->
     <div class="action-buttons">
         <a asp-action="Index" class="btn-back">
             <span>←</span> Volver al listado
         </a>
+
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn-delete">
+            🗑 Eliminar
+        </a>
     </div>
+
 </div>
