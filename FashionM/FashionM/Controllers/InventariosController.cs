@@ -71,6 +71,10 @@ namespace FashionM.Controllers
         // CREATE GET
         public IActionResult Create()
         {
+            ViewBag.Proveedores = _context.Proveedores
+                .Where(p => p.Estado)
+                .ToList();
+
             return View();
         }
 
@@ -211,6 +215,10 @@ namespace FashionM.Controllers
             if (inventario == null)
                 return NotFound();
 
+            ViewBag.Proveedores = _context.Proveedores
+                .Where(p => p.Estado)
+                .ToList();
+
             return View(inventario);
         }
 
@@ -239,6 +247,8 @@ namespace FashionM.Controllers
             inventario.PrecioCosto = model.PrecioCosto;
             inventario.PrecioVenta = model.PrecioVenta;
             inventario.Empresa = model.Empresa;
+            inventario.ProveedorCedula = model.ProveedorCedula;
+
 
             _context.TallasInventario.RemoveRange(inventario.Tallas);
             inventario.Tallas = new List<TallaInventario>();
@@ -361,6 +371,7 @@ namespace FashionM.Controllers
             var inventario = await _context.Inventarios
                 .Include(i => i.Tallas)
                 .Include(i => i.Fotos)
+                .Include(i => i.Proveedor)
                 .FirstOrDefaultAsync(i => i.Codigo == id);
 
             if (inventario == null)
@@ -479,6 +490,31 @@ namespace FashionM.Controllers
             return View();
         }
 
-        
+        [HttpGet]
+        public IActionResult BuscarProveedores(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            var proveedores = _context.Proveedores
+                .Where(p =>
+                    p.Nombre.Contains(term) ||
+                    p.Apellidos.Contains(term) ||
+                    p.Comercio.Contains(term) ||
+                    p.Cedula.ToString().Contains(term)
+                )
+                .Take(10)
+                .Select(p => new
+                {
+                    id = p.Cedula,
+                    nombre = p.Nombre + " " + p.Apellidos,
+                    comercio = p.Comercio
+                })
+                .ToList();
+
+            return Json(proveedores);
+        }
+
+
     }
 }

@@ -17,6 +17,9 @@ namespace FashionM.Models
         public decimal PrecioCosto { get; set; }
         public decimal PrecioVenta { get; set; }
 
+        public int? ProveedorCedula { get; set; }
+        public Proveedor? Proveedor { get; set; }
+
         public List<TallaInventario> Tallas { get; set; } = new();
         public List<Foto> Fotos { get; set; } = new();
 

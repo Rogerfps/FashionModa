@@ -5,24 +5,18 @@
 namespace FashionM.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDetalleProforma : Migration
+    public partial class FixMovimientos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Detalle",
-                table: "Proformas",
-                type: "text",
-                nullable: true);
+            // Migración vacía (ignore changes)
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Detalle",
-                table: "Proformas");
+            // Migración vacía (ignore changes)
         }
     }
 }

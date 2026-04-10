@@ -318,11 +318,16 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioVenta")
                         .HasColumnType("numeric");
 
+                    b.Property<int?>("ProveedorCedula")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SKU")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Codigo");
+
+                    b.HasIndex("ProveedorCedula");
 
                     b.ToTable("Inventarios");
                 });
@@ -367,6 +372,10 @@ namespace FashionM.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -606,7 +615,8 @@ namespace FashionM.Migrations
 
                     b.HasIndex("ClienteCedula");
 
-                    b.HasIndex("EmpresaId");
+                    b.HasIndex("EmpresaId", "Numero")
+                        .IsUnique();
 
                     b.ToTable("Proformas");
                 });
@@ -923,6 +933,15 @@ namespace FashionM.Migrations
                     b.Navigation("Zapato");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Inventario", b =>
+                {
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorCedula");
+
+                    b.Navigation("Proveedor");
+                });
+
             modelBuilder.Entity("FashionM.Models.MovimientoDetalle", b =>
                 {
                     b.HasOne("FashionM.Models.MovimientoInventario", "MovimientoInventario")
@@ -1011,7 +1030,7 @@ namespace FashionM.Migrations
                     b.HasOne("FashionM.Models.Empresa", "Empresa")
                         .WithMany("Proformas")
                         .HasForeignKey("EmpresaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");

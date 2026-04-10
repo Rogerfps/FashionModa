@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260313144816_InventarioVariante2")]
-    partial class InventarioVariante2
+    [Migration("20260410144016_moviemientos")]
+    partial class moviemientos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,6 +170,53 @@ namespace FashionM.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Empresa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CedulaJuridica")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("CuentaBAC")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CuentaBCR")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CuentaBN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("SimpeMovil")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Empresas");
+                });
+
             modelBuilder.Entity("FashionM.Models.Foto", b =>
                 {
                     b.Property<int>("Id")
@@ -190,6 +237,43 @@ namespace FashionM.Migrations
                     b.HasIndex("InventarioCodigo");
 
                     b.ToTable("Fotos");
+                });
+
+            modelBuilder.Entity("FashionM.Models.HistorialInventario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CodigoInventario")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DatosAntes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DatosDespues")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Motivo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HistorialInventarios");
                 });
 
             modelBuilder.Entity("FashionM.Models.ImagenZapato", b =>
@@ -237,11 +321,16 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioVenta")
                         .HasColumnType("numeric");
 
+                    b.Property<int?>("ProveedorCedula")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SKU")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Codigo");
+
+                    b.HasIndex("ProveedorCedula");
 
                     b.ToTable("Inventarios");
                 });
@@ -256,6 +345,12 @@ namespace FashionM.Migrations
 
                     b.Property<int>("Cantidad")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Detalle")
+                        .HasColumnType("text");
 
                     b.Property<int>("MovimientoInventarioId")
                         .HasColumnType("integer");
@@ -280,6 +375,10 @@ namespace FashionM.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -478,6 +577,94 @@ namespace FashionM.Migrations
                     b.ToTable("PedidosProveedorDetalle");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Proforma", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteCedula")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Detalle")
+                        .HasColumnType("text");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FacturadoPor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NumeroCajas")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Observaciones")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteCedula");
+
+                    b.HasIndex("EmpresaId", "Numero")
+                        .IsUnique();
+
+                    b.ToTable("Proformas");
+                });
+
+            modelBuilder.Entity("FashionM.Models.ProformaDetalle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("InventarioCodigo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("ProformaId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Talla")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventarioCodigo");
+
+                    b.HasIndex("ProformaId");
+
+                    b.ToTable("ProformaDetalles");
+                });
+
             modelBuilder.Entity("FashionM.Models.Proveedor", b =>
                 {
                     b.Property<int>("Cedula")
@@ -546,7 +733,6 @@ namespace FashionM.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Detalle")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("InventarioCodigo")
@@ -556,6 +742,9 @@ namespace FashionM.Migrations
                     b.Property<string>("Numero")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -747,6 +936,15 @@ namespace FashionM.Migrations
                     b.Navigation("Zapato");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Inventario", b =>
+                {
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorCedula");
+
+                    b.Navigation("Proveedor");
+                });
+
             modelBuilder.Entity("FashionM.Models.MovimientoDetalle", b =>
                 {
                     b.HasOne("FashionM.Models.MovimientoInventario", "MovimientoInventario")
@@ -822,6 +1020,42 @@ namespace FashionM.Migrations
                         .HasForeignKey("PedidoProveedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FashionM.Models.Proforma", b =>
+                {
+                    b.HasOne("FashionM.Models.Clientes", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteCedula")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FashionM.Models.Empresa", "Empresa")
+                        .WithMany("Proformas")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("FashionM.Models.ProformaDetalle", b =>
+                {
+                    b.HasOne("FashionM.Models.Inventario", null)
+                        .WithMany()
+                        .HasForeignKey("InventarioCodigo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FashionM.Models.Proforma", "Proforma")
+                        .WithMany("Detalles")
+                        .HasForeignKey("ProformaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proforma");
                 });
 
             modelBuilder.Entity("FashionM.Models.TallaInventario", b =>
@@ -902,6 +1136,11 @@ namespace FashionM.Migrations
                     b.Navigation("Pedidos");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Empresa", b =>
+                {
+                    b.Navigation("Proformas");
+                });
+
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
                     b.Navigation("Fotos");
@@ -925,6 +1164,11 @@ namespace FashionM.Migrations
                 });
 
             modelBuilder.Entity("FashionM.Models.PedidoProveedor", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Proforma", b =>
                 {
                     b.Navigation("Detalles");
                 });

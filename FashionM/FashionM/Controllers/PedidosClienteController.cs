@@ -138,56 +138,69 @@ namespace FashionM.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(PedidoCliente pedido)
         {
-            try
+            // 🔥 QUITAR VALIDACIÓN AUTOMÁTICA
+            ModelState.Remove("Cliente");
+
+            // VALIDACIONES PROPIAS
+            if (pedido.ClienteCedula == 0)
             {
-                if (pedido.ClienteCedula == 0)
-                    throw new Exception("ClienteCedula viene en 0");
-
-                if (pedido.Detalles == null || !pedido.Detalles.Any())
-                    throw new Exception("No hay detalles en el pedido");
-
-                // 🔹 Asegurar UTC
-                pedido.FechaPedido = DateTime.UtcNow;
-                pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
-
-                pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
-                pedido.EstadoCredito = EstadoCredito.Pendiente;
-
-                _context.PedidosCliente.Add(pedido);
-                _context.SaveChanges();
-
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Debe seleccionar un cliente.");
             }
-            catch (DbUpdateException ex)
+
+            if (pedido.Detalles == null || !pedido.Detalles.Any())
             {
-                var sqlError = ex.InnerException?.Message;
-                throw new Exception(sqlError);
+                ModelState.AddModelError("", "Debe agregar al menos un producto.");
             }
+
+            if (!ModelState.IsValid)
+            {
+                return View(pedido);
+            }
+
+            // PROCESO NORMAL
+            pedido.FechaPedido = DateTime.UtcNow;
+            pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
+
+            pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
+            pedido.EstadoCredito = EstadoCredito.Pendiente;
+
+            _context.PedidosCliente.Add(pedido);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // =====================================================
-        // BUSCAR CLIENTE (AJAX)
+        // 🔥 AUTOCOMPLETE CLIENTES
         // =====================================================
         [HttpGet]
-        public IActionResult BuscarCliente(int cedula)
+        public IActionResult BuscarClientes(string term)
         {
-            var cliente = _context.Clientes
-                .Where(c => c.Cedula == cedula)
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            term = term.Trim();
+
+            var clientes = _context.Clientes
+                .Where(c =>
+                    c.Nombre.Contains(term) ||
+                    c.Apellidos.Contains(term) ||
+                    c.Cedula.ToString().Contains(term)
+                )
+                .Take(10)
                 .Select(c => new
                 {
-                    c.Cedula,
-                    Nombre = c.Nombre + " " + c.Apellidos,
-                    c.Direccion,
-                    c.Transporte,
-                    c.Correo,
-                    c.Telefonos
+                    cedula = c.Cedula,
+                    nombre = c.Nombre + " " + c.Apellidos,
+                    direccion = c.Direccion,
+                    transporte = c.Transporte,
+                    correo = c.Correo,
+                    telefonos = c.Telefonos,
+                    empresa = c.Empresa
                 })
-                .FirstOrDefault();
+                .ToList();
 
-            if (cliente == null)
-                return NotFound();
-
-            return Json(cliente);
+            return Json(clientes);
         }
 
         // =====================================================

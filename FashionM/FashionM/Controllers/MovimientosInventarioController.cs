@@ -119,23 +119,7 @@ namespace FashionM.Controllers
         // ===============================
         public async Task<IActionResult> Delete(int id)
         {
-            var movimiento = await _context.MovimientosInventario
-                .Include(m => m.Detalles)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (movimiento == null)
-                return NotFound();
-
-            return View(movimiento);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var movimiento = await _context.MovimientosInventario
-                .Include(m => m.Detalles)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movimiento = await _context.MovimientosInventario.FindAsync(id);
 
             if (movimiento != null)
             {
@@ -183,4 +167,3 @@ namespace FashionM.Controllers
         }
     }
 }
-

@@ -16,32 +16,31 @@
     </a>
 </div>
 
-<!-- Formulario -->
 <div class="form-card">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
 
-        <!-- =========================
-             CLIENTE
-        ========================== -->
+        <!-- CLIENTE -->
         <fieldset>
             <legend>👤 Cliente</legend>
 
             <div class="row">
-                <div class="col-md-4">
-                    <label class="form-label">Cédula</label>
-                    <div class="d-flex gap-2">
-                        <input type="number" id="cedula" class="form-control" placeholder="Ingrese cédula" />
-                        <button type="button"
-                                onclick="buscarCliente()"
-                                class="btn-search">
-                            Buscar
-                        </button>
-                    </div>
+                <div class="col-md-6 position-relative">
+                    <label class="form-label">Buscar Cliente (solo cédula)</label>
+
+                    <input type="text"
+                           id="clienteBuscar"
+                           class="form-control"
+                           placeholder="Digite la cédula..."
+                           autocomplete="off" />
+
+                    <input asp-for="ClienteCedula" type="hidden" id="clienteCedulaHidden" />
+
+                    <div id="listaClientes" class="list-group"></div>
                 </div>
             </div>
 
-            <input asp-for="ClienteCedula" type="hidden" />
+            <div asp-validation-summary="All" class="text-danger"></div>
 
             <div class="row mt-3">
                 <div class="col-md-6">
@@ -68,29 +67,49 @@
                     <input id="telefono" readonly class="form-control" />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Empresa</label>
+                    <label class="form-label">Empresa (Cliente)</label>
                     <input id="empresaCliente" readonly class="form-control" />
                 </div>
             </div>
         </fieldset>
 
-        <!-- =========================
-             EMPRESA / SEMANA
-        ========================== -->
+        <!-- EMPRESA -->
         <div class="row">
             <div class="col-md-6">
-                <label class="form-label">Empresa</label>
-                <input asp-for="Empresa" class="form-control" placeholder="Empresa" />
+                <label asp-for="Empresa" class="form-label">Empresa</label>
+
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" asp-for="Empresa" value="Fashion Shoes S.A" />
+                        <span>Fashion Shoes S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" asp-for="Empresa" value="LSG MODA S.A" />
+                        <span>LSG MODA S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" asp-for="Empresa" value="Cocalza Plus S.A" />
+                        <span>Cocalza Plus S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" asp-for="Empresa" value="Maxi Plus 23" />
+                        <span>Maxi Plus 23</span>
+                    </label>
+                </div>
+
+                <span asp-validation-for="Empresa" class="text-danger"></span>
             </div>
+
             <div class="col-md-6">
                 <label class="form-label">Semana</label>
-                <input asp-for="Semana" class="form-control" placeholder="Ej: 32" />
+                <input asp-for="Semana" class="form-control" />
             </div>
         </div>
 
-        <!-- =========================
-             DETALLE DEL PEDIDO
-        ========================== -->
+        <!-- DETALLE -->
         <div class="section-title">
             <span>🛒</span> Detalle del Pedido
         </div>
@@ -99,7 +118,7 @@
             <table class="productos-table" id="tablaDetalle">
                 <thead>
                     <tr>
-                        <th>Proveedor</th>
+                        <th>Proveedor (Cédula)</th>
                         <th>Código</th>
                         <th>Color</th>
                         <th>Talla</th>
@@ -113,226 +132,273 @@
             </table>
         </div>
 
-        <button type="button"
-                onclick="agregarFila()"
-                class="btn-add-row">
+        <button type="button" onclick="agregarFila()" class="btn-add-row">
             ➕ Agregar Producto
         </button>
 
-        <!-- =========================
-             OBSERVACIONES
-        ========================== -->
+        <!-- OBSERVACIONES -->
         <div class="mt-4">
             <label class="form-label">Observaciones</label>
-            <textarea asp-for="Observaciones"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Notas adicionales sobre el pedido..."></textarea>
+            <textarea asp-for="Observaciones" class="form-control"></textarea>
         </div>
 
-        <!-- =========================
-             BOTONES
-        ========================== -->
+        <!-- BOTONES -->
         <div class="action-buttons">
-            <button type="submit" class="btn-save">
-                💾 Guardar Pedido
-            </button>
-            <a asp-action="Index" class="btn-cancel">
-                ← Cancelar
-            </a>
+            <button type="submit" class="btn-save">💾 Guardar Pedido</button>
+            <a asp-action="Index" class="btn-cancel">← Cancelar</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <script>
-            let index = 0;
-            let proveedoresCache = [];
+        let index = 0;
+        let proveedoresCache = [];
 
-            // =========================
-            // CLIENTE
-            // =========================
-            function buscarCliente() {
-                const cedula = document.getElementById("cedula").value;
+        // =========================
+        // 🔥 CLIENTE (CEDULA + NOMBRE)
+        // =========================
+        let timeoutCliente = null;
 
-                if (!cedula) {
-                    alert("Digite la cédula del cliente");
+        const inputCliente = document.getElementById("clienteBuscar");
+        const listaClientes = document.getElementById("listaClientes");
+        const hiddenCliente = document.getElementById("clienteCedulaHidden");
+
+        inputCliente.addEventListener("keyup", function () {
+            clearTimeout(timeoutCliente);
+
+            let term = this.value.trim();
+
+            timeoutCliente = setTimeout(() => {
+
+                if (term.length < 1) {
+                    listaClientes.innerHTML = "";
                     return;
                 }
 
-                fetch(`/PedidoCliente/BuscarCliente?cedula=${cedula}`)
-                    .then(r => {
-                        if (!r.ok) throw "Cliente no encontrado";
-                        return r.json();
-                    })
+                fetch(`/PedidoCliente/BuscarClientes?term=${encodeURIComponent(term)}`)
+                    .then(r => r.json())
                     .then(data => {
-                        console.log("Cliente recibido:", data);
 
-                        document.getElementById("nombre").value = data.nombre;
-                        document.getElementById("direccion").value = data.direccion;
-                        document.getElementById("transporte").value = data.transporte;
-                        document.getElementById("correo").value = data.correo;
-                        document.getElementById("telefono").value = data.telefonos;
-                        document.getElementById("empresaCliente").value = data.empresa;
+                        listaClientes.innerHTML = "";
 
-                        document.querySelector("input[name='ClienteCedula']").value = data.cedula;
+                        data.forEach(c => {
+                            let item = document.createElement("a");
+                            item.className = "list-group-item list-group-item-action";
 
-                        if (data.empresa) {
-                            document.getElementById("Empresa").value = data.empresa;
-                        }
+                            // 🔥 MOSTRAR CEDULA + NOMBRE
+                            item.innerHTML = `<strong>${c.cedula}</strong> - ${c.nombre}`;
+
+                            item.onclick = () => {
+
+                                // visible
+                                inputCliente.value = `${c.cedula} - ${c.nombre}`;
+
+                                // real
+                                hiddenCliente.value = c.cedula;
+
+                                // datos
+                                document.getElementById("nombre").value = c.nombre || "";
+                                document.getElementById("direccion").value = c.direccion || "";
+                                document.getElementById("transporte").value = c.transporte || "";
+                                document.getElementById("correo").value = c.correo || "";
+                                document.getElementById("telefono").value = c.telefonos || "";
+                                document.getElementById("empresaCliente").value = c.empresa || "";
+
+                                // 🚫 NO tocar Empresa del pedido
+
+                                listaClientes.innerHTML = "";
+                            };
+
+                            listaClientes.appendChild(item);
+                        });
                     })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Cliente no existe");
-                    });
+                    .catch(err => console.error("Error buscando cliente:", err));
+
+            }, 300);
+        });
+
+        // cerrar lista
+        document.addEventListener("click", function (e) {
+            if (!inputCliente.contains(e.target) && !listaClientes.contains(e.target)) {
+                listaClientes.innerHTML = "";
             }
+        });
 
-            // =========================
-            // DETALLE
-            // =========================
-            async function cargarProveedores() {
-                if (proveedoresCache.length > 0) return proveedoresCache;
 
+        // =========================
+        // PROVEEDORES (CACHE)
+        // =========================
+        async function cargarProveedores() {
+            if (proveedoresCache.length > 0) return proveedoresCache;
+
+            try {
                 const r = await fetch("/PedidoCliente/ObtenerProveedores");
                 proveedoresCache = await r.json();
                 return proveedoresCache;
+            } catch (err) {
+                console.error("Error cargando proveedores:", err);
+                return [];
             }
+        }
 
-            async function agregarFila() {
-                const proveedores = await cargarProveedores();
 
-                let opcionesProveedor = `<option value="">Seleccione</option>`;
-                proveedores.forEach(p => {
-                    opcionesProveedor += `<option value="${p.cedula}">${p.nombre}</option>`;
+        // =========================
+        // AGREGAR FILA
+        // =========================
+        async function agregarFila() {
+
+            const row = `
+            <tr>
+                <td>
+                    <input type="number"
+                           class="form-control"
+                           placeholder="Cédula proveedor"
+                           name="Detalles[${index}].ProveedorCedula"
+                           onblur="validarProveedor(this, ${index})" />
+                </td>
+
+                <td>
+                    <select class="form-control"
+                            name="Detalles[${index}].CodigoProducto"
+                            id="codigo_${index}"
+                            onchange="cargarColores(this, ${index})">
+                        <option value="">Seleccione</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select class="form-control"
+                            name="Detalles[${index}].Color"
+                            id="color_${index}">
+                        <option value="">Seleccione</option>
+                    </select>
+                </td>
+
+                <td>
+                    <input class="form-control"
+                           name="Detalles[${index}].Talla"
+                           placeholder="Ej: 38" />
+                </td>
+
+                <td>
+                    <input type="number"
+                           class="form-control"
+                           name="Detalles[${index}].Cantidad"
+                           value="1"
+                           min="1" />
+                </td>
+
+                <td>
+                    <input type="number"
+                           step="0.01"
+                           class="form-control"
+                           name="Detalles[${index}].PrecioUnitario"
+                           placeholder="0.00" />
+                </td>
+
+                <td>
+                    <input type="text"
+                           class="form-control"
+                           name="Detalles[${index}].Detalle"
+                           placeholder="Detalle" />
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn-remove-row"
+                            onclick="this.closest('tr').remove()">
+                        ✕
+                    </button>
+                </td>
+            </tr>`;
+
+            document.querySelector("#tablaDetalle tbody")
+                .insertAdjacentHTML("beforeend", row);
+
+            index++;
+        }
+
+
+        // =========================
+        // VALIDAR PROVEEDOR
+        // =========================
+        function validarProveedor(input, i) {
+
+            const proveedorCedula = input.value.trim();
+
+            const comboCodigo = document.getElementById(`codigo_${i}`);
+            const comboColor = document.getElementById(`color_${i}`);
+
+            comboCodigo.innerHTML = `<option value="">Seleccione</option>`;
+            comboColor.innerHTML = `<option value="">Seleccione</option>`;
+
+            if (!proveedorCedula) return;
+
+            fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorCedula=${proveedorCedula}`)
+                .then(r => {
+                    if (!r.ok) throw "Proveedor no encontrado";
+                    return r.json();
+                })
+                .then(data => {
+
+                    if (!data || data.length === 0) {
+                        alert("Proveedor no existe o no tiene productos");
+                        input.value = "";
+                        return;
+                    }
+
+                    data.forEach(codigo => {
+                        comboCodigo.innerHTML += `<option value="${codigo}">${codigo}</option>`;
+                    });
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Proveedor inválido");
+                    input.value = "";
                 });
+        }
 
-                const row = `
-        <tr>
-            <td>
-                <select class="form-control"
-                        name="Detalles[${index}].ProveedorCedula"
-                        onchange="cargarCodigos(this, ${index})">
-                    ${opcionesProveedor}
-                </select>
-            </td>
 
-            <td>
-                <select class="form-control"
-                        name="Detalles[${index}].CodigoProducto"
-                        id="codigo_${index}"
-                        onchange="cargarColores(this, ${index})">
-                    <option value="">Seleccione</option>
-                </select>
-            </td>
+        // =========================
+        // COLORES
+        // =========================
+        function cargarColores(select, i) {
 
-            <td>
-                <select class="form-control"
-                        name="Detalles[${index}].Color"
-                        id="color_${index}">
-                    <option value="">Seleccione</option>
-                </select>
-            </td>
+            const codigo = select.value;
 
-            <td>
-                <input class="form-control"
-                       name="Detalles[${index}].Talla"
-                       placeholder="Ej: 38" />
-            </td>
+            if (!codigo) return;
 
-            <td>
-                <input type="number"
-                       class="form-control"
-                       name="Detalles[${index}].Cantidad"
-                       value="1"
-                       min="1" />
-            </td>
+            const proveedorCedula =
+                document.querySelector(`input[name='Detalles[${i}].ProveedorCedula']`)?.value;
 
-            <td>
-                <input type="number"
-                       step="0.01"
-                       class="form-control"
-                       name="Detalles[${index}].PrecioUnitario"
-                       placeholder="0.00" />
-            </td>
-
-            <td>
-                <input type="text"
-                       class="form-control"
-                       name="Detalles[${index}].Detalle"
-                       placeholder="Detalle" />
-            </td>
-
-            <td>
-                <button type="button"
-                        class="btn-remove-row"
-                        onclick="this.closest('tr').remove()">
-                    ✕
-                </button>
-            </td>
-        </tr>`;
-
-                document.querySelector("#tablaDetalle tbody")
-                    .insertAdjacentHTML("beforeend", row);
-
-                index++;
+            if (!proveedorCedula) {
+                alert("Primero ingrese la cédula del proveedor");
+                return;
             }
 
-            function cargarCodigos(select, i) {
-                const proveedorCedula = select.value;
+            const comboColor = document.getElementById(`color_${i}`);
+            comboColor.innerHTML = `<option value="">Seleccione</option>`;
 
-                const comboCodigo = document.getElementById(`codigo_${i}`);
-                const comboColor = document.getElementById(`color_${i}`);
+            fetch(`/PedidoCliente/ObtenerColoresPorCodigo?codigo=${codigo}&proveedorCedula=${proveedorCedula}`)
+                .then(r => r.json())
+                .then(data => {
 
-                comboCodigo.innerHTML = `<option value="">Seleccione</option>`;
-                comboColor.innerHTML = `<option value="">Seleccione</option>`;
+                    if (!data || data.length === 0) {
+                        alert("No hay colores disponibles");
+                        return;
+                    }
 
-                if (!proveedorCedula) return;
+                    data.forEach(color => {
+                        comboColor.innerHTML += `<option value="${color}">${color}</option>`;
+                    });
 
-                fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorCedula=${proveedorCedula}`)
-                    .then(r => r.text())
-                    .then(text => text ? JSON.parse(text) : [])
-                    .then(data => {
-                        console.log("Códigos recibidos:", data);
-
-                        data.forEach(codigo => {
-                            comboCodigo.innerHTML +=
-                                `<option value="${codigo}">${codigo}</option>`;
-                        });
-                    })
-                    .catch(err => console.error(err));
-            }
-
-            function cargarColores(select, i) {
-                const codigo = select.value;
-
-                if (!codigo || codigo === "undefined") {
-                    console.warn("Código inválido:", codigo);
-                    return;
-                }
-
-                const proveedorCedula =
-                    document.querySelector(`select[name='Detalles[${i}].ProveedorCedula']`)?.value;
-
-                if (!proveedorCedula) {
-                    console.warn("Proveedor no seleccionado");
-                    return;
-                }
-
-                const comboColor = document.getElementById(`color_${i}`);
-                comboColor.innerHTML = `<option value="">Seleccione</option>`;
-
-                fetch(`/PedidoCliente/ObtenerColoresPorCodigo?codigo=${codigo}&proveedorCedula=${proveedorCedula}`)
-                    .then(r => r.text())
-                    .then(text => text ? JSON.parse(text) : [])
-                    .then(data => {
-                        console.log("Colores recibidos:", data);
-
-                        data.forEach(color => {
-                            comboColor.innerHTML +=
-                                `<option value="${color}">${color}</option>`;
-                        });
-                    })
-                    .catch(err => console.error(err));
-            }
+                })
+                .catch(err => {
+                    console.error("Error cargando colores:", err);
+                    alert("Error al cargar colores");
+                });
+        }
     </script>
 }

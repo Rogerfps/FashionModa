@@ -55,6 +55,21 @@
                     <input asp-for="CodigoCabys" class="form-control" />
                 </div>
 
+                <!-- PROVEEDOR AUTOCOMPLETE -->
+                <div class="form-group position-relative">
+                    <label>Proveedor</label>
+
+                    <input type="text"
+                           id="proveedorBuscar"
+                           class="form-control"
+                           placeholder="Buscar proveedor..."
+                           autocomplete="off" />
+
+                    <input type="hidden" asp-for="ProveedorCedula" id="proveedorId" required />
+
+                    <div id="listaProveedores" class="list-group"></div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Empresa</label>
 
@@ -154,6 +169,10 @@
 
     <script>
 
+        // =========================
+        // 🔥 TALLAS (TU CÓDIGO)
+        // =========================
+
         let idx = 1;
 
         function agregarTalla() {
@@ -210,6 +229,73 @@
             });
 
             idx = filas.length;
+        }
+
+
+        // =========================
+        // 🔥 AUTOCOMPLETE PROVEEDOR
+        // =========================
+
+        let timeoutProveedor = null;
+
+        const inputProveedor = document.getElementById("proveedorBuscar");
+        const listaProveedores = document.getElementById("listaProveedores");
+        const proveedorId = document.getElementById("proveedorId");
+
+        if (inputProveedor) {
+
+            inputProveedor.addEventListener("keyup", function () {
+
+                clearTimeout(timeoutProveedor);
+
+                let term = this.value;
+
+                timeoutProveedor = setTimeout(() => {
+
+                    if (term.length < 1) {
+                        listaProveedores.innerHTML = "";
+                        proveedorId.value = "";
+                        return;
+                    }
+
+                    fetch(`/Inventarios/BuscarProveedores?term=${term}`)
+                        .then(r => r.json())
+                        .then(data => {
+
+                            listaProveedores.innerHTML = "";
+
+                            data.forEach(p => {
+
+                                let item = document.createElement("a");
+                                item.className = "list-group-item list-group-item-action";
+
+                                item.innerHTML = `
+                                    <strong>${p.nombre}</strong><br>
+                                    <small>${p.comercio}</small>
+                                `;
+
+                                item.onclick = () => {
+                                    inputProveedor.value = p.nombre;
+                                    proveedorId.value = p.id; // 🔥 Cedula
+                                    listaProveedores.innerHTML = "";
+                                };
+
+                                listaProveedores.appendChild(item);
+                            });
+
+                        });
+
+                }, 300);
+
+            });
+
+            // cerrar lista si hace click fuera
+            document.addEventListener("click", function (e) {
+                if (!inputProveedor.contains(e.target)) {
+                    listaProveedores.innerHTML = "";
+                }
+            });
+
         }
 
     </script>

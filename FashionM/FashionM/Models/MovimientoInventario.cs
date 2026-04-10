@@ -1,5 +1,7 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FashionM.Models
 {
     public class MovimientoInventario
@@ -13,6 +15,8 @@ namespace FashionM.Models
         public string Tipo { get; set; } = string.Empty; // Entrada / Salida
 
         public string Detalle { get; set; } = string.Empty;
+
+        public string Empresa { get; set; } = string.Empty;
 
         public Inventario? Inventario { get; set; }
 

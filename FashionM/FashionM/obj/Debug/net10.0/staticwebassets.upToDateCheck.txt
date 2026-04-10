@@ -52,7 +52,6 @@ wwwroot\images\inventarios\7094d08a-0fcc-4e47-812d-fea2589dd4e7.jpg
 wwwroot\images\inventarios\7abfe274-4f59-46a1-9076-bba3f5645b69.webp
 wwwroot\images\inventarios\7ba4e615-2434-4941-9767-8efbc963ae56.jpg
 wwwroot\images\inventarios\85887461-9eeb-4ce2-82ce-241e1e333b00.png
-wwwroot\images\inventarios\9b7b8cfd-6be2-4857-ba18-aea9ab6d6b08.png
 wwwroot\images\inventarios\9ff305fc-430a-4e23-8b29-740f5612d703.jpg
 wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
 wwwroot\images\inventarios\a43a42ad-a048-4459-bff5-da906d833812.jpg
@@ -71,7 +70,6 @@ wwwroot\images\inventarios\d9bcf52e-8f1f-486a-abee-8f39e7bb0d2b.png
 wwwroot\images\inventarios\db587956-fda9-450a-a007-361bec7490d7.webp
 wwwroot\images\inventarios\ea641d22-07dc-4726-9756-bcbe78b02f1f.jpg
 wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
-wwwroot\images\inventarios\ffd144ee-f194-40e5-9308-e9097f7fb72a.png
 wwwroot\images\Jade.jpg
 wwwroot\images\LogoDavid.png
 wwwroot\images\lsg.jpg
@@ -137,6 +135,10 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\images\inventarios\ffd144ee-f194-40e5-9308-e9097f7fb72a.png
+wwwroot\images\inventarios\9b7b8cfd-6be2-4857-ba18-aea9ab6d6b08.png
+wwwroot\images\inventarios\7efa3499-6ee9-4286-935b-49a3b2afe1a8.png
+wwwroot\imagenes\zapatos\bf35df94-8c66-40ec-bae1-7680abe87d1b_ChatGPT Image 8 abr 2026, 08_53_14.png
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Historial\Detalle.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioCreate.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Inventario\InventarioDetails.css

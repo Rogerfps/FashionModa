@@ -148,6 +148,8 @@ namespace FashionM.Data
                 .HasForeignKey(h => h.CodigoInventario) No deja hacer delete
                 .HasPrincipalKey(i => i.Codigo)
                 .OnDelete(DeleteBehavior.Restrict);*/
+
+            
         }
     }
 }
