@@ -395,7 +395,12 @@
                             <td>
                                 <div class="action-group">
                                     <a asp-action="Details" asp-route-id="@item.Cedula" class="btn-action btn-view" title="Ver detalles">👁</a>
-                                    <a asp-action="Edit" asp-route-id="@item.Cedula" class="btn-action btn-edit" title="Editar">✏️</a>
+                                    <a asp-controller="Proveedores"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.Cedula"
+                                       class="btn-zapato btn-zapato-edit">
+                                        ✏️
+                                    </a>
                                     <a asp-action="Delete" asp-route-id="@item.Cedula" class="btn-action btn-delete" title="Eliminar">🗑</a>
                                 </div>
                             </td>

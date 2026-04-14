@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FashionM.Models
 {
@@ -15,6 +16,20 @@ namespace FashionM.Models
 
         [Required]
         public string Suela { get; set; } = string.Empty;
+
+        [Required]
+        public string Numero { get; set; } = string.Empty; // talla
+        public string? Detalle { get; set; }
+
+        public int Cantidad { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal PrecioCosto { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal PrecioVenta { get; set; } = 0;
+
+        public bool Activo { get; set; } = true;
 
         [Required]
         public int ProveedorCedula { get; set; }

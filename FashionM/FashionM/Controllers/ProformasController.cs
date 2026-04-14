@@ -120,97 +120,82 @@ namespace FashionM.Controllers
         // ==========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AgregarProducto(
-            int proformaId,
+        public async Task<IActionResult> Create(
+            int proveedorCedula,
             string codigo,
             string color,
-            string detalle,
+            string suela,
             string[] tallas,
-            int[] cantidades)
+            int[] cantidades,
+            decimal[] preciosCosto,
+            decimal[] preciosVenta,
+            List<IFormFile> imagenes
+)
         {
-            // 🔥 VALIDACIONES BÁSICAS
-            if (string.IsNullOrWhiteSpace(codigo) ||
-                string.IsNullOrWhiteSpace(color))
-                
+            if (tallas == null || tallas.Length == 0)
             {
-                TempData["Error"] = "Debe completar todos los campos del producto";
-                return RedirectToAction("AgregarProducto", new { id = proformaId });
+                ModelState.AddModelError("", "Debe agregar al menos una talla");
+                return View(new Zapato { ProveedorCedula = proveedorCedula });
             }
 
-            if (tallas == null || cantidades == null || tallas.Length == 0)
-            {
-                TempData["Error"] = "Debe ingresar al menos una talla con cantidad";
-                return RedirectToAction("AgregarProducto", new { id = proformaId });
-            }
+            var zapatosCreados = new List<Zapato>();
 
-            var inventario = await _context.Inventarios
-                .FirstOrDefaultAsync(i => i.Codigo == codigo);
-
-            if (inventario == null)
-                return NotFound();
-
-            bool agregoAlgo = false;
-
-            // 🔥 LOOP SEGURO
             for (int i = 0; i < tallas.Length; i++)
             {
-                // evitar desbordes
-                if (i >= cantidades.Length)
-                    break;
+                if (i >= cantidades.Length) break;
 
-                int cantidad = cantidades[i];
+                if (cantidades[i] <= 0) continue;
 
-                if (cantidad <= 0)
-                    continue;
-
-                var tallaInventario = await _context.TallasInventario
-                    .FirstOrDefaultAsync(t =>
-                        t.InventarioCodigo == codigo &&
-                        t.Color == color &&
-                        (t.Detalle ?? "").Trim() == (detalle ?? "").Trim() &&
-                        (t.Numero ?? "").Trim() == (tallas[i] ?? "").Trim());
-
-                if (tallaInventario == null)
-                    continue;
-
-                if (tallaInventario.Cantidad < cantidad)
-                    continue;
-
-                decimal precio = tallaInventario.Precio > 0
-                    ? tallaInventario.Precio
-                    : inventario.PrecioVenta;
-
-                var detalleProforma = new ProformaDetalle
+                var zapato = new Zapato
                 {
-                    ProformaId = proformaId,
-                    InventarioCodigo = codigo,
+                    Codigo = codigo,
                     Color = color,
-                    Talla = tallas[i],
-                    Cantidad = cantidad,
-                    PrecioUnitario = precio,
-                    SubTotal = precio * cantidad
+                    Suela = suela,
+                    Numero = tallas[i],
+                    Cantidad = cantidades[i],
+                    PrecioCosto = preciosCosto[i],
+                    PrecioVenta = preciosVenta[i],
+                    ProveedorCedula = proveedorCedula
                 };
 
-                // 🔽 DESCONTAR STOCK
-                tallaInventario.Cantidad -= cantidad;
-
-                _context.ProformaDetalles.Add(detalleProforma);
-
-                agregoAlgo = true;
-            }
-
-            // 🔥 VALIDAR SI NO AGREGÓ NADA
-            if (!agregoAlgo)
-            {
-                TempData["Error"] = "No se agregaron productos. Verifique cantidades o stock.";
-                return RedirectToAction("AgregarProducto", new { id = proformaId });
+                _context.Zapatos.Add(zapato);
+                zapatosCreados.Add(zapato);
             }
 
             await _context.SaveChangesAsync();
 
-            await ActualizarTotal(proformaId);
+            // 🔥 GUARDAR IMÁGENES
+            if (imagenes != null && imagenes.Any())
+            {
+                var folder = Path.Combine("wwwroot", "imagenes", "zapatos");
 
-            return RedirectToAction("AgregarProducto", new { id = proformaId });
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                foreach (var zapato in zapatosCreados)
+                {
+                    foreach (var file in imagenes)
+                    {
+                        if (file.Length == 0) continue;
+
+                        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                        var path = Path.Combine(folder, fileName);
+
+                        using var stream = new FileStream(path, FileMode.Create);
+                        await file.CopyToAsync(stream);
+
+                        _context.Add(new ImagenZapato
+                        {
+                            ZapatoId = zapato.Id,
+                            Url = "/imagenes/zapatos/" + fileName
+                        });
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Details", "Proveedores", new { id = proveedorCedula });
         }
 
         // ==========================

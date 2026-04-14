@@ -2,387 +2,200 @@
 
 @{
     ViewData["Title"] = "Editar Proveedor";
+    var zapatos = Model.Zapatos?.ToList() ?? new List<Zapato>();
 }
 
-<style>
-    :root {
-        --deep-blue: #0B2447;
-        --ocean-blue: #19376D;
-        --electric-blue: #576CBC;
-        --light-bg: #F5F9FF;
-        --pure-white: #FFFFFF;
-        --success: #10b981;
-        --danger: #ef4444;
-        --warning: #f59e0b;
-        --text-gray: #64748b;
-    }
-
-    body {
-        background: var(--light-bg);
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* Header */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
-    }
-
-    .back-link {
-        color: var(--deep-blue);
-        text-decoration: none;
-        font-size: 0.9rem;
-        padding: 0.4rem 1rem;
-        border-radius: 30px;
-        background: #f1f5f9;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    /* Card del formulario */
-    .form-card {
-        background: var(--pure-white);
-        border-radius: 24px;
-        padding: 2rem;
-        box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
-        max-width: 1000px;
-        margin: 0 auto;
-        border: 1px solid rgba(11, 36, 71, 0.05);
-    }
-
-    .section-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--deep-blue);
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #eef2f6;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .section-title span {
-        font-size: 1.4rem;
-    }
-
-    /* Grid del formulario */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem 2rem;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--deep-blue);
-        margin-bottom: 0.3rem;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .form-control, .form-select {
-        width: 100%;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.7rem 1rem;
-        font-size: 0.95rem;
-        transition: all 0.2s;
-        background: #fafcff;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--electric-blue);
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(87, 108, 188, 0.1);
-    }
-
-    .form-control:hover, .form-select:hover {
-        border-color: var(--electric-blue);
-    }
-
-    /* Campo readonly (cédula) */
-    .form-control[readonly] {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
-        color: #64748b;
-        cursor: not-allowed;
-    }
-
-    .form-control[readonly]:hover {
-        border-color: #e2e8f0;
-    }
-
-    /* Select personalizado */
-    .form-select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230B2447' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-        background-size: 1rem;
-    }
-
-    /* Checkbox */
-    .checkbox-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        padding: 0.5rem 0;
-    }
-
-    .form-check-input {
-        width: 1.2rem;
-        height: 1.2rem;
-        border: 2px solid var(--deep-blue);
-        border-radius: 6px;
-        cursor: pointer;
-        accent-color: var(--deep-blue);
-    }
-
-    .form-check-label {
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--deep-blue);
-        cursor: pointer;
-    }
-
-    /* Validación */
-    .validation-error {
-        font-size: 0.7rem;
-        color: var(--danger);
-        margin-top: 0.2rem;
-        display: block;
-    }
-
-    /* Botones */
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid #eef2f6;
-    }
-
-    .btn-save {
-        background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
-        color: white;
-        border: none;
-        border-radius: 30px;
-        padding: 0.7rem 2.5rem;
-        font-size: 0.95rem;
-        font-weight: 500;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-    }
-
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -8px rgba(245, 158, 11, 0.3);
-    }
-
-    .btn-back {
-        background: #f1f5f9;
-        color: var(--deep-blue);
-        border: none;
-        border-radius: 30px;
-        padding: 0.7rem 2.5rem;
-        font-size: 0.95rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-    }
-
-    .btn-back:hover {
-        background: var(--deep-blue);
-        color: white;
-    }
-
-    /* Badge para cédula */
-    .cedula-badge {
-        background: var(--deep-blue);
-        color: white;
-        padding: 0.3rem 1rem;
-        border-radius: 30px;
-        font-size: 0.9rem;
-        display: inline-block;
-        margin-bottom: 1rem;
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-            gap: 0.5rem;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-        }
-        
-        .btn-save, .btn-back {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .page-title {
-            font-size: 1.5rem;
-        }
-    }
-
-    /* Animación */
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .form-card {
-        animation: fadeIn 0.3s ease-out;
-    }
-</style>
-
-<!-- Header -->
-<div class="page-header">
-    <h1 class="page-title">✏️ Editar Proveedor</h1>
-    <a asp-action="Index" class="back-link">
-        <span>←</span> Volver
-    </a>
+<div class="neo-header">
+    <div class="container d-flex justify-content-between align-items-center px-3">
+        <h1 class="title-glow">✏️ Editar Proveedor</h1>
+        <a asp-action="Index" class="back-link">← Volver</a>
+    </div>
 </div>
 
-<!-- Formulario -->
-<div class="form-card">
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
+<div class="container px-3" style="max-width: 1000px;">
+    <div class="form-card">
 
-        <div class="section-title">
-            <span>📋</span> Editar Información
-        </div>
+        <form asp-action="Edit" method="post">
 
-        <!-- Cédula (PK) como badge -->
-        <div class="cedula-badge">
-            Cédula: @Model.Cedula
-        </div>
+            @Html.AntiForgeryToken()
 
-        <div class="form-grid">
-            <!-- Tipo ID -->
-            <div class="form-group">
-                <label asp-for="IDTipo" class="form-label"></label>
-                <select asp-for="IDTipo" asp-items="ViewBag.TiposIdentificacion" class="form-select">
-                    <option value="">-- Seleccione tipo --</option>
-                </select>
-                <span asp-validation-for="IDTipo" class="validation-error"></span>
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <!-- 🔴 PK -->
+            <input type="hidden" asp-for="Cedula" />
+
+            <h4>Datos del Proveedor</h4>
+
+            <!-- 🔥 NUEVO -->
+            <label>Tipo Identificación</label>
+            <select asp-for="IDTipo" asp-items="ViewBag.TiposIdentificacion" class="form-control mb-2">
+                <option value="">-- Seleccione --</option>
+            </select>
+
+            <label>Nombre</label>
+            <input asp-for="Nombre" class="form-control mb-2" />
+
+            <label>Apellidos</label>
+            <input asp-for="Apellidos" class="form-control mb-2" />
+
+            <label>Correo</label>
+            <input asp-for="Correo" class="form-control mb-2" />
+
+            <label>Teléfono</label>
+            <input asp-for="Telefono" class="form-control mb-2" />
+
+            <label>Comercio</label>
+            <input asp-for="Comercio" class="form-control mb-2" />
+
+            <label>Dirección</label>
+            <input asp-for="Direccion" class="form-control mb-2" />
+
+            <label>Actividad</label>
+            <input asp-for="Actividad" class="form-control mb-2" />
+
+            <label>Empresa</label>
+            <input asp-for="Empresa" class="form-control mb-3" />
+
+            <div class="form-check mb-3">
+                <input asp-for="Estado" class="form-check-input" />
+                <label asp-for="Estado" class="form-check-label">
+                    Activo
+                </label>
             </div>
 
-            <!-- Nombre -->
-            <div class="form-group">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control" placeholder="Nombre" />
-                <span asp-validation-for="Nombre" class="validation-error"></span>
-            </div>
+            <hr />
 
-            <!-- Apellidos -->
-            <div class="form-group">
-                <label asp-for="Apellidos" class="form-label"></label>
-                <input asp-for="Apellidos" class="form-control" placeholder="Apellidos" />
-                <span asp-validation-for="Apellidos" class="validation-error"></span>
-            </div>
+            <h4>Zapatos</h4>
 
-            <!-- Correo -->
-            <div class="form-group">
-                <label asp-for="Correo" class="form-label"></label>
-                <input asp-for="Correo" type="email" class="form-control" placeholder="proveedor@email.com" />
-                <span asp-validation-for="Correo" class="validation-error"></span>
-            </div>
+            <table class="table table-bordered" id="tablaZapatos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Color</th>
+                        <th>Suela</th> <!-- 🔥 NUEVO -->
+                        <th>Detalle</th>
+                        <th>Talla</th>
+                        <th>Cantidad</th>
+                        <th>Precio Venta</th>
+                        <th>Precio Costo</th>
+                        <th></th>
+                    </tr>
+                </thead>
 
-            <!-- Teléfono -->
-            <div class="form-group">
-                <label asp-for="Telefono" class="form-label"></label>
-                <input asp-for="Telefono" type="tel" class="form-control" placeholder="8888-8888" />
-                <span asp-validation-for="Telefono" class="validation-error"></span>
-            </div>
+                <tbody>
+                    @for (int i = 0; i < zapatos.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input type="hidden" name="Zapatos[@i].Id" value="@zapatos[i].Id" />
+                                <input name="Zapatos[@i].Codigo"
+                                       value="@zapatos[i].Codigo"
+                                       class="form-control" />
+                            </td>
 
-            <!-- Comercio -->
-            <div class="form-group">
-                <label asp-for="Comercio" class="form-label"></label>
-                <input asp-for="Comercio" class="form-control" placeholder="Nombre del comercio" />
-                <span asp-validation-for="Comercio" class="validation-error"></span>
-            </div>
+                            <td>
+                                <input name="Zapatos[@i].Color"
+                                       value="@zapatos[i].Color"
+                                       class="form-control" />
+                            </td>
 
-            <!-- Dirección -->
-            <div class="form-group">
-                <label asp-for="Direccion" class="form-label"></label>
-                <input asp-for="Direccion" class="form-control" placeholder="Dirección exacta" />
-                <span asp-validation-for="Direccion" class="validation-error"></span>
-            </div>
+                            <!-- 🔥 NUEVO -->
+                            <td>
+                                <input name="Zapatos[@i].Suela"
+                                       value="@zapatos[i].Suela"
+                                       class="form-control" />
+                            </td>
 
-            <!-- Actividad -->
-            <div class="form-group">
-                <label asp-for="Actividad" class="form-label"></label>
-                <input asp-for="Actividad" class="form-control" placeholder="Actividad económica" />
-                <span asp-validation-for="Actividad" class="validation-error"></span>
-            </div>
+                            <td>
+                                <input name="Zapatos[@i].Detalle"
+                                       value="@zapatos[i].Detalle"
+                                       class="form-control" />
+                            </td>
 
-            <!-- Empresa -->
-            <div class="form-group">
-                <label asp-for="Empresa" class="form-label"></label>
-                <input asp-for="Empresa" class="form-control" placeholder="Empresa" />
-                <span asp-validation-for="Empresa" class="validation-error"></span>
-            </div>
+                            <td>
+                                <input name="Zapatos[@i].Numero"
+                                       value="@zapatos[i].Numero"
+                                       class="form-control" />
+                            </td>
 
-            <!-- Estado (checkbox) -->
-            <div class="form-group d-flex align-items-center">
-                <div class="checkbox-wrapper">
-                    <input asp-for="Estado" class="form-check-input" />
-                    <label asp-for="Estado" class="form-check-label">Proveedor Activo</label>
-                </div>
-            </div>
-        </div>
+                            <td>
+                                <input name="Zapatos[@i].Cantidad"
+                                       value="@zapatos[i].Cantidad"
+                                       type="number"
+                                       class="form-control" />
+                            </td>
 
-        <!-- Campo oculto para la cédula -->
-        <input type="hidden" asp-for="Cedula" />
+                            <td>
+                                <input name="Zapatos[@i].PrecioVenta"
+                                       value="@zapatos[i].PrecioVenta"
+                                       class="form-control" />
+                            </td>
 
-        <!-- Botones -->
-        <div class="action-buttons">
-            <button type="submit" class="btn-save">
-                <span>💾</span> Guardar Cambios
+                            <td>
+                                <input name="Zapatos[@i].PrecioCosto"
+                                       value="@zapatos[i].PrecioCosto"
+                                       class="form-control" />
+                            </td>
+
+                            <td>
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        onclick="removeRow(this)">
+                                    X
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button type="button" class="btn btn-secondary mb-3" onclick="addRow()">
+                ➕ Nuevo Zapato
             </button>
-            <a asp-action="Index" class="btn-back">
-                <span>←</span> Cancelar
-            </a>
-        </div>
-    </form>
+
+            <hr />
+
+            <button class="btn btn-success">Guardar Todo</button>
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
+        </form>
+
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+
+        function addRow(){
+
+            let table = document.querySelector("#tablaZapatos tbody");
+            let i = table.rows.length;
+
+            table.insertAdjacentHTML("beforeend", `
+            <tr>
+
+                <td><input name="Zapatos[${i}].Codigo" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].Color" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].Suela" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].Detalle" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].Numero" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].Cantidad" type="number" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].PrecioVenta" class="form-control"/></td>
+                <td><input name="Zapatos[${i}].PrecioCosto" class="form-control"/></td>
+
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">
+                        X
+                    </button>
+                </td>
+
+            </tr>
+            `);
+        }
+
+        function removeRow(btn){
+            btn.closest("tr").remove();
+        }
+
+    </script>
 }

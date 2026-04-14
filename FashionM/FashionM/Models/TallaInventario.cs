@@ -8,6 +8,7 @@ namespace FashionM.Models
 {
     public class TallaInventario
     {
+        [Key]
         public int Id { get; set; }
 
         public string Color { get; set; } = string.Empty;

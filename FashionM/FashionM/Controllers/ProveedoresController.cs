@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FashionM.Controllers
 {
@@ -12,10 +13,12 @@ namespace FashionM.Controllers
     public class ProveedoresController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public ProveedoresController(AppDbContext context)
+        public ProveedoresController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         // =========================
@@ -144,47 +147,113 @@ namespace FashionM.Controllers
 
 
         // =========================
-        // EDIT
+        // EDIT GET
         // =========================
         public async Task<IActionResult> Edit(int id)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
+            var proveedor = await _context.Proveedores
+                .Include(p => p.Zapatos)
+                .FirstOrDefaultAsync(p => p.Cedula == id);
+
             if (proveedor == null)
                 return NotFound();
 
             CargarTiposIdentificacion();
+
             return View(proveedor);
         }
 
+
+        // =========================
+        // EDIT POST
+        // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Proveedor proveedor)
+        public async Task<IActionResult> Edit(Proveedor model)
         {
             if (!ModelState.IsValid)
             {
                 CargarTiposIdentificacion();
-                return View(proveedor);
+                return View(model);
             }
 
-            // 🔴 Traer el proveedor original
+            // 🔴 Traer proveedor real con zapatos
             var proveedorDB = await _context.Proveedores
-                .FirstOrDefaultAsync(p => p.Cedula == proveedor.Cedula);
+                .Include(p => p.Zapatos)
+                .FirstOrDefaultAsync(p => p.Cedula == model.Cedula);
 
             if (proveedorDB == null)
                 return NotFound();
 
-            // 🔴 Actualizar SOLO campos editables
-            proveedorDB.Nombre = proveedor.Nombre;
-            proveedorDB.Apellidos = proveedor.Apellidos;
-            proveedorDB.IDTipo = proveedor.IDTipo;
-            proveedorDB.Correo = proveedor.Correo;
-            proveedorDB.Telefono = proveedor.Telefono;
-            proveedorDB.Comercio = proveedor.Comercio;
-            proveedorDB.Direccion = proveedor.Direccion;
-            proveedorDB.Actividad = proveedor.Actividad;
-            proveedorDB.Empresa = proveedor.Empresa;
-            proveedorDB.Estado = proveedor.Estado;
+            // =========================
+            // 🔵 ACTUALIZAR PROVEEDOR
+            // =========================
+            proveedorDB.Nombre = model.Nombre;
+            proveedorDB.Apellidos = model.Apellidos;
+            proveedorDB.IDTipo = model.IDTipo;
+            proveedorDB.Correo = model.Correo;
+            proveedorDB.Telefono = model.Telefono;
+            proveedorDB.Comercio = model.Comercio;
+            proveedorDB.Direccion = model.Direccion;
+            proveedorDB.Actividad = model.Actividad;
+            proveedorDB.Empresa = model.Empresa;
+            proveedorDB.Estado = model.Estado;
 
+            // =========================
+            // 🟡 MANEJO DE ZAPATOS
+            // =========================
+
+            var zapatosForm = model.Zapatos ?? new List<Zapato>();
+
+            // IDs enviados
+            var idsEnviados = zapatosForm
+                .Where(z => z.Id != 0)
+                .Select(z => z.Id)
+                .ToList();
+
+            // 🔴 ELIMINAR los que quitaste en la vista
+            var eliminar = proveedorDB.Zapatos
+                .Where(z => !idsEnviados.Contains(z.Id))
+                .ToList();
+
+            _context.Zapatos.RemoveRange(eliminar);
+
+            // 🔄 ACTUALIZAR o CREAR
+            foreach (var z in zapatosForm)
+            {
+                if (z.Id != 0)
+                {
+                    var zapatoDB = proveedorDB.Zapatos
+                        .FirstOrDefault(x => x.Id == z.Id);
+
+                    if (zapatoDB != null)
+                    {
+                        zapatoDB.Codigo = z.Codigo;
+                        zapatoDB.Color = z.Color;
+                        zapatoDB.Suela = z.Suela;
+                        zapatoDB.Detalle = z.Detalle;
+                        zapatoDB.Numero = z.Numero;
+                        zapatoDB.Cantidad = z.Cantidad;
+                        zapatoDB.PrecioVenta = z.PrecioVenta;
+                        zapatoDB.PrecioCosto = z.PrecioCosto;
+                    }
+                }
+                else
+                {
+                    proveedorDB.Zapatos.Add(new Zapato
+                    {
+                        Codigo = z.Codigo,
+                        Color = z.Color,
+                        Suela = z.Suela,
+                        Detalle = z.Detalle,
+                        Numero = z.Numero,
+                        Cantidad = z.Cantidad,
+                        PrecioVenta = z.PrecioVenta,
+                        PrecioCosto = z.PrecioCosto,
+                        ProveedorCedula = proveedorDB.Cedula
+                    });
+                }
+            }
 
             await _context.SaveChangesAsync();
 

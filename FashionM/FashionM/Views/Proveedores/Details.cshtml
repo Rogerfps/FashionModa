@@ -1,6 +1,23 @@
 ﻿@model Proveedor
 
 @{
+    var tallas = Model.Zapatos
+        .Select(z => z.Numero)
+        .Distinct()
+        .OrderBy(t => t)
+        .ToList();
+
+    var grupos = Model.Zapatos
+    .GroupBy(z => new
+    {
+        z.Codigo,
+        z.Color,
+        z.Suela,
+        z.Detalle,
+        z.PrecioVenta
+    })
+    .ToList();
+
     ViewData["Title"] = "Detalle del Proveedor";
 }
 
@@ -232,10 +249,10 @@
     }
 
     .imagen-thumb {
-        width: 60px;
-        height: 60px;
+        width: 140px;
+        height: 140px;
         object-fit: cover;
-        border-radius: 10px;
+        border-radius: 12px;
         border: 2px solid #e2e8f0;
         transition: all 0.2s;
     }
@@ -379,8 +396,11 @@
     </div>
 
     <div class="action-buttons">
-        <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn-edit">
-            <span>✏️</span> Editar Proveedor
+        <a asp-controller="Proveedores"
+               asp-action="Edit"
+               asp-route-id="@Model.Cedula"
+               class="btn-zapato btn-zapato-edit">
+            ✏️
         </a>
         <a asp-action="Index" class="btn-back">
             <span>←</span> Volver
@@ -409,26 +429,57 @@
                         <th>Código</th>
                         <th>Color</th>
                         <th>Suela</th>
+                        <th>Detalle</th>
+
+                        @foreach (var talla in tallas)
+                        {
+                            <th class="text-center">@talla</th>
+                        }
+
+                        <th>Total</th>
+                        <th>Precio</th>
                         <th>Imágenes</th>
-                        <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    @foreach (var zapato in Model.Zapatos)
+                    @foreach (var g in grupos)
                     {
+                        var precio = g.First().PrecioVenta;
+
                         <tr>
-                            <td class="fw-semibold">@zapato.Codigo</td>
-                            <td>@zapato.Color</td>
-                            <td>@zapato.Suela</td>
+                            <td>@g.Key.Codigo</td>
+                            <td>@g.Key.Color</td>
+                            <td>@g.Key.Suela</td>
+                            <td>@g.Key.Detalle</td>
+
+                            @foreach (var talla in tallas)
+                            {
+                                var item = g.FirstOrDefault(x => x.Numero == talla);
+                                <td class="text-center">
+                                    @(item?.Cantidad ?? 0)
+                                </td>
+                            }
+
+                            <td class="fw-bold">
+                                @g.Sum(x => x.Cantidad)
+                            </td>
+
+                            <td class="text-success fw-bold">
+                                ₡@precio.ToString("N2")
+                            </td>
+
                             <td>
-                                @if (zapato.Imagenes != null && zapato.Imagenes.Any())
+                                @{
+                                    var imagenes = g.SelectMany(x => x.Imagenes).ToList();
+                                }
+
+                                @if (imagenes.Any())
                                 {
                                     <div class="imagenes-grid">
-                                        @foreach (var img in zapato.Imagenes)
+                                        @foreach (var img in imagenes.Take(3))
                                         {
-                                            <img src="@img.Url"
-                                                 class="imagen-thumb"
-                                                 title="Imagen de @zapato.Codigo" />
+                                            <img src="@img.Url" class="imagen-thumb" />
                                         }
                                     </div>
                                 }
@@ -437,28 +488,31 @@
                                     <span class="text-muted">Sin imágenes</span>
                                 }
                             </td>
-                            <td>
-                                <div class="zapato-actions">
-                                    <a asp-controller="Zapatos"
-                                           asp-action="Edit"
-                                           asp-route-id="@zapato.Id"
-                                           class="btn-zapato btn-zapato-edit"
-                                           title="Editar zapato">
-                                        ✏️
-                                    </a>
-                                    <a asp-controller="Zapatos"
-                                           asp-action="Delete"
-                                           asp-route-id="@zapato.Id"
-                                           class="btn-zapato btn-zapato-delete"
-                                           title="Eliminar zapato"
-                                           onclick="return confirm('¿Eliminar este zapato?')">
-                                        🗑
-                                    </a>
-                                </div>
-                            </td>
                         </tr>
                     }
                 </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="fw-bold">Totales</td>
+
+                        @foreach (var talla in tallas)
+                        {
+                            var totalTalla = Model.Zapatos
+                                .Where(x => x.Numero == talla)
+                                .Sum(x => x.Cantidad);
+
+                            <td class="fw-bold text-center">@totalTalla</td>
+                        }
+
+                        <td class="fw-bold">
+                            @Model.Zapatos.Sum(x => x.Cantidad)
+                        </td>
+
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     }

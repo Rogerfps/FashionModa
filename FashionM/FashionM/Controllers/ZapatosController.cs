@@ -12,9 +12,12 @@ namespace FashionM.Controllers
     {
         private readonly AppDbContext _context;
 
-        public ZapatosController(AppDbContext context)
+        private readonly IWebHostEnvironment _environment;
+
+        public ZapatosController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         // =========================
@@ -49,12 +52,12 @@ namespace FashionM.Controllers
         // =========================
         public IActionResult Create(int proveedorCedula)
         {
-            var zapato = new Zapato
+            ViewBag.ProveedorCedula = proveedorCedula;
+
+            return View(new Zapato
             {
                 ProveedorCedula = proveedorCedula
-            };
-
-            return View(zapato);
+            });
         }
 
         // =========================
@@ -62,49 +65,72 @@ namespace FashionM.Controllers
         // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-    Zapato zapato,
-    List<IFormFile> imagenes
-)
+        public async Task<IActionResult> Create(List<Zapato> modelos, List<IFormFile> imagenes)
         {
-            if (!ModelState.IsValid)
+            if (modelos == null || !modelos.Any())
             {
-                return View(zapato);
+                ModelState.AddModelError("", "Debe agregar al menos una talla");
+
+                ViewBag.ProveedorCedula = modelos?.FirstOrDefault()?.ProveedorCedula;
+
+                return View(new Zapato
+                {
+                    ProveedorCedula = modelos?.FirstOrDefault()?.ProveedorCedula ?? 0
+                });
             }
 
-            // 1️⃣ Guardar zapato primero
-            _context.Zapatos.Add(zapato);
-            await _context.SaveChangesAsync(); // ← AQUÍ ya tenemos zapato.Id
+            var proveedorCedula = modelos.First().ProveedorCedula;
 
-            // 2️⃣ Guardar imágenes
-            if (imagenes != null && imagenes.Count > 0)
+            var existeProveedor = await _context.Proveedores
+                .AnyAsync(p => p.Cedula == proveedorCedula);
+
+            if (!existeProveedor)
             {
-                foreach (var file in imagenes)
+                ModelState.AddModelError("", "El proveedor no existe");
+
+                ViewBag.ProveedorCedula = proveedorCedula;
+
+                return View(new Zapato
                 {
-                    if (file.Length == 0) continue;
+                    ProveedorCedula = proveedorCedula
+                });
+            }
 
-                    // Nombre único
-                    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-                    var rutaCarpeta = Path.Combine("wwwroot", "imagenes", "zapatos");
+            // 🔥 1. Guardar zapatos
+            foreach (var zapato in modelos)
+            {
+                _context.Zapatos.Add(zapato);
+            }
 
-                    if (!Directory.Exists(rutaCarpeta))
-                        Directory.CreateDirectory(rutaCarpeta);
+            await _context.SaveChangesAsync(); // 🔴 NECESARIO para obtener IDs
 
-                    var rutaFisica = Path.Combine(rutaCarpeta, fileName);
+            // 🔥 2. Guardar imágenes
+            if (imagenes != null && imagenes.Any())
+            {
+                var folder = Path.Combine(_environment.WebRootPath, "imagenes", "zapatos");
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                foreach (var img in imagenes)
+                {
+                    if (img.Length == 0)
+                        continue;
+
+                    var nombre = $"{Guid.NewGuid()}{Path.GetExtension(img.FileName)}";
+                    var rutaFisica = Path.Combine(folder, nombre);
 
                     using (var stream = new FileStream(rutaFisica, FileMode.Create))
                     {
-                        await file.CopyToAsync(stream);
+                        await img.CopyToAsync(stream);
                     }
 
-                    // 3️⃣ Guardar en BD
-                    var imagen = new ImagenZapato
+                    // 🔴 IMPORTANTE: asociar imágenes al PRIMER zapato (modelo base)
+                    _context.ImagenesZapato.Add(new ImagenZapato
                     {
-                        ZapatoId = zapato.Id, // 🔴 CLAVE
-                        Url = $"/imagenes/zapatos/{fileName}"
-                    };
-
-                    _context.Add(imagen);
+                        ZapatoId = modelos.First().Id,
+                        Url = "/imagenes/zapatos/" + nombre
+                    });
                 }
 
                 await _context.SaveChangesAsync();
@@ -113,7 +139,7 @@ namespace FashionM.Controllers
             return RedirectToAction(
                 "Details",
                 "Proveedores",
-                new { id = zapato.ProveedorCedula }
+                new { id = proveedorCedula }
             );
         }
 
