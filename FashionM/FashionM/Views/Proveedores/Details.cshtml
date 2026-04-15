@@ -8,15 +8,15 @@
         .ToList();
 
     var grupos = Model.Zapatos
-    .GroupBy(z => new
-    {
-        z.Codigo,
-        z.Color,
-        z.Suela,
-        z.Detalle,
-        z.PrecioVenta
-    })
-    .ToList();
+        .GroupBy(z => new
+        {
+            z.Codigo,
+            z.Color,
+            z.Suela,
+            z.Detalle,
+            z.PrecioVenta
+        })
+        .ToList();
 
     ViewData["Title"] = "Detalle del Proveedor";
 }
@@ -337,190 +337,179 @@
 <!-- Header -->
 <div class="page-header">
     <h1 class="page-title">👤 Detalle del Proveedor</h1>
-    <a asp-action="Index" class="back-link">
-        <span>←</span> Volver
-    </a>
+    <a asp-action="Index" class="back-link">← Volver</a>
 </div>
 
-<!-- Card principal - Datos del Proveedor -->
+<!-- INFO PROVEEDOR -->
 <div class="detail-card">
-    <div class="section-title">
-        <span>📋</span> Información del Proveedor
-    </div>
+    <div class="section-title">📋 Información del Proveedor</div>
 
     <div class="info-grid">
-        <div class="info-item">
-            <span class="info-label">Cédula</span>
-            <span class="info-value">@Model.Cedula</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Nombre</span>
-            <span class="info-value">@Model.Nombre @Model.Apellidos</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Tipo ID</span>
-            <span class="info-value">@Model.IDTipo</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Correo</span>
-            <span class="info-value">@Model.Correo</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Teléfono</span>
-            <span class="info-value">@Model.Telefono</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Comercio</span>
-            <span class="info-value">@Model.Comercio</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Dirección</span>
-            <span class="info-value">@Model.Direccion</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Actividad</span>
-            <span class="info-value">@Model.Actividad</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Empresa</span>
-            <span class="info-value"><span class="empresa-badge">@Model.Empresa</span></span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Estado</span>
-            <span class="info-value">
-                <span class="status-badge @(Model.Estado ? "active" : "inactive")">
-                    @(Model.Estado ? "Activo" : "Inactivo")
-                </span>
+        <div><b>Cédula:</b> @Model.Cedula</div>
+        <div><b>Nombre:</b> @Model.Nombre @Model.Apellidos</div>
+        <div><b>Tipo ID:</b> @Model.IDTipo</div>
+        <div><b>Correo:</b> @Model.Correo</div>
+        <div><b>Teléfono:</b> @Model.Telefono</div>
+        <div><b>Comercio:</b> @Model.Comercio</div>
+        <div><b>Dirección:</b> @Model.Direccion</div>
+        <div><b>Actividad:</b> @Model.Actividad</div>
+        <div>
+            <b>Estado:</b>
+            <span class="status-badge @(Model.Estado ? "active" : "inactive")">
+                @(Model.Estado ? "Activo" : "Inactivo")
             </span>
         </div>
     </div>
 
-    <div class="action-buttons">
-        <a asp-controller="Proveedores"
-               asp-action="Edit"
-               asp-route-id="@Model.Cedula"
-               class="btn-zapato btn-zapato-edit">
-            ✏️
-        </a>
-        <a asp-action="Index" class="btn-back">
-            <span>←</span> Volver
-        </a>
-    </div>
+    <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn btn-warning">Editar</a>
 </div>
 
-<!-- Card - Zapatos del Proveedor -->
+<!-- ZAPATOS -->
 <div class="detail-card">
-    <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-        <span><span>👞</span> Zapatos del Proveedor</span>
+
+    <!-- 🔥 FILTRO -->
+    <form method="get" class="mb-3">
+        <input type="hidden" name="id" value="@Model.Cedula" />
+
+        <select name="empresa" class="form-control" onchange="this.form.submit()">
+
+            <option value="">Todas las empresas</option>
+
+            @if (ViewBag.EmpresaSeleccionada == "Cocalza Plus S.A")
+            {
+                <option value="Cocalza Plus S.A" selected>Cocalza Plus S.A</option>
+            }
+            else
+            {
+                <option value="Cocalza Plus S.A">Cocalza Plus S.A</option>
+            }
+
+            @if (ViewBag.EmpresaSeleccionada == "Fashion Shoes S.A")
+            {
+                <option value="Fashion Shoes S.A" selected>Fashion Shoes S.A</option>
+            }
+            else
+            {
+                <option value="Fashion Shoes S.A">Fashion Shoes S.A</option>
+            }
+
+            @if (ViewBag.EmpresaSeleccionada == "LSG Moda S.A")
+            {
+                <option value="LSG Moda S.A" selected>LSG Moda S.A</option>
+            }
+            else
+            {
+                <option value="LSG Moda S.A">LSG Moda S.A</option>
+            }
+
+            @if (ViewBag.EmpresaSeleccionada == "Maxi Plus 23 S.A")
+            {
+                <option value="Maxi Plus 23 S.A" selected>Maxi Plus 23 S.A</option>
+            }
+            else
+            {
+                <option value="Maxi Plus 23 S.A">Maxi Plus 23 S.A</option>
+            }
+
+        </select>
+    </form>
+
+    <div class="section-title">
+        👞 Zapatos del Proveedor
         <a asp-controller="Zapatos"
-               asp-action="Create"
-               asp-route-proveedorCedula="@Model.Cedula"
-               class="btn-primary-small">
-            <span>➕</span> Nuevo Zapato
+           asp-action="Create"
+           asp-route-proveedorCedula="@Model.Cedula"
+           class="btn btn-primary btn-sm">
+            ➕ Nuevo
         </a>
     </div>
 
     @if (Model.Zapatos != null && Model.Zapatos.Any())
     {
-        <div class="table-responsive">
-            <table class="zapatos-table">
-                <thead>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Color</th>
+                    <th>Suela</th>
+                    <th>Detalle</th>
+
+                    @foreach (var talla in tallas)
+                    {
+                        <th>@talla</th>
+                    }
+
+                    <th>Total</th>
+                    <th>Precio</th>
+                    <th>Imágenes</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var g in grupos)
+                {
+                    var precio = g.First().PrecioVenta;
+
                     <tr>
-                        <th>Código</th>
-                        <th>Color</th>
-                        <th>Suela</th>
-                        <th>Detalle</th>
+                        <td>@g.Key.Codigo</td>
+                        <td>@g.Key.Color</td>
+                        <td>@g.Key.Suela</td>
+                        <td>@g.Key.Detalle</td>
 
                         @foreach (var talla in tallas)
                         {
-                            <th class="text-center">@talla</th>
+                            var item = g.FirstOrDefault(x => x.Numero == talla);
+                            <td>@(item?.Cantidad ?? 0)</td>
                         }
 
-                        <th>Total</th>
-                        <th>Precio</th>
-                        <th>Imágenes</th>
-                    </tr>
-                </thead>
+                        <td>@g.Sum(x => x.Cantidad)</td>
 
-                <tbody>
-                    @foreach (var g in grupos)
-                    {
-                        var precio = g.First().PrecioVenta;
+                        <td>₡@precio.ToString("N2")</td>
 
-                        <tr>
-                            <td>@g.Key.Codigo</td>
-                            <td>@g.Key.Color</td>
-                            <td>@g.Key.Suela</td>
-                            <td>@g.Key.Detalle</td>
-
-                            @foreach (var talla in tallas)
-                            {
-                                var item = g.FirstOrDefault(x => x.Numero == talla);
-                                <td class="text-center">
-                                    @(item?.Cantidad ?? 0)
-                                </td>
+                        <td>
+                            @{
+                                var imagenes = g.SelectMany(x => x.Imagenes).ToList();
                             }
 
-                            <td class="fw-bold">
-                                @g.Sum(x => x.Cantidad)
-                            </td>
-
-                            <td class="text-success fw-bold">
-                                ₡@precio.ToString("N2")
-                            </td>
-
-                            <td>
-                                @{
-                                    var imagenes = g.SelectMany(x => x.Imagenes).ToList();
-                                }
-
-                                @if (imagenes.Any())
+                            @if (imagenes.Any())
+                            {
+                                foreach (var img in imagenes.Take(3))
                                 {
-                                    <div class="imagenes-grid">
-                                        @foreach (var img in imagenes.Take(3))
-                                        {
-                                            <img src="@img.Url" class="imagen-thumb" />
-                                        }
-                                    </div>
+                                    <img src="@img.Url" width="80" />
                                 }
-                                else
-                                {
-                                    <span class="text-muted">Sin imágenes</span>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-                <tfoot>
-                    <tr>
-                        <td colspan="4" class="fw-bold">Totales</td>
-
-                        @foreach (var talla in tallas)
-                        {
-                            var totalTalla = Model.Zapatos
-                                .Where(x => x.Numero == talla)
-                                .Sum(x => x.Cantidad);
-
-                            <td class="fw-bold text-center">@totalTalla</td>
-                        }
-
-                        <td class="fw-bold">
-                            @Model.Zapatos.Sum(x => x.Cantidad)
+                            }
+                            else
+                            {
+                                <span>Sin imágenes</span>
+                            }
                         </td>
-
-                        <td></td>
-                        <td></td>
                     </tr>
-                </tfoot>
-            </table>
-        </div>
+                }
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="4"><b>Totales</b></td>
+
+                    @foreach (var talla in tallas)
+                    {
+                        var total = Model.Zapatos
+                            .Where(x => x.Numero == talla)
+                            .Sum(x => x.Cantidad);
+
+                        <td>@total</td>
+                    }
+
+                    <td>@Model.Zapatos.Sum(x => x.Cantidad)</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
     }
     else
     {
-        <div class="empty-state">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👞</div>
-            <p>Este proveedor no tiene zapatos registrados</p>
-        </div>
+        <p>No hay zapatos</p>
     }
+
 </div>

@@ -31,6 +31,8 @@ namespace FashionM.Models
 
         public bool Activo { get; set; } = true;
 
+        public string Empresa { get; set; }
+
         [Required]
         public int ProveedorCedula { get; set; }
         public Proveedor? Proveedor { get; set; }

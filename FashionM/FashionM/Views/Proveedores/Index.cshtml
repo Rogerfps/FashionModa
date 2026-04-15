@@ -369,8 +369,7 @@
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Teléfono</th>
-                    <th>Actividad</th>
-                    <th>Empresa</th>
+                    <th>Actividad</th> 
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -386,7 +385,6 @@
                             <td>@item.Correo</td>
                             <td>@item.Telefono</td>
                             <td>@item.Actividad</td>
-                            <td><span class="empresa-badge">@item.Empresa</span></td>
                             <td>
                                 <span class="status-badge @(item.Estado ? "active" : "inactive")">
                                     @(item.Estado ? "Activo" : "Inactivo")

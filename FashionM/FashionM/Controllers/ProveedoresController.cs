@@ -47,32 +47,6 @@ namespace FashionM.Controllers
                 proveedores = proveedores.Where(p => p.Estado == estado.Value);
             }
 
-            // 🏢 FILTRO POR EMPRESA 
-            if (!string.IsNullOrWhiteSpace(empresa))
-            {
-                var e = empresa.Trim();
-
-                proveedores = proveedores.Where(p =>
-                    p.Empresa != null &&
-                    (
-                        p.Empresa == e ||
-                        EF.Functions.Like(p.Empresa, $"{e}|%") ||
-                        EF.Functions.Like(p.Empresa, $"%|{e}") ||
-                        EF.Functions.Like(p.Empresa, $"%|{e}|%")
-                    )
-                );
-            }
-
-
-                ViewBag.Empresas = _context.Proveedores
-                    .Where(p => !string.IsNullOrWhiteSpace(p.Empresa))
-                    .AsEnumerable()                 
-                    .SelectMany(p => p.Empresa.Split('|'))
-                    .Select(e => e.Trim())
-                    .Distinct()
-                    .OrderBy(e => e)
-                    .ToList();
-
 
             ViewBag.EmpresaSeleccionada = empresa;
 
@@ -130,17 +104,43 @@ namespace FashionM.Controllers
         }
 
         // =========================
-        // DETAILS (con relaciones)
+        // DETAILS (con filtro empresa)
         // =========================
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string empresa)
         {
             var proveedor = await _context.Proveedores
-            .Include(p => p.Zapatos)
-            .ThenInclude(z => z.Imagenes)
-            .FirstOrDefaultAsync(p => p.Cedula == id);
+                .Include(p => p.Zapatos)
+                .ThenInclude(z => z.Imagenes)
+                .FirstOrDefaultAsync(p => p.Cedula == id);
 
             if (proveedor == null)
                 return NotFound();
+
+            // 🔥 FILTRO POR EMPRESA
+            if (!string.IsNullOrEmpty(empresa))
+            {
+                proveedor.Zapatos = proveedor.Zapatos
+                    .Where(z => z.Empresa == empresa)
+                    .ToList();
+            }
+
+            // =========================
+            // 🔵 AGRUPAR IMÁGENES POR CÓDIGO
+            // =========================
+            var imagenesPorCodigo = proveedor.Zapatos
+                .GroupBy(z => z.Codigo)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.SelectMany(z => z.Imagenes)
+                          .GroupBy(i => i.Url)
+                          .Select(x => x.First())
+                          .ToList()
+                );
+
+            // 👇 Mandar al View
+            ViewBag.ImagenesPorCodigo = imagenesPorCodigo;
+
+            ViewBag.EmpresaSeleccionada = empresa;
 
             return View(proveedor);
         }
@@ -196,7 +196,6 @@ namespace FashionM.Controllers
             proveedorDB.Comercio = model.Comercio;
             proveedorDB.Direccion = model.Direccion;
             proveedorDB.Actividad = model.Actividad;
-            proveedorDB.Empresa = model.Empresa;
             proveedorDB.Estado = model.Estado;
 
             // =========================
@@ -236,6 +235,7 @@ namespace FashionM.Controllers
                         zapatoDB.Cantidad = z.Cantidad;
                         zapatoDB.PrecioVenta = z.PrecioVenta;
                         zapatoDB.PrecioCosto = z.PrecioCosto;
+                        zapatoDB.Empresa = z.Empresa;
                     }
                 }
                 else
@@ -250,7 +250,8 @@ namespace FashionM.Controllers
                         Cantidad = z.Cantidad,
                         PrecioVenta = z.PrecioVenta,
                         PrecioCosto = z.PrecioCosto,
-                        ProveedorCedula = proveedorDB.Cedula
+                        ProveedorCedula = proveedorDB.Cedula,
+                        Empresa = z.Empresa
                     });
                 }
             }

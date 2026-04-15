@@ -11,7 +11,7 @@
     <div class="card mb-3">
         <div class="card-body">
 
-            <!-- DATOS GENERALES (se replican) -->
+            <!-- DATOS GENERALES -->
             <div class="row">
                 <div class="col-md-4">
                     <label class="form-label">Código</label>
@@ -26,6 +26,35 @@
                 <div class="col-md-4">
                     <label class="form-label">Suela</label>
                     <input id="suela" class="form-control" />
+                </div>
+            </div>
+
+            <!-- 🔥 EMPRESA CON RADIO -->
+            <div class="form-group mt-3">
+                <label class="form-label">Empresa</label>
+
+                <div class="radio-group">
+
+                    <label class="radio-option">
+                        <input type="radio" name="empresaSeleccionada" value="Cocalza Plus S.A" required />
+                        <span>Cocalza Plus S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" name="empresaSeleccionada" value="Fashion Shoes S.A" />
+                        <span>Fashion Shoes S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" name="empresaSeleccionada" value="LSG Moda S.A" />
+                        <span>LSG Moda S.A</span>
+                    </label>
+
+                    <label class="radio-option">
+                        <input type="radio" name="empresaSeleccionada" value="Maxi Plus 23 S.A" />
+                        <span>Maxi Plus 23 S.A</span>
+                    </label>
+
                 </div>
             </div>
 
@@ -91,41 +120,48 @@
             const suela = document.getElementById("suela").value;
             const proveedor = document.getElementById("proveedorCedula").value;
 
-            if (!codigo || !color || !suela) {
-                alert("Completa código, color y suela primero");
+            const empresa = document.querySelector('input[name="empresaSeleccionada"]:checked');
+
+            if (!codigo || !color || !suela || !empresa) {
+                alert("Completa código, color, suela y empresa");
                 return;
             }
 
             const fila = `
-                <tr>
-                    <td>
-                        <input name="modelos[${index}].Numero" class="form-control" required />
-                    </td>
-                    <td>
-                        <input name="modelos[${index}].Detalle" class="form-control" />
-                    </td>
-                    <td>
-                        <input name="modelos[${index}].Cantidad" type="number" class="form-control" required />
-                    </td>
-                    <td>
-                        <input name="modelos[${index}].PrecioCosto" type="number" step="0.01" class="form-control" required />
-                    </td>
-                    <td>
-                        <input name="modelos[${index}].PrecioVenta" type="number" step="0.01" class="form-control" required />
-                    </td>
+            <tr>
+                <td>
+                    <input name="modelos[${index}].Numero" class="form-control" required />
+                </td>
 
-                    <!-- CAMPOS OCULTOS -->
-                    <input type="hidden" name="modelos[${index}].Codigo" value="${codigo}" />
-                    <input type="hidden" name="modelos[${index}].Color" value="${color}" />
-                    <input type="hidden" name="modelos[${index}].Suela" value="${suela}" />
-                    <input type="hidden" name="modelos[${index}].ProveedorCedula" value="${proveedor}" />
+                <td>
+                    <input name="modelos[${index}].Detalle" class="form-control" />
+                </td>
 
-                    <td>
-                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">
-                            X
-                        </button>
-                    </td>
-                </tr>
+                <td>
+                    <input name="modelos[${index}].Cantidad" type="number" class="form-control" required />
+                </td>
+
+                <td>
+                    <input name="modelos[${index}].PrecioCosto" type="number" step="0.01" class="form-control" required />
+                </td>
+
+                <td>
+                    <input name="modelos[${index}].PrecioVenta" type="number" step="0.01" class="form-control" required />
+                </td>
+
+                <!-- 🔥 CAMPOS OCULTOS -->
+                <input type="hidden" name="modelos[${index}].Codigo" value="${codigo}" />
+                <input type="hidden" name="modelos[${index}].Color" value="${color}" />
+                <input type="hidden" name="modelos[${index}].Suela" value="${suela}" />
+                <input type="hidden" name="modelos[${index}].Empresa" value="${empresa.value}" />
+                <input type="hidden" name="modelos[${index}].ProveedorCedula" value="${proveedor}" />
+
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">
+                        X
+                    </button>
+                </td>
+            </tr>
             `;
 
             document.querySelector("#tablaTallas tbody").insertAdjacentHTML("beforeend", fila);

@@ -21,12 +21,11 @@
 
             <div asp-validation-summary="All" class="text-danger"></div>
 
-            <!-- 🔴 PK -->
+            <!-- PK -->
             <input type="hidden" asp-for="Cedula" />
 
             <h4>Datos del Proveedor</h4>
 
-            <!-- 🔥 NUEVO -->
             <label>Tipo Identificación</label>
             <select asp-for="IDTipo" asp-items="ViewBag.TiposIdentificacion" class="form-control mb-2">
                 <option value="">-- Seleccione --</option>
@@ -53,9 +52,6 @@
             <label>Actividad</label>
             <input asp-for="Actividad" class="form-control mb-2" />
 
-            <label>Empresa</label>
-            <input asp-for="Empresa" class="form-control mb-3" />
-
             <div class="form-check mb-3">
                 <input asp-for="Estado" class="form-check-input" />
                 <label asp-for="Estado" class="form-check-label">
@@ -72,12 +68,13 @@
                     <tr>
                         <th>Código</th>
                         <th>Color</th>
-                        <th>Suela</th> <!-- 🔥 NUEVO -->
+                        <th>Suela</th>
                         <th>Detalle</th>
                         <th>Talla</th>
                         <th>Cantidad</th>
                         <th>Precio Venta</th>
                         <th>Precio Costo</th>
+                        <th>Empresa</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -88,59 +85,81 @@
                         <tr>
                             <td>
                                 <input type="hidden" name="Zapatos[@i].Id" value="@zapatos[i].Id" />
-                                <input name="Zapatos[@i].Codigo"
-                                       value="@zapatos[i].Codigo"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Codigo" value="@zapatos[i].Codigo" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].Color"
-                                       value="@zapatos[i].Color"
-                                       class="form-control" />
-                            </td>
-
-                            <!-- 🔥 NUEVO -->
-                            <td>
-                                <input name="Zapatos[@i].Suela"
-                                       value="@zapatos[i].Suela"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Color" value="@zapatos[i].Color" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].Detalle"
-                                       value="@zapatos[i].Detalle"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Suela" value="@zapatos[i].Suela" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].Numero"
-                                       value="@zapatos[i].Numero"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Detalle" value="@zapatos[i].Detalle" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].Cantidad"
-                                       value="@zapatos[i].Cantidad"
-                                       type="number"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Numero" value="@zapatos[i].Numero" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].PrecioVenta"
-                                       value="@zapatos[i].PrecioVenta"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].Cantidad" value="@zapatos[i].Cantidad" type="number" class="form-control" />
                             </td>
 
                             <td>
-                                <input name="Zapatos[@i].PrecioCosto"
-                                       value="@zapatos[i].PrecioCosto"
-                                       class="form-control" />
+                                <input name="Zapatos[@i].PrecioVenta" value="@zapatos[i].PrecioVenta" class="form-control" />
                             </td>
 
                             <td>
-                                <button type="button"
-                                        class="btn btn-danger"
-                                        onclick="removeRow(this)">
+                                <input name="Zapatos[@i].PrecioCosto" value="@zapatos[i].PrecioCosto" class="form-control" />
+                            </td>
+
+                            <td>
+                                <select name="Zapatos[@i].Empresa" class="form-control" required>
+                                    <option value="">-- Empresa --</option>
+
+                                    @if (zapatos[i].Empresa == "Cocalza Plus S.A")
+                                    {
+                                        <option value="Cocalza Plus S.A" selected>Cocalza Plus S.A</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Cocalza Plus S.A">Cocalza Plus S.A</option>
+                                    }
+
+                                    @if (zapatos[i].Empresa == "Fashion Shoes S.A")
+                                    {
+                                        <option value="Fashion Shoes S.A" selected>Fashion Shoes S.A</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Fashion Shoes S.A">Fashion Shoes S.A</option>
+                                    }
+
+                                    @if (zapatos[i].Empresa == "LSG Moda S.A")
+                                    {
+                                        <option value="LSG Moda S.A" selected>LSG Moda S.A</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="LSG Moda S.A">LSG Moda S.A</option>
+                                    }
+
+                                    @if (zapatos[i].Empresa == "Maxi Plus 23 S.A")
+                                    {
+                                        <option value="Maxi Plus 23 S.A" selected>Maxi Plus 23 S.A</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Maxi Plus 23 S.A">Maxi Plus 23 S.A</option>
+                                    }
+                                </select>
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-danger" onclick="removeRow(this)">
                                     X
                                 </button>
                             </td>
@@ -164,38 +183,48 @@
 </div>
 
 @section Scripts {
-    <script>
+<script>
 
-        function addRow(){
+    function addRow(){
 
-            let table = document.querySelector("#tablaZapatos tbody");
-            let i = table.rows.length;
+        let table = document.querySelector("#tablaZapatos tbody");
+        let i = table.rows.length;
 
-            table.insertAdjacentHTML("beforeend", `
-            <tr>
+        table.insertAdjacentHTML("beforeend", `
+        <tr>
 
-                <td><input name="Zapatos[${i}].Codigo" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].Color" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].Suela" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].Detalle" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].Numero" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].Cantidad" type="number" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].PrecioVenta" class="form-control"/></td>
-                <td><input name="Zapatos[${i}].PrecioCosto" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Codigo" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Color" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Suela" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Detalle" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Numero" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].Cantidad" type="number" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].PrecioVenta" class="form-control"/></td>
+            <td><input name="Zapatos[${i}].PrecioCosto" class="form-control"/></td>
 
-                <td>
-                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">
-                        X
-                    </button>
-                </td>
+            <td>
+                <select name="Zapatos[${i}].Empresa" class="form-control" required>
+                    <option value="">-- Empresa --</option>
+                    <option value="Cocalza Plus S.A">Cocalza Plus S.A</option>
+                    <option value="Fashion Shoes S.A">Fashion Shoes S.A</option>
+                    <option value="LSG Moda S.A">LSG Moda S.A</option>
+                    <option value="Maxi Plus 23 S.A">Maxi Plus 23 S.A</option>
+                </select>
+            </td>
 
-            </tr>
-            `);
-        }
+            <td>
+                <button type="button" class="btn btn-danger" onclick="removeRow(this)">
+                    X
+                </button>
+            </td>
 
-        function removeRow(btn){
-            btn.closest("tr").remove();
-        }
+        </tr>
+        `);
+    }
 
-    </script>
+    function removeRow(btn){
+        btn.closest("tr").remove();
+    }
+
+</script>
 }
