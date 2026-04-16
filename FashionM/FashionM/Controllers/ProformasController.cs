@@ -65,6 +65,7 @@ namespace FashionM.Controllers
         // ==========================
         // CREATE GET
         // ==========================
+        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Empresas = new SelectList(_context.Empresas, "Id", "Nombre");
@@ -84,7 +85,6 @@ namespace FashionM.Controllers
                 return View(proforma);
             }
 
-            // 🔥 NUMERO POR EMPRESA
             var ultimoNumero = await _context.Proformas
                 .Where(p => p.EmpresaId == proforma.EmpresaId)
                 .MaxAsync(p => (int?)p.Numero) ?? 0;
@@ -120,82 +120,75 @@ namespace FashionM.Controllers
         // ==========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            int proveedorCedula,
+        public async Task<IActionResult> CrearZapato(
+            int proformaId,
             string codigo,
             string color,
-            string suela,
             string[] tallas,
             int[] cantidades,
-            decimal[] preciosCosto,
-            decimal[] preciosVenta,
-            List<IFormFile> imagenes
+            decimal[] preciosVenta
 )
         {
             if (tallas == null || tallas.Length == 0)
             {
-                ModelState.AddModelError("", "Debe agregar al menos una talla");
-                return View(new Zapato { ProveedorCedula = proveedorCedula });
+                TempData["Error"] = "Debe agregar al menos una talla";
+                return RedirectToAction("AgregarProducto", new { id = proformaId });
             }
-
-            var zapatosCreados = new List<Zapato>();
 
             for (int i = 0; i < tallas.Length; i++)
             {
-                if (i >= cantidades.Length) break;
-
+                if (i >= cantidades.Length) continue;
                 if (cantidades[i] <= 0) continue;
 
-                var zapato = new Zapato
+                // 🔥 BUSCAR INVENTARIO
+                var inventario = await _context.TallasInventario
+                    .FirstOrDefaultAsync(t =>
+                        t.InventarioCodigo == codigo &&
+                        t.Color == color &&
+                        t.Numero == tallas[i]);
+
+                if (inventario == null)
+                    continue;
+
+                // ❌ VALIDAR STOCK
+                if (inventario.Cantidad < cantidades[i])
                 {
-                    Codigo = codigo,
+                    TempData["Error"] = $"Stock insuficiente para talla {tallas[i]}";
+                    return RedirectToAction("AgregarProducto", new { id = proformaId });
+                }
+
+                // 🔥 RESTAR INVENTARIO
+                inventario.Cantidad -= cantidades[i];
+
+                // 🔥 GUARDAR DETALLE
+                var detalle = new ProformaDetalle
+                {
+                    ProformaId = proformaId,
+                    InventarioCodigo = codigo,
                     Color = color,
-                    Suela = suela,
-                    Numero = tallas[i],
+                    Talla = tallas[i],
                     Cantidad = cantidades[i],
-                    PrecioCosto = preciosCosto[i],
-                    PrecioVenta = preciosVenta[i],
-                    ProveedorCedula = proveedorCedula
+                    PrecioUnitario = preciosVenta[i],
+                    SubTotal = cantidades[i] * preciosVenta[i]
                 };
 
-                _context.Zapatos.Add(zapato);
-                zapatosCreados.Add(zapato);
+                _context.ProformaDetalles.Add(detalle);
             }
 
             await _context.SaveChangesAsync();
 
-            // 🔥 GUARDAR IMÁGENES
-            if (imagenes != null && imagenes.Any())
+            // 🔥 actualizar total
+            var proforma = await _context.Proformas
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == proformaId);
+
+            if (proforma != null)
             {
-                var folder = Path.Combine("wwwroot", "imagenes", "zapatos");
-
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
-
-                foreach (var zapato in zapatosCreados)
-                {
-                    foreach (var file in imagenes)
-                    {
-                        if (file.Length == 0) continue;
-
-                        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-                        var path = Path.Combine(folder, fileName);
-
-                        using var stream = new FileStream(path, FileMode.Create);
-                        await file.CopyToAsync(stream);
-
-                        _context.Add(new ImagenZapato
-                        {
-                            ZapatoId = zapato.Id,
-                            Url = "/imagenes/zapatos/" + fileName
-                        });
-                    }
-                }
-
+                proforma.Total = proforma.Detalles.Sum(d => d.SubTotal);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Details", "Proveedores", new { id = proveedorCedula });
+            return RedirectToAction("AgregarProducto", new { id = proformaId });
         }
 
         // ==========================

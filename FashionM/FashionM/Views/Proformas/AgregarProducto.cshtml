@@ -42,7 +42,7 @@
             <span>➕</span> Agregar Nuevo Producto
         </div>
 
-        <form asp-action="AgregarProducto" method="post" id="formProforma">
+        <form asp-action="CrearZapato" method="post" id="formProforma">
             <input type="hidden" name="proformaId" value="@Model.Id" />
 
             <div class="row g-3">
@@ -90,14 +90,6 @@
             </div>
         </form>
     </div>
-
-    <!-- ERROR -->
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert-modern">
-            @TempData["Error"]
-        </div>
-    }
 
     <!-- TABLA ACTUAL -->
     <div class="table-wrapper">
@@ -194,7 +186,6 @@
             }, 300);
         });
 
-        // CARGAR VARIANTES
         function cargarVariantes(codigo) {
             fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}&proformaId=@Model.Id`)
                 .then(r => r.json())
@@ -208,33 +199,28 @@
                 });
         }
 
-        // COLOR → DETALLE
         color.addEventListener("change", () => {
             let c = color.value;
 
-            let detalles = variantes
-                .filter(v => v.color === c)
-                .map(v => v.detalle || "");
+            let filtradasColor = variantes.filter(v => v.color === c);
 
+            let detalles = filtradasColor.map(v => v.detalle || "");
             let unicos = [...new Set(detalles)];
 
             llenarSelect(detalle, unicos, "(Sin detalle)");
 
-            // 🔥 AUTO si solo hay uno
+            // 🔥 SI SOLO HAY UN DETALLE → AUTO
             if (unicos.length === 1) {
                 detalle.value = unicos[0];
                 detalle.dispatchEvent(new Event("change"));
             }
 
-            // 🔥 SI NO HAY DETALLE → mostrar todo
+            // 🔥 SI NO HAY DETALLE → MOSTRAR DIRECTO
             if (unicos.length === 0) {
-                renderTallas(
-                    variantes.filter(v => v.color === c)
-                );
+                renderTallas(filtradasColor);
             }
         });
 
-        // DETALLE → TABLA
         detalle.addEventListener("change", () => {
 
             let c = color.value;
@@ -248,14 +234,7 @@
             renderTallas(filtradas);
         });
 
-        // TABLA
         function renderTallas(data) {
-
-            if (data.length === 0) {
-                document.getElementById("tablaTallas").innerHTML =
-                    "<div class='text-muted'>No hay tallas disponibles</div>";
-                return;
-            }
 
             let html = `
                 <table class="productos-table">
@@ -263,6 +242,7 @@
                         <tr>
                             <th>Talla</th>
                             <th>Stock</th>
+                            <th>Precio</th>
                             <th>Cantidad</th>
                         </tr>
                     </thead>
@@ -274,8 +254,12 @@
                     <tr>
                         <td>${v.talla}</td>
                         <td>${v.stock ?? '-'}</td>
+                        <td>₡ ${v.precio}</td>
                         <td>
                             <input type="hidden" name="tallas[${i}]" value="${v.talla}" />
+                            <input type="hidden" name="preciosCosto[${i}]" value="${v.precio}" />
+                            <input type="hidden" name="preciosVenta[${i}]" value="${v.precio}" />
+
                             <input type="number"
                                    name="cantidades[${i}]"
                                    min="0"
@@ -286,24 +270,20 @@
             });
 
             html += `</tbody></table>`;
-
             document.getElementById("tablaTallas").innerHTML = html;
         }
 
-        // VALIDACIÓN FINAL
         document.getElementById("formProforma").addEventListener("submit", function (e) {
-
-            if (!hidden.value) {
-                e.preventDefault();
-                alert("Debe seleccionar un producto válido");
-                return;
-            }
 
             let inputsCantidad = document.querySelectorAll("input[name^='cantidades']");
             let inputsTalla = document.querySelectorAll("input[name^='tallas']");
+            let inputsCosto = document.querySelectorAll("input[name^='preciosCosto']");
+            let inputsVenta = document.querySelectorAll("input[name^='preciosVenta']");
 
             let nuevasTallas = [];
             let nuevasCantidades = [];
+            let nuevosCostos = [];
+            let nuevosVentas = [];
 
             inputsCantidad.forEach((input, index) => {
                 let cantidad = parseInt(input.value);
@@ -311,6 +291,8 @@
                 if (!isNaN(cantidad) && cantidad > 0) {
                     nuevasTallas.push(inputsTalla[index].value);
                     nuevasCantidades.push(cantidad);
+                    nuevosCostos.push(inputsCosto[index].value);
+                    nuevosVentas.push(inputsVenta[index].value);
                 }
             });
 
@@ -322,24 +304,19 @@
 
             inputsCantidad.forEach(i => i.remove());
             inputsTalla.forEach(i => i.remove());
+            inputsCosto.forEach(i => i.remove());
+            inputsVenta.forEach(i => i.remove());
 
             nuevasTallas.forEach((t, i) => {
-                let inputT = document.createElement("input");
-                inputT.type = "hidden";
-                inputT.name = `tallas[${i}]`;
-                inputT.value = t;
-
-                let inputC = document.createElement("input");
-                inputC.type = "hidden";
-                inputC.name = `cantidades[${i}]`;
-                inputC.value = nuevasCantidades[i];
-
-                this.appendChild(inputT);
-                this.appendChild(inputC);
+                this.insertAdjacentHTML("beforeend", `
+                    <input type="hidden" name="tallas[${i}]" value="${t}" />
+                    <input type="hidden" name="cantidades[${i}]" value="${nuevasCantidades[i]}" />
+                    <input type="hidden" name="preciosCosto[${i}]" value="${nuevosCostos[i]}" />
+                    <input type="hidden" name="preciosVenta[${i}]" value="${nuevosVentas[i]}" />
+                `);
             });
         });
 
-        // UTIL
         function llenarSelect(select, items, textoDefault) {
             select.innerHTML = `<option value="">${textoDefault}</option>`;
 
