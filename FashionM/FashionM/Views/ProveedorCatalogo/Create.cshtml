@@ -1,0 +1,83 @@
+﻿@model FashionM.Models.Provedor.ProveedorCatalogo
+
+@{
+    ViewData["Title"] = "Crear Proveedor";
+}
+
+<link rel="stylesheet" href="~/css/ProveedorV2/CreateProveedoresV2.css" />
+
+<div class="container mt-4">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>🏭</span> Crear Proveedor
+        </h1>
+        <a asp-action="Index" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-card">
+            <div class="section-title">
+                <span>📋</span> Datos del Proveedor
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <label asp-for="Nombre" class="form-label"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Nombre del proveedor" />
+                </div>
+
+                <div>
+                    <label asp-for="Codigo" class="form-label"></label>
+                    <input asp-for="Codigo" class="form-control" placeholder="Código único" />
+                </div>
+
+                <div>
+                    <label asp-for="Cedula" class="form-label"></label>
+                    <input asp-for="Cedula" class="form-control" placeholder="Cédula jurídica o física" />
+                </div>
+
+                <div>
+                    <label asp-for="Telefonos" class="form-label"></label>
+                    <input asp-for="Telefonos" class="form-control" placeholder="8888-8888 / 7777-7777" />
+                </div>
+
+                <div>
+                    <label asp-for="Correo" class="form-label"></label>
+                    <input asp-for="Correo" type="email" class="form-control" placeholder="proveedor@email.com" />
+                </div>
+
+                <div>
+                    <label asp-for="ActividadEconomica" class="form-label"></label>
+                    <input asp-for="ActividadEconomica" class="form-control" placeholder="Actividad económica" />
+                </div>
+
+                <div class="full-width">
+                    <label asp-for="Direccion" class="form-label"></label>
+                    <input asp-for="Direccion" class="form-control" placeholder="Dirección completa" />
+                </div>
+
+                <div>
+                    <label asp-for="Activo" class="form-label"></label>
+                    <select asp-for="Activo" class="form-select">
+                        <option value="true">✓ Activo</option>
+                        <option value="false">✗ Inactivo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn-cancel">
+                Cancelar
+            </a>
+            <button type="submit" class="btn-save">
+                💾 Guardar Proveedor
+            </button>
+        </div>
+    </form>
+</div>

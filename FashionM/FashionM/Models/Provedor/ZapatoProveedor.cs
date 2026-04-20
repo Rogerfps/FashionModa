@@ -1,4 +1,6 @@
-﻿namespace FashionM.Models.Provedor
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
+namespace FashionM.Models.Provedor
 {
     public class ZapatoProveedor
     {
@@ -6,18 +8,32 @@
 
         public string Codigo { get; set; } = string.Empty;
 
-        public DateTime FechaIngreso { get; set; } = DateTime.Now;
+        public DateTime FechaIngreso { get; set; } = DateTime.UtcNow;
 
+        public string Empresa { get; set; } = string.Empty;
+
+        // 🖼️ Imagen principal
         public string? ImagenUrl { get; set; }
 
-        // Relaciones
+        // 💰 Precios base
+        public decimal? PrecioVenta { get; set; }
+
+        public decimal? PrecioCosto { get; set; }
+
+        public decimal? PrecioColombia { get; set; }
+
+        // 🔗 Relación
         public int ProveedorCatalogoId { get; set; }
+
+        [ValidateNever]
         public ProveedorCatalogo Proveedor { get; set; } = null!;
 
-        public int EmpresaId { get; set; } // ya tienes esta tabla
-        public Empresa Empresa { get; set; } = null!;
-
-        public ICollection<VarianteZapatoProveedor> Variantes { get; set; } = new List<VarianteZapatoProveedor>();
+        // 🔥 Listas
+        public ICollection<ColorZapato> Colores { get; set; } = new List<ColorZapato>();
+        public ICollection<SuelaZapato> Suelas { get; set; } = new List<SuelaZapato>();
+        public ICollection<DetalleZapato> Detalles { get; set; } = new List<DetalleZapato>();
+        public ICollection<TallaZapato> Tallas { get; set; } = new List<TallaZapato>();
     }
 }
+
 

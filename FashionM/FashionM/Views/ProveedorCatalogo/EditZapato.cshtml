@@ -1,0 +1,264 @@
+﻿@model FashionM.Models.Provedor.ZapatoProveedor
+
+@{
+    ViewData["Title"] = "Editar Zapato";
+}
+
+<link rel="stylesheet" href="~/css/ProveedorV2/ZapatoEditarProveedoresV2.css" />
+
+
+<div class="container mt-4">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>👞</span> Editar Zapato
+        </h1>
+        <a asp-action="Details" asp-route-id="@Model.ProveedorCatalogoId" class="btn-back">
+            ← Volver al Proveedor
+        </a>
+    </div>
+
+    <form asp-action="EditZapato" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ProveedorCatalogoId" />
+
+        <!-- VALIDACIONES -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="validation-summary"></div>
+        }
+
+        <!-- DATOS BASE -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>📋</span> Datos del Zapato
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <label class="form-label">Código</label>
+                    <input asp-for="Codigo" class="form-control" placeholder="Código del zapato" />
+                </div>
+                <div>
+                    <label class="form-label">Empresa</label>
+                    <input asp-for="Empresa" class="form-control" placeholder="Empresa" />
+                </div>
+                <div>
+                    <label class="form-label">Precio Venta (₡)</label>
+                    <input asp-for="PrecioVenta" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                </div>
+                <div>
+                    <label class="form-label">Precio Costo (₡)</label>
+                    <input asp-for="PrecioCosto" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                </div>
+                <div>
+                    <label class="form-label">Precio Colombia ($)</label>
+                    <input asp-for="PrecioColombia" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                </div>
+                <div>
+                    <label class="form-label">Cambiar Imagen</label>
+                    <input type="file" name="imagen" class="form-control" accept="image/*" />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+            {
+                <div class="current-image">
+                    <img src="@Model.ImagenUrl" alt="Imagen actual" />
+                    <div class="text-muted small mt-1">Imagen actual</div>
+                </div>
+            }
+        </div>
+
+        <!-- TIPO DE ZAPATO -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>👟</span> Tipo de Zapato
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Seleccionar tipo</label>
+                    <select id="tipoZapato" class="form-select" onchange="generarTallas()">
+                        <option value="">Seleccione...</option>
+                        <option value="adulto">Adulto (34-44)</option>
+                        <option value="nino">Niño (15-36)</option>
+                    </select>
+                </div>
+                <div class="col-md-8 d-flex align-items-end">
+                    <button type="button" class="btn-copy-price" onclick="copiarPrecioBase()">
+                        📋 Copiar precio a todas las tallas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLORES -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>🎨</span> Colores
+            </div>
+
+            <div id="coloresContainer" class="items-container">
+                @for (int i = 0; i < Model.Colores.Count; i++)
+                {
+                    <div class="item-row">
+                        <input name="Colores[@i].Nombre" value="@Model.Colores.ElementAt(i).Nombre"
+                               class="form-control" placeholder="Color" />
+                        <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+                    </div>
+                }
+            </div>
+
+            <button type="button" class="btn-add" onclick="addItem('coloresContainer','Colores','Nombre')">
+                ➕ Agregar Color
+            </button>
+        </div>
+
+        <!-- SUELAS -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>👞</span> Suelas
+            </div>
+
+            <div id="suelasContainer" class="items-container">
+                @for (int i = 0; i < Model.Suelas.Count; i++)
+                {
+                    <div class="item-row">
+                        <input name="Suelas[@i].Nombre" value="@Model.Suelas.ElementAt(i).Nombre"
+                               class="form-control" placeholder="Suela" />
+                        <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+                    </div>
+                }
+            </div>
+
+            <button type="button" class="btn-add" onclick="addItem('suelasContainer','Suelas','Nombre')">
+                ➕ Agregar Suela
+            </button>
+        </div>
+
+        <!-- DETALLES -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>📝</span> Detalles
+            </div>
+
+            <div id="detallesContainer" class="items-container">
+                @for (int i = 0; i < Model.Detalles.Count; i++)
+                {
+                    <div class="item-row">
+                        <input name="Detalles[@i].Nombre" value="@Model.Detalles.ElementAt(i).Nombre"
+                               class="form-control" placeholder="Detalle" />
+                        <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+                    </div>
+                }
+            </div>
+
+            <button type="button" class="btn-add" onclick="addItem('detallesContainer','Detalles','Nombre')">
+                ➕ Agregar Detalle
+            </button>
+        </div>
+
+        <!-- TALLAS -->
+        <div class="form-card">
+            <div class="section-title">
+                <span>📏</span> Tallas y Precios
+            </div>
+
+            <div id="tallasContainer" class="tallas-container">
+                @for (int i = 0; i < Model.Tallas.Count; i++)
+                {
+                    <div class="talla-row">
+                        <input type="text" name="Tallas[@i].Numero" value="@Model.Tallas.ElementAt(i).Numero"
+                               class="form-control talla-numero" placeholder="Talla" readonly />
+                        <input type="text" name="Tallas[@i].Precio" value="@Model.Tallas.ElementAt(i).Precio"
+                               class="form-control talla-precio" placeholder="Precio" />
+                        <button type="button" class="btn-remove" onclick="removeTallaItem(this)">✕</button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- BOTÓN GUARDAR -->
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn-save">
+                💾 Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let counters = {
+        Colores: @Model.Colores.Count,
+        Suelas: @Model.Suelas.Count,
+        Detalles: @Model.Detalles.Count,
+        Tallas: @Model.Tallas.Count
+    };
+
+    function addItem(containerId, collectionName, fieldName) {
+        const container = document.getElementById(containerId);
+        const index = counters[collectionName]++;
+
+        const div = document.createElement("div");
+        div.className = "item-row";
+
+        div.innerHTML = `
+            <input name="${collectionName}[${index}].${fieldName}" class="form-control" placeholder="${fieldName}" />
+            <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+        `;
+
+        container.appendChild(div);
+    }
+
+    function removeItem(button) {
+        button.closest(".item-row").remove();
+    }
+
+    function removeTallaItem(button) {
+        button.closest(".talla-row").remove();
+    }
+
+    function generarTallas() {
+        const tipo = document.getElementById("tipoZapato").value;
+        const container = document.getElementById("tallasContainer");
+
+        if (!tipo) return;
+
+        container.innerHTML = "";
+        counters["Tallas"] = 0;
+
+        let inicio = tipo === "adulto" ? 34 : 15;
+        let fin = tipo === "adulto" ? 44 : 36;
+
+        for (let talla = inicio; talla <= fin; talla++) {
+            const index = counters["Tallas"]++;
+
+            const div = document.createElement("div");
+            div.className = "talla-row";
+
+            div.innerHTML = `
+                <input type="text" name="Tallas[${index}].Numero" value="${talla}" class="form-control talla-numero" placeholder="Talla" readonly />
+                <input type="text" name="Tallas[${index}].Precio" class="form-control talla-precio" placeholder="Precio" />
+                <button type="button" class="btn-remove" onclick="removeTallaItem(this)">✕</button>
+            `;
+
+            container.appendChild(div);
+        }
+    }
+
+    function copiarPrecioBase() {
+        const precio = document.querySelector('[name="PrecioVenta"]').value;
+
+        if (!precio) {
+            alert("Primero ingrese un precio de venta");
+            return;
+        }
+
+        document.querySelectorAll('[name$=".Precio"]').forEach(input => {
+            input.value = precio;
+        });
+    }
+</script>

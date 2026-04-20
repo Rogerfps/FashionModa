@@ -1,0 +1,64 @@
+﻿@model FashionM.Models.Provedor.ZapatoProveedor
+
+@{
+    ViewData["Title"] = "Eliminar Zapato";
+}
+
+<h2 class="text-danger">Eliminar Zapato</h2>
+
+<div class="alert alert-danger">
+    ⚠️ Esta acción eliminará:
+
+    <ul>
+        <li>El zapato</li>
+        <li>Colores</li>
+        <li>Suelas</li>
+        <li>Detalles</li>
+        <li>Tallas</li>
+        <li>Imagen</li>
+    </ul>
+
+    <strong>No se puede deshacer.</strong>
+</div>
+
+<div class="card p-3 mb-3">
+    <p><strong>Código:</strong> @Model.Codigo</p>
+    <p><strong>Empresa:</strong> @Model.Empresa</p>
+
+    @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+    {
+        <img src="@Model.ImagenUrl" style="width:150px;" />
+    }
+</div>
+
+<form asp-action="DeleteZapato" method="post" onsubmit="return validarConfirmacion()">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label>Escribe <strong>ELIMINAR</strong> para confirmar</label>
+        <input type="text" id="confirmInput" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-danger">
+        Eliminar definitivamente
+    </button>
+
+    <a asp-action="Details" asp-route-id="@Model.ProveedorCatalogoId" class="btn btn-secondary">
+        Cancelar
+    </a>
+
+</form>
+
+<script>
+    function validarConfirmacion() {
+        const valor = document.getElementById("confirmInput").value;
+
+        if (valor !== "ELIMINAR") {
+            alert("Debes escribir ELIMINAR para confirmar.");
+            return false;
+        }
+
+        return true;
+    }
+</script>

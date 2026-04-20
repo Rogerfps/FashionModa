@@ -1,6 +1,7 @@
 ﻿using FashionM.Models;
-using Microsoft.EntityFrameworkCore;
+using FashionM.Models.Provedor;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace FashionM.Data
 {
@@ -36,6 +37,15 @@ namespace FashionM.Data
         public DbSet<Proforma> Proformas { get; set; }
         public DbSet<ProformaDetalle> ProformaDetalles { get; set; }
         public DbSet<HistorialInventario> HistorialInventarios { get; set; }
+
+
+        // ⚠️ NO CONFUNDIR con Proveedor (módulo viejo)
+        public DbSet<ProveedorCatalogo> ProveedoresCatalogo { get; set; }
+        public DbSet<ZapatoProveedor> ZapatosProveedor { get; set; }
+        public DbSet<ColorZapato> ColoresZapato { get; set; }
+        public DbSet<SuelaZapato> SuelasZapato { get; set; }
+        public DbSet<DetalleZapato> DetallesZapato { get; set; }
+        public DbSet<TallaZapato> TallasZapato { get; set; }
 
 
 
@@ -142,14 +152,44 @@ namespace FashionM.Data
                 .HasPrincipalKey(i => i.Codigo)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            /*modelBuilder.Entity<HistorialInventario>()
-                .HasOne(h => h.Inventario)
-                .WithMany()
-                .HasForeignKey(h => h.CodigoInventario) No deja hacer delete
-                .HasPrincipalKey(i => i.Codigo)
-                .OnDelete(DeleteBehavior.Restrict);*/
+            // ===============================
+            // RELACIONES - PROVEEDORES CATÁLOGO
+            // ===============================
 
-            
+            // Proveedor -> Zapatos
+            modelBuilder.Entity<ProveedorCatalogo>()
+                .HasMany(p => p.Zapatos)
+                .WithOne(z => z.Proveedor)
+                .HasForeignKey(z => z.ProveedorCatalogoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Zapato -> Colores
+            modelBuilder.Entity<ZapatoProveedor>()
+                .HasMany(z => z.Colores)
+                .WithOne(c => c.Zapato)
+                .HasForeignKey(c => c.ZapatoProveedorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Zapato -> Suelas
+            modelBuilder.Entity<ZapatoProveedor>()
+                .HasMany(z => z.Suelas)
+                .WithOne(s => s.Zapato)
+                .HasForeignKey(s => s.ZapatoProveedorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Zapato -> Detalles
+            modelBuilder.Entity<ZapatoProveedor>()
+                .HasMany(z => z.Detalles)
+                .WithOne(d => d.Zapato)
+                .HasForeignKey(d => d.ZapatoProveedorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Zapato -> Tallas
+            modelBuilder.Entity<ZapatoProveedor>()
+                .HasMany(z => z.Tallas)
+                .WithOne(t => t.Zapato)
+                .HasForeignKey(t => t.ZapatoProveedorId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

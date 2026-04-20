@@ -1,0 +1,71 @@
+﻿@model FashionM.Models.Provedor.ProveedorCatalogo
+
+@{
+    ViewData["Title"] = "Eliminar Proveedor";
+}
+
+<h2 class="text-danger">Eliminar Proveedor</h2>
+
+<div class="alert alert-danger">
+
+    <h5>⚠️ Atención</h5>
+
+    <p>Estás a punto de eliminar este proveedor y <strong>TODO su contenido:</strong></p>
+
+    <ul>
+        <li>Todos los zapatos</li>
+        <li>Colores</li>
+        <li>Suelas</li>
+        <li>Detalles</li>
+        <li>Tallas</li>
+    </ul>
+
+    <p><strong>Esta acción NO se puede deshacer.</strong></p>
+</div>
+
+<div class="card p-3 mb-3">
+    <h5>Información del proveedor</h5>
+
+    <p><strong>Nombre:</strong> @Model.Nombre</p>
+    <p><strong>Código:</strong> @Model.Codigo</p>
+    <p><strong>Cédula:</strong> @Model.Cedula</p>
+</div>
+
+<form asp-action="Delete" method="post" onsubmit="return validarTextoConfirmacion()">
+
+    <input type="hidden" asp-for="Id" />
+
+    <!-- 🔥 CONFIRMACIÓN FUERTE -->
+    <div class="mb-3">
+        <label class="form-label">
+            Escribe <strong>ELIMINAR</strong> para confirmar:
+        </label>
+
+        <input type="text"
+               id="confirmInput"
+               class="form-control"
+               placeholder="Escribe ELIMINAR para confirmar" />
+    </div>
+
+    <button type="submit" class="btn btn-danger">
+        Eliminar definitivamente
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+
+</form>
+
+<script>
+    function validarTextoConfirmacion() {
+        const valor = document.getElementById("confirmInput").value;
+
+        if (valor !== "ELIMINAR") {
+            alert("Debes escribir exactamente 'ELIMINAR' para confirmar.");
+            return false;
+        }
+
+        return true;
+    }
+</script>

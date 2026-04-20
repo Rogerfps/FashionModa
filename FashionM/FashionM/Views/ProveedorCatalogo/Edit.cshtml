@@ -1,0 +1,56 @@
+﻿@model FashionM.Models.Provedor.ProveedorCatalogo
+
+<h2>Editar Proveedor</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="text-danger mb-2">
+        @Html.ValidationSummary()
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Codigo" class="form-label"></label>
+        <input asp-for="Codigo" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Cedula" class="form-label"></label>
+        <input asp-for="Cedula" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Telefonos" class="form-label"></label>
+        <input asp-for="Telefonos" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Direccion" class="form-label"></label>
+        <input asp-for="Direccion" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Correo" class="form-label"></label>
+        <input asp-for="Correo" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="ActividadEconomica" class="form-label"></label>
+        <input asp-for="ActividadEconomica" class="form-control" />
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Activo" class="form-check-input" />
+        <label asp-for="Activo" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+
+</form>

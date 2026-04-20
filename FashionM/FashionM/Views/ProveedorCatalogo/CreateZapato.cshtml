@@ -1,0 +1,97 @@
+﻿@model FashionM.Models.Provedor.ZapatoProveedor
+
+@{
+    ViewData["Title"] = "Crear Zapato";
+}
+
+<h2>Agregar Zapato</h2>
+
+<form asp-action="CreateZapato" method="post" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="ProveedorCatalogoId" />
+
+    <!-- 🔥 VALIDACIONES -->
+    <div class="text-danger mb-2">
+        @Html.ValidationSummary()
+    </div>
+
+    <div class="card p-3 mb-3">
+        <h4>Datos del Zapato</h4>
+
+        <div class="row">
+
+            <!-- CODIGO -->
+            <div class="col-md-4 mt-3">
+                <label>Código</label>
+                <input asp-for="Codigo" class="form-control" />
+                <span asp-validation-for="Codigo" class="text-danger"></span>
+            </div>
+
+            <!-- EMPRESA -->
+            <div class="col-md-12 mt-3">
+                <label class="form-label">Empresa</label>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Empresa" value="Cocalza Plus S.A" checked />
+                    <label class="form-check-label">Cocalza Plus S.A</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Empresa" value="Fashion Shoes S.A" />
+                    <label class="form-check-label">Fashion Shoes S.A</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Empresa" value="LSG Moda S.A" />
+                    <label class="form-check-label">LSG Moda S.A</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Empresa" value="Maxi Plus 23 S.A" />
+                    <label class="form-check-label">Maxi Plus 23 S.A</label>
+                </div>
+
+                <span asp-validation-for="Empresa" class="text-danger"></span>
+            </div>
+
+            <!-- PRECIOS -->
+            <div class="col-md-4 mt-3">
+                <label>Precio Venta</label>
+                <input asp-for="PrecioVenta" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="PrecioVenta" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mt-3">
+                <label>Precio Costo</label>
+                <input asp-for="PrecioCosto" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="PrecioCosto" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mt-3">
+                <label>Precio Colombia</label>
+                <input asp-for="PrecioColombia" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="PrecioColombia" class="text-danger"></span>
+            </div>
+
+            <!-- IMAGEN -->
+            <div class="col-md-12 mt-3">
+                <label>Imagen</label>
+                <input type="file" name="imagen" class="form-control" />
+            </div>
+
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Guardar y continuar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Volver
+    </a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

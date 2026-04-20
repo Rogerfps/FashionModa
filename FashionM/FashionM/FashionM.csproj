@@ -23,4 +23,8 @@
     <PackageReference Include="QuestPDF" Version="2026.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\imagenes\ZapatosProveedor\" />
+  </ItemGroup>
+
 </Project>

@@ -178,6 +178,38 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZm9ybWFzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/CreateZapato.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cQ3JlYXRlWmFwYXRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/DeleteZapato.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cRGVsZXRlWmFwYXRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/EditZapato.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cRWRpdFphcGF0by5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/ProveedorCatalogo/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yQ2F0YWxvZ29cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Proyectos/FashionModa/FashionModa/FashionM/FashionM/Views/Proveedores/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yZXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

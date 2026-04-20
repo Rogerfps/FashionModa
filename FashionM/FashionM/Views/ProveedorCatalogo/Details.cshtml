@@ -1,0 +1,187 @@
+﻿@model FashionM.Models.Provedor.ProveedorCatalogo
+
+@{
+    ViewData["Title"] = "Detalle del Proveedor";
+}
+
+<link rel="stylesheet" href="~/css/ProveedorV2/DetailsProveedoresV2.css" />
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">🏭 @Model.Nombre</h1>
+        <div class="action-buttons-header">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-edit">✏️ Editar</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn-delete">🗑️ Eliminar</a>
+            <a asp-action="Index" class="btn-back">← Volver</a>
+        </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-card">
+        <strong>Código:</strong> @Model.Codigo |
+        <strong>Cédula:</strong> @Model.Cedula |
+        <strong>Tel:</strong> @Model.Telefonos
+        <br />
+        <strong>Correo:</strong> @Model.Correo
+        <br />
+        <strong>Dirección:</strong> @Model.Direccion
+        <br />
+        <strong>Estado:</strong> @Model.Activo
+
+    </div>
+
+    <form method="get" class="filters-card mb-3">
+
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <div class="row g-2">
+
+            <!-- BUSQUEDA -->
+            <div class="col-md-3">
+                <input type="text"
+                       id="busquedaInput"
+                       name="busqueda"
+                       value="@ViewBag.Busqueda"
+                       class="form-control"
+                       placeholder="🔍 Código..." />
+            </div>
+
+            <!-- EMPRESA -->
+            <div class="col-md-3">
+                <select id="empresaInput" name="empresa" class="form-control">
+                    <option value="">Todas las empresas</option>
+
+                    <option value="Cocalza Plus S.A" selected="@(ViewBag.Empresa == "Cocalza Plus S.A")">Cocalza Plus S.A</option>
+                    <option value="Fashion Shoes S.A" selected="@(ViewBag.Empresa == "Fashion Shoes S.A")">Fashion Shoes S.A</option>
+                    <option value="LSG Moda S.A" selected="@(ViewBag.Empresa == "LSG Moda S.A")">LSG Moda S.A</option>
+                    <option value="Maxi Plus 23 S.A" selected="@(ViewBag.Empresa == "Maxi Plus 23 S.A")">Maxi Plus 23 S.A</option>
+                </select>
+            </div>
+
+            <!-- FECHA DESDE -->
+            <div class="col-md-2">
+                <input type="date"
+                       id="fechaDesdeInput"
+                       name="fechaDesde"
+                       value="@(ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : "")"
+                       class="form-control" />
+            </div>
+
+            <!-- FECHA HASTA -->
+            <div class="col-md-2">
+                <input type="date"
+                       id="fechaHastaInput"
+                       name="fechaHasta"
+                       value="@(ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : "")"
+                       class="form-control" />
+            </div>
+
+            <!-- LIMPIAR -->
+            <div class="col-md-2">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary w-100">
+                    Limpiar
+                </a>
+            </div>
+
+        </div>
+
+    </form>
+
+    <!-- ZAPATOS -->
+    <h4>👞 Zapatos</h4>
+
+    @if (Model.Zapatos != null && Model.Zapatos.Any())
+    {
+        @foreach (var z in Model.Zapatos)
+        {
+            <div class="shoe-card">
+
+                <!-- IMAGEN -->
+                <div style="width:180px;">
+                    <div class="img-container">
+                        @if (!string.IsNullOrEmpty(z.ImagenUrl))
+                        {
+                            <img src="@z.ImagenUrl" />
+                        }
+                        else
+                        {
+                            <span>Sin imagen</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- CONTENIDO -->
+                <div class="shoe-content">
+
+                    <div class="shoe-header">
+                        <strong>@z.Codigo</strong>
+                        <small>@z.FechaIngreso.ToString("dd/MM/yyyy")</small>
+                    </div>
+
+                    <div class="mt-2">
+                        <strong>Empresa:</strong> @z.Empresa
+                    </div>
+
+                    <div>
+                        <strong>Venta:</strong> ₡ @z.PrecioVenta <br />
+                        <strong>Costo:</strong> ₡ @z.PrecioCosto <br />
+                        <strong>Colombia:</strong> $ @z.PrecioColombia
+                    </div>
+
+                    <div class="mt-2">
+                        <span class="badge-count">Colores: @(z.Colores?.Count ?? 0)</span>
+                        <span class="badge-count">Suelas: @(z.Suelas?.Count ?? 0)</span>
+                        <span class="badge-count">Detalles: @(z.Detalles?.Count ?? 0)</span>
+                        <span class="badge-count">Tallas: @(z.Tallas?.Count ?? 0)</span>
+                    </div>
+
+                    <div class="mt-2 text-end">
+                        <a asp-action="EditZapato" asp-route-id="@z.Id" class="btn btn-sm btn-warning">✏️</a>
+                        <a asp-action="DeleteZapato" asp-route-id="@z.Id" class="btn btn-sm btn-danger">🗑️</a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No hay zapatos registrados
+        </div>
+    }
+
+</div>
+
+<script>
+    let timeout = null;
+
+    function aplicarFiltros() {
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+
+            const busqueda = document.getElementById("busquedaInput").value;
+            const empresa = document.getElementById("empresaInput").value;
+            const fechaDesde = document.getElementById("fechaDesdeInput").value;
+            const fechaHasta = document.getElementById("fechaHastaInput").value;
+
+            const url = `/ProveedorCatalogo/Details?id=@Model.Id`
+                + `&busqueda=${busqueda}`
+                + `&empresa=${empresa}`
+                + `&fechaDesde=${fechaDesde}`
+                + `&fechaHasta=${fechaHasta}`;
+
+            window.location.href = url;
+
+        }, 400);
+    }
+
+    document.getElementById("busquedaInput").addEventListener("keyup", aplicarFiltros);
+    document.getElementById("empresaInput").addEventListener("change", aplicarFiltros);
+    document.getElementById("fechaDesdeInput").addEventListener("change", aplicarFiltros);
+    document.getElementById("fechaHastaInput").addEventListener("change", aplicarFiltros);
+</script>

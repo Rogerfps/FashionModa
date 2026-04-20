@@ -1,0 +1,156 @@
+﻿@model List<FashionM.Models.Provedor.ProveedorCatalogo>
+
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+<link rel="stylesheet" href="~/css/ProveedorV2/IndexProveedorV2.css" />
+
+<div class="container mt-4">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>🏭</span> Proveedores
+        </h1>
+        <a asp-action="Create" class="btn-neo">
+            <span>➕</span> Nuevo Proveedor
+        </a>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-container">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <div class="filter-label">🔍 Buscar</div>
+                <input type="text"
+                       id="busquedaInput"
+                       name="busqueda"
+                       value="@Context.Request.Query["busqueda"]"
+                       class="filter-input"
+                       placeholder="Buscar por código o nombre..." />
+            </div>
+
+            <div class="col-md-3">
+                <div class="filter-label">⚡ Estado</div>
+                <select name="activo" class="filter-input">
+                    <option value="">Todos</option>
+                    <option value="true" selected="@(Context.Request.Query["activo"] == "true")">Activos</option>
+                    <option value="false" selected="@(Context.Request.Query["activo"] == "false")">Inactivos</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button type="submit" class="btn-primary">
+                    🔍 Buscar
+                </button>
+                <a asp-action="Index" class="btn-secondary">
+                    ✖ Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Cédula</th>
+                        <th>Teléfonos</th>
+                        <th>Estado</th>
+                        <th># Zapatos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <div class="empty-icon">🏭</div>
+                                    <div class="empty-text">No hay proveedores registrados</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.Nombre</td>
+                                <td>@item.Codigo</td>
+                                <td>@item.Cedula</td>
+                                <td>@item.Telefonos</td>
+
+                                <td>
+                                    @if (item.Activo)
+                                    {
+                                        <span class="status-badge active">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge inactive">Inactivo</span>
+                                    }
+                                 </td>
+
+                                <td>
+                                    <span class="zapatos-count">@(item.Zapatos?.Count ?? 0) zapatos</span>
+                                 </td>
+
+                                <td>
+                                    <div class="action-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-view" title="Ver detalles">
+                                            👁 Ver
+                                        </a>
+
+                                        <a asp-action="CreateZapato" asp-route-proveedorId="@item.Id" class="btn-action btn-add-shoe" title="Agregar zapato">
+                                            👞 + Zapato
+                                        </a>
+                                    </div>
+                                 </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    @if ((int)ViewBag.TotalPages > 1)
+    {
+        <div class="pagination-modern">
+            @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+            {
+                <a class="page-link-custom @(i == (int)ViewBag.CurrentPage ? "active" : "")"
+                   href="@Url.Action("Index", new {
+                       page = i,
+                       busqueda = ViewBag.Busqueda,
+                       activo = ViewBag.Activo
+                   })">
+                    @i
+                </a>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    let timeout = null;
+
+    document.getElementById("busquedaInput").addEventListener("keyup", function () {
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+            const busqueda = this.value;
+            const activo = document.querySelector('[name="activo"]').value;
+            const url = `/ProveedorCatalogo?busqueda=${encodeURIComponent(busqueda)}&activo=${activo}`;
+            window.location.href = url;
+        }, 400);
+    });
+</script>
