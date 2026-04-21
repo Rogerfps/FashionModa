@@ -5,21 +5,22 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace FashionM.Controllers
 {
     [Authorize(Roles = "Admin,Secretaria")]
     public class PedidoClienteController : Controller
     {
-        private readonly AppDbContext _context;
+            private readonly AppDbContext _context;
 
-        public PedidoClienteController(AppDbContext context)
-        {
-            _context = context;
-        }
+            public PedidoClienteController(AppDbContext context)
+            {
+                _context = context;
+            }
 
         // =====================================================
-        // LISTADO DE PEDIDOS
+        // INDEX
         // =====================================================
         public async Task<IActionResult> Index(string buscar, string empresa, int? semana, int page = 1)
         {
@@ -29,26 +30,26 @@ namespace FashionM.Controllers
                 .Include(p => p.Cliente)
                 .AsQueryable();
 
-            // 🔍 BÚSQUEDA GENERAL + ID
+            // =========================
+            // 🔍 BUSCADOR INTELIGENTE
+            // =========================
             if (!string.IsNullOrWhiteSpace(buscar))
             {
-                buscar = buscar.Trim();
-
-                // 🔹 Intentar convertir a número
+                buscar = buscar.Trim().ToLower();
                 bool esNumero = int.TryParse(buscar, out int idBuscado);
 
                 pedidos = pedidos.Where(p =>
-                    // 🔹 Buscar por ID si es número
                     (esNumero && p.Id == idBuscado)
-
-                    // 🔹 O por cliente
-                    || p.Cliente.Nombre.Contains(buscar)
-                    || p.Cliente.Apellidos.Contains(buscar)
+                    || p.Cliente.Nombre.ToLower().Contains(buscar)
+                    || p.Cliente.Apellidos.ToLower().Contains(buscar)
                     || p.Cliente.Cedula.ToString().Contains(buscar)
+                    || (p.Empresa != null && p.Empresa.ToLower().Contains(buscar))
                 );
             }
 
-            // 🏢 FILTRO POR EMPRESA 
+            // =========================
+            // 🏢 EMPRESA FLEXIBLE
+            // =========================
             if (!string.IsNullOrWhiteSpace(empresa))
             {
                 var e = empresa.Trim();
@@ -64,14 +65,18 @@ namespace FashionM.Controllers
                 );
             }
 
+            // =========================
             // 📅 SEMANA
+            // =========================
             if (semana.HasValue)
             {
                 pedidos = pedidos.Where(p => p.Semana == semana.Value);
             }
 
-            // 🔽 TOTAL
-            int totalRegistros = await pedidos.CountAsync();
+            // =========================
+            // 📊 TOTAL
+            // =========================
+            int total = await pedidos.CountAsync();
 
             var lista = await pedidos
                 .OrderByDescending(p => p.FechaPedido)
@@ -79,15 +84,20 @@ namespace FashionM.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            // =========================
             // 📄 PAGINACIÓN
-            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+            // =========================
+            ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)pageSize);
             ViewBag.PaginaActual = page;
 
-            // 🏢 LISTA DE EMPRESAS 
+            // =========================
+            // 🏢 EMPRESAS DINÁMICAS
+            // =========================
             ViewBag.Empresas = _context.PedidosCliente
-                .Where(p => !string.IsNullOrWhiteSpace(p.Empresa))
+                .Where(p => p.Empresa != null && p.Empresa != "")
+                .Select(p => p.Empresa)
                 .AsEnumerable()
-                .SelectMany(p => p.Empresa.Split('|'))
+                .SelectMany(e => e.Split('|'))
                 .Select(e => e.Trim())
                 .Distinct()
                 .OrderBy(e => e)
@@ -96,304 +106,164 @@ namespace FashionM.Controllers
             return View(lista);
         }
 
-
         // =====================================================
-        // DETALLE DEL PEDIDO
+        // DETAILS
         // =====================================================
         public IActionResult Details(int id)
-        {
-            var pedido = _context.PedidosCliente
-                .Include(p => p.Cliente)
-                .Include(p => p.Detalles)
-                    .ThenInclude(d => d.Proveedor)
-                        .ThenInclude(p => p.Zapatos)
-                            .ThenInclude(z => z.Imagenes)
-                .FirstOrDefault(p => p.Id == id);
-
-            if (pedido == null)
-                return NotFound();
-
-            return View(pedido);
-        }
-
-        // =====================================================
-        // CREAR PEDIDO - GET
-        // =====================================================
-        public IActionResult Create()
-        {
-            var pedido = new PedidoCliente
             {
-                FechaPedido = DateTime.UtcNow,
-                FechaEntrega = DateTime.UtcNow.AddDays(60),
-                EstadoCredito = EstadoCredito.Pendiente
-            };
+                var pedido = _context.PedidosCliente
+                    .Include(p => p.Cliente)
+                    .Include(p => p.Detalles)
+                        .ThenInclude(d => d.ProveedorCatalogo)
+                            .ThenInclude(p => p.Zapatos)
+                    .FirstOrDefault(p => p.Id == id);
 
-            return View(pedido);
-        }
+                if (pedido == null)
+                    return NotFound();
 
-        // =====================================================
-        // CREAR PEDIDO - POST
-        // =====================================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(PedidoCliente pedido)
-        {
-            // 🔥 QUITAR VALIDACIÓN AUTOMÁTICA
-            ModelState.Remove("Cliente");
-
-            // VALIDACIONES PROPIAS
-            if (pedido.ClienteCedula == 0)
-            {
-                ModelState.AddModelError("", "Debe seleccionar un cliente.");
-            }
-
-            if (pedido.Detalles == null || !pedido.Detalles.Any())
-            {
-                ModelState.AddModelError("", "Debe agregar al menos un producto.");
-            }
-
-            if (!ModelState.IsValid)
-            {
                 return View(pedido);
             }
 
-            // PROCESO NORMAL
-            pedido.FechaPedido = DateTime.UtcNow;
-            pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
-
-            pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
-            pedido.EstadoCredito = EstadoCredito.Pendiente;
-
-            _context.PedidosCliente.Add(pedido);
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // =====================================================
-        // 🔥 AUTOCOMPLETE CLIENTES
-        // =====================================================
-        [HttpGet]
-        public IActionResult BuscarClientes(string term)
-        {
-            if (string.IsNullOrWhiteSpace(term))
-                return Json(new List<object>());
-
-            term = term.Trim();
-
-            var clientes = _context.Clientes
-                .Where(c =>
-                    c.Nombre.Contains(term) ||
-                    c.Apellidos.Contains(term) ||
-                    c.Cedula.ToString().Contains(term)
-                )
-                .Take(10)
-                .Select(c => new
-                {
-                    cedula = c.Cedula,
-                    nombre = c.Nombre + " " + c.Apellidos,
-                    direccion = c.Direccion,
-                    transporte = c.Transporte,
-                    correo = c.Correo,
-                    telefonos = c.Telefonos,
-                    empresa = c.Empresa
-                })
-                .ToList();
-
-            return Json(clientes);
-        }
-
-        // =====================================================
-        // 🔹 NUEVO: OBTENER PROVEEDORES
-        // =====================================================
-        [HttpGet]
-        public IActionResult ObtenerProveedores()
-        {
-            var proveedores = _context.Proveedores
-                .Where(p => p.Estado)
-                .Select(p => new
-                {
-                    cedula = p.Cedula,
-                    nombre = p.Comercio
-                })
-                .ToList();
-
-            return Json(proveedores);
-        }
-
-        // =====================================================
-        // 🔹 NUEVO: OBTENER CÓDIGOS POR PROVEEDOR
-        // =====================================================
-        [HttpGet]
-        public IActionResult ObtenerCodigosPorProveedor(int proveedorCedula)
-        {
-            var codigos = _context.Zapatos
-                .Where(z => z.ProveedorCedula == proveedorCedula)
-                .Select(z => z.Codigo)
-                .Distinct()
-                .ToList();
-
-            return Json(codigos);
-        }
-
-        // =====================================================
-        // 🔹 NUEVO: OBTENER COLORES POR PROVEEDOR + CÓDIGO
-        // =====================================================
-        [HttpGet]
-        public IActionResult ObtenerColoresPorCodigo(string codigo, int proveedorCedula)
-        {
-            var colores = _context.Zapatos
-                .Where(z => z.Codigo == codigo && z.ProveedorCedula == proveedorCedula)
-                .Select(z => z.Color)
-                .Distinct()
-                .ToList();
-
-            return Json(colores);
-        }
-
-        // =====================================================
-        // APROBAR SECRETARIA
-        // =====================================================
-        [HttpPost]
-        public IActionResult AprobarSecretaria(int id)
-        {
-            var pedido = _context.PedidosCliente.Find(id);
-
-            if (pedido == null)
-                return NotFound();
-
-            pedido.AprobadoSecretaria = true;
-
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        // =====================================================
-        // APROBAR CRÉDITO
-        // =====================================================
-        [HttpPost]
-        public IActionResult AprobarCredito(int id)
-        {
-            var pedido = _context.PedidosCliente
-                .Include(p => p.Cliente)
-                .FirstOrDefault(p => p.Id == id);
-
-            if (pedido == null)
-                return NotFound();
-
-            if (!pedido.AprobadoSecretaria)
-                return BadRequest("El pedido aún no ha sido aprobado por secretaría.");
-
-            // 🔹 Validacion básica de credito
-            if (pedido.Total > pedido.Cliente.LimiteCredito)
+            // =====================================================
+            // CREATE GET
+            // =====================================================
+            public IActionResult Create()
             {
-                pedido.EstadoCredito = EstadoCredito.Rechazado;
-            }
-            else
-            {
-                pedido.EstadoCredito = EstadoCredito.Aprobado;
+                return View(new PedidoCliente
+                {
+                    FechaPedido = DateTime.UtcNow,
+                    FechaEntrega = DateTime.UtcNow.AddDays(60)
+                });
             }
 
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Details), new { id });
-        }
+            // =====================================================
+            // CREATE POST
+            // =====================================================
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+            public IActionResult Create(PedidoCliente pedido)
+            {
+                ModelState.Remove("Cliente");
+
+                if (pedido.ClienteCedula == 0)
+                    ModelState.AddModelError("", "Debe seleccionar un cliente.");
+
+                if (pedido.Detalles == null || !pedido.Detalles.Any())
+                    ModelState.AddModelError("", "Debe agregar productos.");
+
+                if (!ModelState.IsValid)
+                    return View(pedido);
+
+                pedido.FechaPedido = DateTime.UtcNow;
+                pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
+
+                pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
+
+                _context.PedidosCliente.Add(pedido);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            // =====================================================
+            // 🔍 AUTOCOMPLETE CLIENTES
+            // =====================================================
+            [HttpGet]
+            public IActionResult BuscarClientes(string term)
+            {
+                var clientes = _context.Clientes
+                    .Where(c =>
+                        c.Nombre.Contains(term) ||
+                        c.Apellidos.Contains(term) ||
+                        c.Cedula.ToString().Contains(term)
+                    )
+                    .Take(10)
+                    .Select(c => new
+                    {
+                        cedula = c.Cedula,
+                        nombre = c.Nombre + " " + c.Apellidos
+                    })
+                    .ToList();
+
+                return Json(clientes);
+            }
+
+            // =====================================================
+            // 🔥 NUEVO: PROVEEDORES (CATALOGO)
+            // =====================================================
+            [HttpGet]
+            public IActionResult ObtenerProveedores()
+            {
+                var proveedores = _context.ProveedoresCatalogo
+                    .Where(p => p.Activo)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        nombre = p.Nombre
+                    })
+                    .ToList();
+
+                return Json(proveedores);
+            }
+
+            // =====================================================
+            // 🔥 NUEVO: CODIGOS POR PROVEEDOR
+            // =====================================================
+            [HttpGet]
+            public IActionResult ObtenerCodigosPorProveedor(int proveedorId)
+            {
+                var codigos = _context.ZapatosProveedor
+                    .Where(z => z.ProveedorCatalogoId == proveedorId)
+                    .Select(z => z.Codigo)
+                    .Distinct()
+                    .ToList();
+
+                return Json(codigos);
+            }
+
+            // =====================================================
+            // 🔥 NUEVO: COLORES
+            // =====================================================
+            [HttpGet]
+            public IActionResult ObtenerColoresPorCodigo(string codigo, int proveedorId)
+            {
+                var colores = _context.ZapatosProveedor
+                    .Where(z => z.Codigo == codigo && z.ProveedorCatalogoId == proveedorId)
+                    .SelectMany(z => z.Colores.Select(c => c.Nombre))
+                    .Distinct()
+                    .ToList();
+
+                return Json(colores);
+            }
+
+            // =====================================================
+            // EDIT GET
+            // =====================================================
+            public async Task<IActionResult> Edit(int id)
+            {
+                var pedido = await _context.PedidosCliente
+                    .Include(p => p.Cliente)
+                    .Include(p => p.Detalles)
+                        .ThenInclude(d => d.ProveedorCatalogo)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (pedido == null)
+                    return NotFound();
+
+                return View(pedido);
+            }
 
         // =====================================================
-        // RECHAZAR CRÉDITO
+        // EDIT POST
         // =====================================================
-        [HttpPost]
-        public IActionResult RechazarCredito(int id)
-        {
-            var pedido = _context.PedidosCliente.Find(id);
-
-            if (pedido == null)
-                return NotFound();
-
-            pedido.EstadoCredito = EstadoCredito.Rechazado;
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        // =====================================================
-        // RETENER CRÉDITO
-        // =====================================================
-        [HttpPost]
-        public IActionResult RetenerCredito(int id)
-        {
-            var pedido = _context.PedidosCliente.Find(id);
-
-            if (pedido == null)
-                return NotFound();
-
-            pedido.EstadoCredito = EstadoCredito.Retenido;
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        // =====================================================
-        // FIRMAR BODEGA
-        // =====================================================
-        [HttpPost]
-        public IActionResult FirmarBodega(int id)
-        {
-            var pedido = _context.PedidosCliente.Find(id);
-
-            if (pedido == null)
-                return NotFound();
-
-            if (pedido.EstadoCredito != EstadoCredito.Aprobado)
-                return BadRequest("El pedido no tiene crédito aprobado.");
-
-            pedido.FirmaBodega = true;
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        // =====================================================
-        // EDITAR
-        // =====================================================
-        public async Task<IActionResult> Edit(int id)
-        {
-            var pedido = await _context.PedidosCliente
-                .Include(p => p.Cliente)
-                .Include(p => p.Detalles)
-                    .ThenInclude(d => d.Proveedor)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (pedido == null)
-                return NotFound();
-
-            return View(pedido);
-        }
-
-
-        // =======================================
-        // POST: Edit
-        // =======================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PedidoCliente model)
         {
             ModelState.Remove("Cliente");
-            ModelState.Remove("EstadoCredito");
-            ModelState.Remove("FechaPedido");
-            ModelState.Remove("FechaEntrega");
-            ModelState.Remove("FirmaBodega");
-            ModelState.Remove("Detalles");
 
             if (!ModelState.IsValid)
-            {
-                var errores = ModelState
-                    .SelectMany(x => x.Value.Errors)
-                    .Select(x => x.ErrorMessage)
-                    .ToList();
-
-                throw new Exception(string.Join(" | ", errores));
-            }
+                return View(model);
 
             var pedidoDb = await _context.PedidosCliente
                 .Include(p => p.Detalles)
@@ -402,27 +272,39 @@ namespace FashionM.Controllers
             if (pedidoDb == null)
                 return NotFound();
 
+            // =========================
+            // DATOS PRINCIPALES
+            // =========================
             pedidoDb.Empresa = model.Empresa;
             pedidoDb.Semana = model.Semana;
             pedidoDb.Observaciones = model.Observaciones;
+
+            // =========================
+            // 🔥 LIMPIAR Y REINSERTAR (más fácil y seguro)
+            // =========================
+            _context.PedidoClienteDetalles.RemoveRange(pedidoDb.Detalles);
 
             decimal total = 0;
 
             if (model.Detalles != null)
             {
-                foreach (var detalleForm in model.Detalles)
+                foreach (var d in model.Detalles)
                 {
-                    var detalleDb = pedidoDb.Detalles
-                        .FirstOrDefault(d => d.Id == detalleForm.Id);
+                    var nuevo = new PedidoClienteDetalle
+                    {
+                        PedidoClienteId = pedidoDb.Id,
+                        ProveedorCatalogoId = d.ProveedorCatalogoId,
+                        CodigoProducto = d.CodigoProducto,
+                        Color = d.Color,
+                        Talla = d.Talla,
+                        Detalle = d.Detalle,
+                        Cantidad = d.Cantidad,
+                        PrecioUnitario = d.PrecioUnitario
+                    };
 
-                    if (detalleDb == null)
-                        continue;
+                    total += d.Cantidad * d.PrecioUnitario;
 
-                    detalleDb.Cantidad = detalleForm.Cantidad;
-                    detalleDb.PrecioUnitario = detalleForm.PrecioUnitario;
-                    detalleDb.Detalle = detalleForm.Detalle;
-
-                    total += detalleDb.Cantidad * detalleDb.PrecioUnitario;
+                    _context.PedidoClienteDetalles.Add(nuevo);
                 }
             }
 
@@ -434,23 +316,20 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
-        // ELIMINAR PEDIDO - GET
+        // DELETE
         // =====================================================
         public IActionResult Delete(int id)
-        {
-            var pedido = _context.PedidosCliente
-                .Include(p => p.Cliente)
-                .FirstOrDefault(p => p.Id == id);
+            {
+                var pedido = _context.PedidosCliente
+                    .Include(p => p.Cliente)
+                    .FirstOrDefault(p => p.Id == id);
 
-            if (pedido == null)
-                return NotFound();
+                if (pedido == null)
+                    return NotFound();
 
-            return View(pedido);
-        }
+                return View(pedido);
+            }
 
-        // =====================================================
-        // ELIMINAR PEDIDO - POST
-        // =====================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -462,10 +341,125 @@ namespace FashionM.Controllers
             if (pedido == null)
                 return NotFound();
 
+            // 🔥 eliminar detalles primero (seguro)
+            _context.PedidoClienteDetalles.RemoveRange(pedido.Detalles);
+
             _context.PedidosCliente.Remove(pedido);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult ObtenerInfoZapato(string codigo, int proveedorId)
+        {
+            var zapato = _context.ZapatosProveedor
+                .Include(z => z.Colores)
+                .Include(z => z.Detalles)
+                .Include(z => z.Tallas)
+                .FirstOrDefault(z => z.Codigo == codigo && z.ProveedorCatalogoId == proveedorId);
+
+            if (zapato == null)
+                return Json(null);
+
+            return Json(new
+            {
+                colores = zapato.Colores.Select(c => c.Nombre).ToList(),
+                detalles = zapato.Detalles.Select(d => d.Nombre).ToList(),
+                tallas = zapato.Tallas.Select(t => new
+                {
+                    numero = t.Numero,
+                    precio = t.Precio
+                }).ToList(),
+                precioBase = zapato.PrecioVenta
+            });
+        }
+
+      
+
+    [HttpPost]
+    public IActionResult ToggleEntregaDetalle([FromBody] JsonElement data)
+    {
+        int id = data.GetProperty("id").GetInt32();
+        bool entregado = data.GetProperty("entregado").GetBoolean();
+
+        var detalle = _context.PedidoClienteDetalles.Find(id);
+
+        if (detalle == null)
+            return NotFound();
+
+        detalle.Entregado = entregado;
+
+        _context.SaveChanges();
+
+        return Ok();
+    }
+
+
+        // =========================
+        // SECRETARIA
+        // =========================
+        [HttpPost]
+        [Authorize(Roles = "Admin,Secretaria")]
+        public IActionResult ToggleSecretaria(int id)
+        {
+            var pedido = _context.PedidosCliente.Find(id);
+            if (pedido == null) return NotFound();
+
+            pedido.AprobadoSecretaria = !pedido.AprobadoSecretaria;
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        // =========================
+        // CREDITO
+        // =========================
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult CambiarCredito(int id, string estado)
+        {
+            var pedido = _context.PedidosCliente.Find(id);
+            if (pedido == null) return NotFound();
+
+            pedido.EstadoCredito = Enum.Parse<EstadoCredito>(estado);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        // =========================
+        // BODEGA
+        // =========================
+        [HttpPost]
+        [Authorize(Roles = "Admin,Bodega")]
+        public IActionResult ToggleBodega(int id)
+        {
+            var pedido = _context.PedidosCliente.Find(id);
+            if (pedido == null) return NotFound();
+
+            pedido.FirmaBodega = !pedido.FirmaBodega;
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        // =========================
+        // ENTREGA (GLOBAL)
+        // =========================
+        [HttpPost]
+        [Authorize(Roles = "Admin,Secretaria")]
+        public IActionResult ToggleEntrega(int id)
+        {
+            var pedido = _context.PedidosCliente.Find(id);
+            if (pedido == null) return NotFound();
+
+            pedido.EstadoEntrega = !pedido.EstadoEntrega;
+            _context.SaveChanges();
+
+            return Ok();
+        }
     }
 }
+
+

@@ -24,12 +24,13 @@ namespace FashionM.Models
         public bool AprobadoSecretaria { get; set; } = false;
         public EstadoCredito EstadoCredito { get; set; } = EstadoCredito.Pendiente;
         public bool FirmaBodega { get; set; }
+        public bool EstadoEntrega { get; set; } = false;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Total { get; set; }
 
         public string? Empresa { get; set; }
-        public int Semana { get; set; }
+        public int Semana { get; set; } = 0;
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();
     }

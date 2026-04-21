@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FashionM.Models.Provedor;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FashionM.Models
@@ -31,14 +32,13 @@ namespace FashionM.Models
 
         [NotMapped]
         public decimal SubTotal => Cantidad * PrecioUnitario;
+        public bool Entregado { get; set; } = false;
 
-        // =========================
-        // 🔗 NUEVO: PROVEEDOR
-        // =========================
-        public int? ProveedorCedula { get; set; }
+        // 🔥 NUEVO PROVEEDOR
+        public int? ProveedorCatalogoId { get; set; }
 
-        [ForeignKey(nameof(ProveedorCedula))]
-        public Proveedor? Proveedor { get; set; }
+        [ForeignKey(nameof(ProveedorCatalogoId))]
+        public ProveedorCatalogo? ProveedorCatalogo { get; set; }
     }
 
 }

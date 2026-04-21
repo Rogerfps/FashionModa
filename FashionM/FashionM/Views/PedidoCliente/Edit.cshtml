@@ -1,225 +1,372 @@
-﻿@using System.Globalization
-@using FashionM.Enums
-@model PedidoCliente
+﻿@model PedidoCliente
 
 @{
     ViewData["Title"] = "Editar Pedido";
-    var detalles = Model.Detalles?.ToList() ?? new List<PedidoClienteDetalle>();
 }
 
-<link rel="stylesheet" href="~/css/PedidoCliente/PedidoEdit.css" />
+<link rel="stylesheet" href="~/css/PedidoCliente/PedidoCreate.css" />
 
-<!-- Header -->
 <div class="page-header">
-    <h1 class="page-title">
-        <span>✏️</span> Editar Pedido #@Model.Id
-    </h1>
-    <a asp-action="Index" class="back-link">
-        <span>←</span> Volver
-    </a>
+    <h1 class="page-title">✏️ Editar Pedido #@Model.Id</h1>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">← Volver</a>
 </div>
 
-<!-- Formulario -->
 <div class="form-card">
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post" onsubmit="generarDetalles()">
         @Html.AntiForgeryToken()
 
         <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="ClienteCedula" />
 
-        <!-- Cliente -->
-        <fieldset>
-            <legend>👤 Cliente</legend>
+        <!-- EMPRESA -->
+        <div class="mt-3">
+            <label class="fw-bold">Empresa</label>
+            <div class="d-flex flex-wrap gap-3">
+                @{
+                    var empresas = new[] {
+                "Cocalza Plus S.A",
+                "Fashion Shoes S.A",
+                "LSG Moda S.A",
+                "Maxi Plus 23 S.A"
+            };
+                }
 
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Nombre</label>
-                    <input class="form-control"
-                           value="@Model.Cliente.Nombre @Model.Cliente.Apellidos"
-                           readonly />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Cédula</label>
-                    <input class="form-control"
-                           value="@Model.Cliente.Cedula"
-                           readonly />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Transporte</label>
-                    <input class="form-control"
-                           value="@Model.Cliente.Transporte"
-                           readonly />
-                </div>
-            </div>
-        </fieldset>
-
-        <!-- Datos del Pedido -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label asp-for="Empresa" class="form-label"></label>
-                <input asp-for="Empresa" class="form-control" placeholder="Empresa" />
-                <span asp-validation-for="Empresa" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-3">
-                <label asp-for="Semana" class="form-label"></label>
-                <input asp-for="Semana"
-                       type="number"
-                       min="1"
-                       max="53"
-                       class="form-control"
-                       placeholder="Ej: 32" />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Fecha Pedido</label>
-                <input class="form-control"
-                       value="@Model.FechaPedido.ToString("dd/MM/yyyy")"
-                       readonly />
+                @foreach (var e in empresas)
+                {
+                    <label class="form-check">
+                        <input type="radio" name="Empresa" value="@e"
+                               class="form-check-input"
+                        @(Model.Empresa == e ? "checked" : "") />
+                        <span class="form-check-label">@e</span>
+                    </label>
+                }
             </div>
         </div>
 
-        <!-- Detalle del Pedido -->
-        <fieldset>
-            <legend>🛒 Detalle del Pedido</legend>
+        <!-- SEMANA -->
+        <div class="mt-3">
+            <label>Semana</label>
+            <input asp-for="Semana" class="form-control" />
+        </div>
 
-            <div class="table-wrapper">
-                <table class="detalle-table" id="tablaDetalles">
-                    <thead>
-                        <tr>
-                            <th>Proveedor</th>
-                            <th>Código</th>
-                            <th>Color</th>
-                            <th>Talla</th>
-                            <th>Cantidad</th>
-                            <th>Detalle</th>
-                            <th>Precio</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < detalles.Count; i++)
+        <h4 class="mt-4">🛒 Detalle del Pedido</h4>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Código</th>
+                    <th>Color</th>
+                    <th>Detalle</th>
+                    <th>Tallas</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="tablaDetalle">
+
+                @{
+                    var grupos = Model.Detalles
+                        .GroupBy(d => new
                         {
-                            <tr>
-                                <!-- IMPORTANTE PARA BINDING -->
-                                <input type="hidden" name="Detalles.Index" value="@i" />
+                            d.ProveedorCatalogoId,
+                            d.CodigoProducto,
+                            d.Color,
+                            d.Detalle
+                        }).ToList();
 
-                                <td class="texto-fijo">
-                                    @detalles[i].Proveedor?.Nombre
-                                </td>
+                    int i = 0;
+                }
 
-                                <td>
-                                    @detalles[i].CodigoProducto
+                @foreach (var g in grupos)
+                {
+                    var p = g.First();
 
-                                    <input type="hidden" name="Detalles[@i].Id"
-                                           value="@detalles[i].Id" />
+                    <tr>
+                        <td>
+                            <select class="form-control"
+                                    id="prov_@i"
+                                    data-selected="@p.ProveedorCatalogoId"
+                                    onchange="cargarCodigos(this, @i)">
+                            </select>
+                        </td>
 
-                                    <input type="hidden" name="Detalles[@i].PedidoClienteId"
-                                           value="@Model.Id" />
+                        <td>
+                            <select class="form-control"
+                                    id="codigo_@i"
+                                    data-selected="@p.CodigoProducto"
+                                    onchange="cargarInfoZapato(this, @i)">
+                            </select>
+                        </td>
 
-                                    <input type="hidden" name="Detalles[@i].ProveedorCedula"
-                                           value="@detalles[i].ProveedorCedula" />
+                        <td>
+                            <select class="form-control" id="color_@i"
+                                    data-selected="@p.Color"></select>
+                        </td>
 
-                                    <input type="hidden" name="Detalles[@i].CodigoProducto"
-                                           value="@detalles[i].CodigoProducto" />
-                                </td>
+                        <td>
+                            <select class="form-control" id="detalle_@i"
+                                    data-selected="@p.Detalle"></select>
+                        </td>
 
-                                <td>
-                                    @detalles[i].Color
+                        <td>
+                            <div id="tallas_@i"
+                                 data-tallas='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                              g.Select(x => new { x.Talla, x.Cantidad })
+                                          ))'>
+                            </div>
+                        </td>
 
-                                    <input type="hidden" name="Detalles[@i].Color"
-                                           value="@detalles[i].Color" />
-                                </td>
+                        <td>
+                            <button type="button" class="btn btn-danger"
+                                    onclick="eliminarFila(this, @i)">
+                                ✕
+                            </button>
+                        </td>
+                    </tr>
 
-                                <td>
-                                    @detalles[i].Talla
+                    i++;
+                }
 
-                                    <input type="hidden" name="Detalles[@i].Talla"
-                                           value="@detalles[i].Talla" />
-                                </td>
+            </tbody>
+        </table>
 
-                                <td>
-                                    <input type="number"
-                                           class="form-control cantidad"
-                                           name="Detalles[@i].Cantidad"
-                                           value="@detalles[i].Cantidad"
-                                           min="1"
-                                           onchange="recalcular()" />
-                                </td>
+        <button type="button" onclick="agregarFila()" class="btn btn-primary">
+            ➕ Agregar Producto
+        </button>
 
-                                <td>
-                                    <input class="form-control"
-                                           name="Detalles[@i].Detalle"
-                                           value="@detalles[i].Detalle"
-                                           placeholder="Detalle" />
-                                </td>
-
-                                <td>
-                                    <input type="number"
-                                           step="0.01"
-                                           class="form-control precio"
-                                           name="Detalles[@i].PrecioUnitario"
-                                           value="@detalles[i].PrecioUnitario.ToString("0.##")"
-                                           onchange="recalcular()" />
-                                </td>
-
-                                <td class="subtotal-cell subtotal">
-                                    @((detalles[i].Cantidad * detalles[i].PrecioUnitario).ToString("0.00", CultureInfo.InvariantCulture))
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </fieldset>
-
-        <!-- Observaciones -->
         <div class="mt-4">
-            <label asp-for="Observaciones" class="form-label"></label>
-            <textarea asp-for="Observaciones"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Notas adicionales sobre el pedido..."></textarea>
+            <label>Observaciones</label>
+            <textarea asp-for="Observaciones" class="form-control"></textarea>
         </div>
 
-        <!-- Total -->
-        <div class="total-box">
-            <div class="total-label">Total del Pedido</div>
-            <div class="total-value" id="totalPedido">
-                ₡ @Model.Total.ToString("N2", CultureInfo.InvariantCulture)
-            </div>
+        <div id="detallesHidden"></div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">💾 Guardar</button>
         </div>
 
-        <!-- Botones -->
-        <div class="action-buttons">
-            <button type="submit" class="btn-save">
-                💾 Guardar Cambios
-            </button>
-            <a asp-action="Index" class="btn-cancel">
-                ← Cancelar
-            </a>
-        </div>
     </form>
 </div>
 
 @section Scripts {
     <script>
-        function recalcular() {
-            let total = 0;
 
-            document.querySelectorAll("#tablaDetalles tbody tr").forEach(row => {
-                const cantidad = parseFloat(row.querySelector(".cantidad")?.value || 0);
-                const precio = parseFloat(row.querySelector(".precio")?.value || 0);
+        let filaIndex = document.querySelectorAll("#tablaDetalle tr").length;
+        let proveedoresCache = [];
 
-                const subtotal = cantidad * precio;
+        // =========================
+        // PROVEEDORES
+        // =========================
+        async function cargarProveedores() {
 
-                row.querySelector(".subtotal").innerText = subtotal.toFixed(2);
-                total += subtotal;
+            if (proveedoresCache.length > 0)
+                return proveedoresCache;
+
+            const r = await fetch("/PedidoCliente/ObtenerProveedores");
+            proveedoresCache = await r.json();
+
+            return proveedoresCache;
+        }
+
+        // =========================
+        // AGREGAR FILA
+        // =========================
+        async function agregarFila() {
+
+            const proveedores = await cargarProveedores();
+
+            let options = `<option value="">Seleccione</option>`;
+
+            proveedores.forEach(p => {
+                options += `<option value="${p.id}">${p.nombre}</option>`;
             });
 
-            document.getElementById("totalPedido").innerText = "₡ " + total.toFixed(2);
+            const row = `
+            <tr>
+                <td>
+                    <select class="form-control"
+                            id="prov_${filaIndex}"
+                            onchange="cargarCodigos(this, ${filaIndex})">
+                        ${options}
+                    </select>
+                </td>
+
+                <td>
+                    <select class="form-control"
+                            id="codigo_${filaIndex}"
+                            onchange="cargarInfoZapato(this, ${filaIndex})">
+                        <option value="">Seleccione</option>
+                    </select>
+                </td>
+
+                <td><select class="form-control" id="color_${filaIndex}"></select></td>
+                <td><select class="form-control" id="detalle_${filaIndex}"></select></td>
+
+                <td><div id="tallas_${filaIndex}"></div></td>
+
+                <td>
+                    <button type="button" class="btn btn-danger"
+                            onclick="eliminarFila(this, ${filaIndex})">✕</button>
+                </td>
+            </tr>`;
+
+            document.getElementById("tablaDetalle")
+                .insertAdjacentHTML("beforeend", row);
+
+            filaIndex++;
         }
+
+        // =========================
+        // CODIGOS
+        // =========================
+        async function cargarCodigos(select, i) {
+
+            const proveedorId = select.value;
+
+            const r = await fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorId=${proveedorId}`);
+            const data = await r.json();
+
+            let combo = document.getElementById(`codigo_${i}`);
+            let selected = combo.dataset?.selected;
+
+            combo.innerHTML = `<option value="">Seleccione</option>`;
+
+            data.forEach(c => {
+                combo.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+
+            if (selected) combo.value = selected;
+        }
+
+        // =========================
+        // INFO ZAPATO
+        // =========================
+        async function cargarInfoZapato(select, i) {
+
+            const codigo = select.value;
+            const proveedorId = document.getElementById(`prov_${i}`).value;
+
+            const r = await fetch(`/PedidoCliente/ObtenerInfoZapato?codigo=${codigo}&proveedorId=${proveedorId}`);
+            const data = await r.json();
+
+            if (!data) return;
+
+            let color = document.getElementById(`color_${i}`);
+            let detalle = document.getElementById(`detalle_${i}`);
+            let cont = document.getElementById(`tallas_${i}`);
+
+            let tallasData = [];
+
+            if (cont.dataset.tallas) {
+                try {
+                    tallasData = JSON.parse(cont.dataset.tallas);
+                } catch {
+                    tallasData = [];
+                }
+            }
+
+            // COLOR
+            color.innerHTML = data.colores.map(c => `<option>${c}</option>`).join("");
+            if (color.dataset.selected) color.value = color.dataset.selected;
+
+            // DETALLE
+            detalle.innerHTML = data.detalles.map(d => `<option>${d}</option>`).join("");
+            if (detalle.dataset.selected) detalle.value = detalle.dataset.selected;
+
+            // TALLAS
+            cont.innerHTML = "";
+
+            data.tallas.forEach(t => {
+
+                let match = tallasData.find(x => x.Talla == t.numero);
+                let cantidad = match ? match.Cantidad : 0;
+
+                cont.innerHTML += `
+                <div class="d-flex mb-1 align-items-center">
+                    <span style="width:40px">${t.numero}</span>
+                    <input type="number"
+                           value="${cantidad}"
+                           min="0"
+                           class="form-control form-control-sm"
+                           data-talla="${t.numero}"
+                           data-precio="${t.precio}"
+                           onchange="generarDetalles()" />
+                </div>`;
+            });
+
+            cont.dataset.tallas = JSON.stringify(tallasData);
+
+            generarDetalles();
+        }
+
+        // =========================
+        // GENERAR DETALLES
+        // =========================
+        function generarDetalles() {
+
+            const contenedor = document.getElementById("detallesHidden");
+            contenedor.innerHTML = "";
+
+            let index = 0;
+
+            for (let fila = 0; fila < filaIndex; fila++) {
+
+                if (!document.getElementById(`prov_${fila}`)) continue;
+
+                const cont = document.getElementById(`tallas_${fila}`);
+                if (!cont) continue;
+
+                const inputs = cont.querySelectorAll("input");
+
+                inputs.forEach(input => {
+
+                    let cantidad = parseInt(input.value || 0);
+
+                    if (cantidad > 0) {
+
+                        const html = `
+                        <input type="hidden" name="Detalles[${index}].ProveedorCatalogoId" value="${document.getElementById(`prov_${fila}`).value}" />
+                        <input type="hidden" name="Detalles[${index}].CodigoProducto" value="${document.getElementById(`codigo_${fila}`).value}" />
+                        <input type="hidden" name="Detalles[${index}].Color" value="${document.getElementById(`color_${fila}`).value}" />
+                        <input type="hidden" name="Detalles[${index}].Detalle" value="${document.getElementById(`detalle_${fila}`).value}" />
+                        <input type="hidden" name="Detalles[${index}].Talla" value="${input.dataset.talla}" />
+                        <input type="hidden" name="Detalles[${index}].Cantidad" value="${cantidad}" />
+                        <input type="hidden" name="Detalles[${index}].PrecioUnitario" value="${input.dataset.precio}" />
+                        `;
+
+                        contenedor.insertAdjacentHTML("beforeend", html);
+                        index++;
+                    }
+                });
+            }
+        }
+
+        // =========================
+        // INIT
+        // =========================
+        window.onload = async () => {
+
+            const proveedores = await cargarProveedores();
+
+            for (let i = 0; i < filaIndex; i++) {
+
+                let prov = document.getElementById(`prov_${i}`);
+                let selected = prov.dataset.selected;
+
+                prov.innerHTML = proveedores.map(p =>
+                    `<option value="${p.id}">${p.nombre}</option>`
+                ).join("");
+
+                prov.value = selected;
+
+                await cargarCodigos(prov, i);
+
+                let codigo = document.getElementById(`codigo_${i}`);
+                if (codigo.value) {
+                    await cargarInfoZapato(codigo, i);
+                }
+            }
+        };
+
     </script>
 }

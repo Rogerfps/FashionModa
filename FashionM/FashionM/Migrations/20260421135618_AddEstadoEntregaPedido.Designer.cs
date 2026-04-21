@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260421135618_AddEstadoEntregaPedido")]
+    partial class AddEstadoEntregaPedido
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -466,9 +469,6 @@ namespace FashionM.Migrations
 
                     b.Property<string>("Detalle")
                         .HasColumnType("text");
-
-                    b.Property<bool>("Entregado")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("PedidoClienteId")
                         .HasColumnType("integer");

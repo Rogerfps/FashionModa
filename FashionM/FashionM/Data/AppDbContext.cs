@@ -82,12 +82,12 @@ namespace FashionM.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            modelBuilder.Entity<PedidoClienteDetalle>()
-                .HasOne(d => d.Proveedor)
-                .WithMany()
-                .HasForeignKey(d => d.ProveedorCedula)
-                .HasPrincipalKey(p => p.Cedula)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<PedidoClienteDetalle>()
+                //.HasOne(d => d.Proveedor)
+                //.WithMany()
+                //.HasForeignKey(d => d.ProveedorCedula)
+                //.HasPrincipalKey(p => p.Cedula)
+                //.OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Proveedor>()
                 .HasMany(p => p.Zapatos)
@@ -190,6 +190,16 @@ namespace FashionM.Data
                 .WithOne(t => t.Zapato)
                 .HasForeignKey(t => t.ZapatoProveedorId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            //PedidoCliente Nuevo
+            // ===============================
+            // 🔥 PEDIDO → PROVEEDOR CATALOGO
+            // ===============================
+            modelBuilder.Entity<PedidoClienteDetalle>()
+                .HasOne(d => d.ProveedorCatalogo)
+                .WithMany()
+                .HasForeignKey(d => d.ProveedorCatalogoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

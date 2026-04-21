@@ -9,34 +9,38 @@
 
 <link rel="stylesheet" href="~/css/PedidoCliente/PedidoIndex.css" />
 
-<!-- Header -->
+<!-- HEADER -->
 <div class="page-header">
     <h1 class="page-title">
-        <span>📋</span> Pedidos de Clientes
+        📋 Pedidos de Clientes
     </h1>
 </div>
 
-<!-- Filtros -->
+<!-- FILTROS -->
 <div class="filters-container">
     <form method="get" class="row g-3">
+
+        <!-- BUSCAR -->
         <div class="col-md-4">
             <div class="filter-label">Buscar</div>
             <input type="text"
+                   id="buscarInput"
                    name="buscar"
                    value="@Context.Request.Query["buscar"]"
                    class="filter-input"
-                   placeholder="Nombre, cédula..." />
+                   placeholder="Nombre, cédula o ID..." />
         </div>
 
-        <div class="col-md-2">
+        <!-- EMPRESA -->
+        <div class="col-md-3">
             <div class="filter-label">Empresa</div>
-            <select name="empresa" class="filter-input">
+            <select id="empresaInput" name="empresa" class="filter-input">
                 <option value="">Todas</option>
                 @if (ViewBag.Empresas != null)
                 {
                     foreach (var e in ViewBag.Empresas as List<string>)
                     {
-                        <option value="@e" selected="@(Context.Request.Query["empresa"] == e)">
+                        <option value="@e" selected="@(Context.Request.Query["empresa"] == e ? "selected" : null)">
                             @e
                         </option>
                     }
@@ -44,9 +48,11 @@
             </select>
         </div>
 
+        <!-- SEMANA -->
         <div class="col-md-2">
             <div class="filter-label">Semana</div>
             <input type="number"
+                   id="semanaInput"
                    name="semana"
                    class="filter-input"
                    min="1"
@@ -55,27 +61,24 @@
                    placeholder="Ej: 32" />
         </div>
 
-        <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn-filter w-100">
-                <span>🔍</span> Filtrar
-            </button>
-        </div>
-
-        <div class="col-md-2 d-flex align-items-end">
+        <!-- LIMPIAR -->
+        <div class="col-md-3 d-flex align-items-end">
             <a asp-action="Index" class="btn-clear w-100">
-                <span>✖</span> Limpiar
+                ✖ Limpiar filtros
             </a>
         </div>
 
-        <div class="col-12 mt-3">
+        <!-- CREAR -->
+        <div class="col-12 mt-2">
             <a asp-action="Create" class="btn-create">
-                <span>➕</span> Crear Nuevo Pedido
+                ➕ Crear Nuevo Pedido
             </a>
         </div>
+
     </form>
 </div>
 
-<!-- Tabla -->
+<!-- TABLA -->
 <div class="table-wrapper">
     <div class="table-responsive">
         <table class="modern-table">
@@ -90,9 +93,11 @@
                     <th>Secretaría</th>
                     <th>Crédito</th>
                     <th>Bodega</th>
+                    <th>Entrega</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
+
             <tbody>
                 @if (!Model.Any())
                 {
@@ -110,16 +115,17 @@
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td class="fw-semibold">@item.Id</td>
+                            <td>@item.Id</td>
                             <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
                             <td>@item.Semana</td>
+
                             <td>
-                                <div class="cliente-info">
-                                    <span class="cliente-nombre">@item.Cliente.Nombre @item.Cliente.Apellidos</span>
-                                    <span class="cliente-cedula">@item.Cliente.Cedula</span>
-                                </div>
+                                <strong>@item.Cliente.Nombre @item.Cliente.Apellidos</strong><br />
+                                <small>@item.Cliente.Cedula</small>
                             </td>
+
                             <td>@item.Cliente.Transporte</td>
+
                             <td class="total-monto">₡ @item.Total.ToString("N2")</td>
 
                             <!-- SECRETARIA -->
@@ -155,26 +161,20 @@
                                 </span>
                             </td>
 
+                            <!-- ENTREGA -->
+                            <td>
+                                <span class="status-badge @(item.EstadoEntrega ? "success" : "secondary")">
+                                    @(item.FirmaBodega ? "Entregar" : "PorEntregar")
+                                </span>
+                            </td>
+
                             <!-- ACCIONES -->
                             <td>
-                                <div class="action-group">
-                                    <a asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="btn-action btn-view">
-                                        👁 Ver
-                                    </a>
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.Id"
-                                       class="btn-action btn-edit">
-                                        ✏️ Editar
-                                    </a>
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.Id"
-                                       class="btn-action btn-delete"
-                                       onclick="return confirm('¿Eliminar este pedido?')">
-                                        🗑 Eliminar
-                                    </a>
-                                </div>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-view">👁</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit">✏️</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id"
+                                   class="btn-action btn-delete"
+                                   onclick="return confirm('¿Eliminar este pedido?')">🗑</a>
                             </td>
                         </tr>
                     }
@@ -184,7 +184,7 @@
     </div>
 </div>
 
-<!-- Paginación -->
+<!-- PAGINACIÓN -->
 @if (totalPaginas > 1)
 {
     <ul class="pagination-modern">
@@ -204,3 +204,37 @@
         }
     </ul>
 }
+
+<!-- 🔥 SCRIPT FILTROS AUTOMÁTICOS -->
+<script>
+let timeout = null;
+
+function aplicarFiltros() {
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+
+        const buscar = document.getElementById("buscarInput").value;
+        const empresa = document.getElementById("empresaInput").value;
+        const semana = document.getElementById("semanaInput").value;
+
+        const url = `/PedidoCliente/Index?buscar=${buscar}&empresa=${empresa}&semana=${semana}`;
+
+        window.location.href = url;
+
+    }, 400);
+}
+
+document.querySelectorAll('#buscarInput, #empresaInput, #semanaInput')
+    .forEach(el => {
+        el.addEventListener('change', () => {
+            el.closest('form').submit();
+        });
+    });
+
+// eventos
+document.getElementById("buscarInput").addEventListener("keyup", aplicarFiltros);
+document.getElementById("empresaInput").addEventListener("change", aplicarFiltros);
+document.getElementById("semanaInput").addEventListener("keyup", aplicarFiltros);
+</script>

@@ -6,11 +6,11 @@
 
         public string Nombre { get; set; } = string.Empty;
 
-        public string Codigo { get; set; } = string.Empty; // puede ser alfanumérico
+        public string Codigo { get; set; } = string.Empty; 
 
         public string Cedula { get; set; } = string.Empty;
 
-        public string Telefonos { get; set; } = string.Empty; // "7777-7777/8888-8888"
+        public string Telefonos { get; set; } = string.Empty; 
 
         public string Direccion { get; set; } = string.Empty;
 

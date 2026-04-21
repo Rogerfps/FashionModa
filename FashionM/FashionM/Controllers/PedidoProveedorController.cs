@@ -127,7 +127,7 @@ namespace FashionM.Controllers
                 .SelectMany(p => p.Detalles, (pedido, detalle) => new
                 {
                     Empresa = pedido.Empresa,
-                    detalle.ProveedorCedula,
+                    //detalle.ProveedorCedula,
                     detalle.CodigoProducto,
                     detalle.Color,
                     detalle.Talla,
@@ -139,7 +139,7 @@ namespace FashionM.Controllers
                 .GroupBy(x => new
                 {
                     x.Empresa,
-                    x.ProveedorCedula,
+                    //x.ProveedorCedula,
                     x.CodigoProducto,
                     x.Color,
                     x.Talla,
@@ -149,7 +149,7 @@ namespace FashionM.Controllers
                 .Select(g => new
                 {
                     Empresa = g.Key.Empresa,
-                    ProveedorCedula = g.Key.ProveedorCedula,
+                    //ProveedorCedula = g.Key.ProveedorCedula,
                     CodigoProducto = g.Key.CodigoProducto,
                     Color = g.Key.Color,
                     Talla = g.Key.Talla,
@@ -163,7 +163,7 @@ namespace FashionM.Controllers
                 .GroupBy(x => new
                 {
                     x.Empresa,
-                    x.ProveedorCedula
+                    //x.ProveedorCedula
                 });
 
             foreach (var grupo in pedidosProveedor)
@@ -172,7 +172,7 @@ namespace FashionM.Controllers
                 {
                     PedidoMainId = pedidoMain.Id,
                     Empresa = grupo.Key.Empresa,
-                    ProveedorCedula = grupo.Key.ProveedorCedula ?? 0,
+                    //ProveedorCedula = grupo.Key.ProveedorCedula ?? 0,
                     Semana = semana,
                     FechaPedido = DateTime.UtcNow,
                     Detalles = new List<PedidoProveedorDetalle>()

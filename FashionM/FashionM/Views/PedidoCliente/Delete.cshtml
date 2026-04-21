@@ -1,0 +1,81 @@
+﻿@model PedidoCliente
+
+@{
+    ViewData["Title"] = "Eliminar Pedido";
+}
+
+<link rel="stylesheet" href="~/css/PedidoCliente/PedidoCreate.css" />
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title text-danger">⚠️ Eliminar Pedido #@Model.Id</h1>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">← Cancelar</a>
+    </div>
+
+    <!-- ALERTA -->
+    <div class="alert alert-danger">
+        <strong>⚠️ Atención:</strong> Esta acción eliminará el pedido completo junto con todos sus productos.
+        <br />
+        <strong>Esta acción NO se puede deshacer.</strong>
+    </div>
+
+    <!-- INFO PEDIDO -->
+    <div class="card p-3 mb-3">
+        <h5>📦 Información del Pedido</h5>
+
+        <div><strong>ID:</strong> @Model.Id</div>
+        <div><strong>Cliente:</strong> @Model.Cliente.Nombre @Model.Cliente.Apellidos</div>
+        <div><strong>Empresa:</strong> @Model.Empresa</div>
+        <div><strong>Semana:</strong> @Model.Semana</div>
+        <div><strong>Total:</strong> ₡ @Model.Total</div>
+    </div>
+
+    <!-- CONFIRMACION -->
+    <div class="card p-3 border-danger">
+
+        <h5 class="text-danger">Confirmación requerida</h5>
+
+        <p>Escribe <strong>ELIMINAR</strong> para confirmar:</p>
+
+        <input type="text"
+               id="confirmInput"
+               class="form-control mb-3"
+               placeholder="Escribe ELIMINAR para confirmar" />
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <button type="submit"
+                    id="btnDelete"
+                    class="btn btn-danger"
+                    disabled>
+                🗑️ Eliminar Pedido
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+
+        const input = document.getElementById("confirmInput");
+        const btn = document.getElementById("btnDelete");
+
+        input.addEventListener("keyup", function () {
+
+            if (input.value.trim().toUpperCase() === "ELIMINAR") {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+
+        });
+
+    </script>
+}
