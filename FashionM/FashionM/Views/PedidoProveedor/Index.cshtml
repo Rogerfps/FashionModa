@@ -9,61 +9,75 @@
 <!-- Header -->
 <div class="page-header">
     <h1 class="page-title">
-        <span>📦</span> Pedidos a Proveedores
+        📦 Pedidos a Proveedores
     </h1>
 </div>
 
-<!-- Generar pedidos -->
-<div class="card-modern">
-    <div class="section-title">
-        <span>⚙️</span> Generar pedidos por semana
+<!-- MENSAJES -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
     </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<!-- GENERAR PEDIDOS -->
+<div class="card-modern">
+    <div class="section-title">⚙️ Generar pedidos por semana</div>
 
     <form asp-action="GenerarPedidos" method="post">
         <div class="row align-items-end">
+
             <div class="col-md-3">
                 <label class="form-label">Semana</label>
                 <input type="number"
                        name="semana"
                        class="form-control"
-                       placeholder="Ej: 32"
+                       min="1"
+                       max="53"
                        required />
             </div>
 
             <div class="col-md-3">
                 <button type="submit" class="btn-generar">
-                    <span>➕</span> Generar pedidos
+                    ➕ Generar pedidos
                 </button>
             </div>
+
         </div>
     </form>
 </div>
 
-<!-- Filtros -->
+<!-- FILTROS -->
 <div class="card-modern">
-    <div class="section-title">
-        <span>🔍</span> Buscar pedidos
-    </div>
+    <div class="section-title">🔍 Buscar pedidos</div>
 
     <form method="get">
         <div class="row g-3">
+
             <div class="col-md-2">
                 <label class="form-label">N° Pedido</label>
                 <input type="number"
                        name="pedidoId"
                        value="@ViewBag.PedidoId"
-                       class="form-control"
-                       placeholder="ID" />
+                       class="form-control" />
             </div>
 
             <div class="col-md-3">
                 <label class="form-label">Empresa</label>
                 <select name="empresa" class="form-control">
-                    <option value="">Todas las empresas</option>
+                    <option value="">Todas</option>
 
                     @foreach (var e in ViewBag.Empresas)
                     {
-                        <option value="@e" selected="@(e == ViewBag.Empresa ? "selected" : null)">
+                        <option value="@e" selected="@(e == ViewBag.Empresa)">
                             @e
                         </option>
                     }
@@ -75,24 +89,24 @@
                 <input type="number"
                        name="semana"
                        value="@ViewBag.Semana"
-                       class="form-control"
-                       placeholder="Ej: 32" />
+                       class="form-control" />
             </div>
 
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-3 d-flex align-items-end gap-2">
                 <button type="submit" class="btn-primary">
-                    <span>🔍</span> Buscar
+                    🔍 Buscar
                 </button>
 
                 <a asp-action="Index" class="btn-secondary">
-                    <span>✖</span> Limpiar
+                    ✖ Limpiar
                 </a>
             </div>
+
         </div>
     </form>
 </div>
 
-<!-- Lista de pedidos -->
+<!-- TABLA -->
 <div class="table-wrapper">
     <div class="table-responsive">
         <table class="modern-table">
@@ -103,52 +117,84 @@
                     <th>Semana</th>
                     <th>Proveedor</th>
                     <th>Fecha</th>
-                    <th>Total Pares</th>
-                    <th>Acciones</th>
+                    <th>Total</th>
+                    <th></th>
                 </tr>
             </thead>
+
             <tbody>
-                @foreach (var p in Model)
+
+                @if (!Model.Any())
                 {
                     <tr>
-                        <td class="fw-semibold">@p.Id</td>
-                        <td>@p.Empresa</td>
-                        <td>@p.Semana</td>
-                        <td>
-                            <span class="badge-proveedor">
-                                @(p.Proveedor != null ? p.Proveedor.Comercio : p.ProveedorCedula.ToString())
-                            </span>
-                        </td>
-                        <td>@p.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                        <td class="total-pares">@p.Detalles.Sum(d => d.Cantidad)</td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <a asp-action="Details"
-                                       asp-route-id="@p.Id"
-                                       class="btn-view">
-                                    👁 Ver
-                                </a>
-
-                                <form asp-action="Delete"
-                                      asp-route-id="@p.Id"
-                                      method="post"
-                                      style="display:inline"
-                                      onsubmit="return confirm('¿Eliminar este pedido?')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn-delete">
-                                        🗑 Eliminar
-                                    </button>
-                                </form>
-                            </div>
+                        <td colspan="7" class="text-center">
+                            No hay pedidos generados
                         </td>
                     </tr>
                 }
+                else
+                {
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@p.Id</td>
+
+                            <td>@p.Empresa</td>
+
+                            <td>@p.Semana</td>
+
+                            <!-- PROVEEDOR -->
+                            <td>
+                                <span class="badge-proveedor">
+                                    @(p.Proveedor != null
+                                        ? $"{p.Proveedor.Codigo} - {p.Proveedor.Nombre}"
+                                        : "Sin proveedor")
+                                </span>
+                            </td>
+
+                            <td>
+                                @p.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td class="fw-bold">
+                                @(p.Detalles?.Sum(d => d.Cantidad) ?? 0)
+                            </td>
+
+                            <!-- ACCIONES -->
+                            <td>
+                                <div class="d-flex gap-1">
+
+                                    <a asp-action="Details"
+                                           asp-route-id="@p.Id"
+                                           class="btn-view">
+                                        👁
+                                    </a>
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@p.Id"
+                                          method="post"
+                                          onsubmit="return confirm('¿Eliminar este pedido?')">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit" class="btn-delete">
+                                            🗑
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Paginación -->
+<!-- PAGINACIÓN -->
 @if (ViewBag.TotalPages > 1)
 {
     <nav>

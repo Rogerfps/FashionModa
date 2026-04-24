@@ -30,6 +30,7 @@ namespace FashionM.Models
         public decimal Total { get; set; }
 
         public string? Empresa { get; set; }
+        public string? Agente { get; set; }
         public int Semana { get; set; } = 0;
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();

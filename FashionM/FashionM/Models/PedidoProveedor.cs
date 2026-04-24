@@ -1,4 +1,7 @@
-﻿namespace FashionM.Models
+﻿using FashionM.Models.Provedor;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FashionM.Models
 {
     public class PedidoProveedor
     {
@@ -10,9 +13,10 @@
 
         public string Empresa { get; set; }
 
-        public int ProveedorCedula { get; set; }
+        public int ProveedorCatalogoId { get; set; }
 
-        public Proveedor? Proveedor { get; set; }
+        [ForeignKey("ProveedorCatalogoId")]
+        public ProveedorCatalogo Proveedor { get; set; }
 
         public DateTime FechaPedido { get; set; }
 

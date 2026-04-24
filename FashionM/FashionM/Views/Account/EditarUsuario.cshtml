@@ -1,0 +1,23 @@
+﻿@model ApplicationUser
+
+<h2>Editar Usuario</h2>
+
+<form method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <input name="nombre" value="@Model.Nombre" class="form-control mb-2" />
+
+    <label>Roles</label>
+    @foreach (var r in ViewBag.Roles)
+    {
+        <div>
+            <input type="checkbox"
+                   name="roles"
+                   value="@r"
+            @(ViewBag.UserRoles.Contains(r) ? "checked" : "") />
+            @r
+        </div>
+    }
+
+    <button class="btn btn-primary mt-3">Guardar</button>
+</form>

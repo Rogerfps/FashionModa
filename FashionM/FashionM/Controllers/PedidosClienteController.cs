@@ -9,15 +9,15 @@ using System.Text.Json;
 
 namespace FashionM.Controllers
 {
-    [Authorize(Roles = "Admin,Secretaria")]
+    [Authorize(Roles = "Admin,Secretaria,Vendedor")]
     public class PedidoClienteController : Controller
     {
-            private readonly AppDbContext _context;
+        private readonly AppDbContext _context;
 
-            public PedidoClienteController(AppDbContext context)
-            {
-                _context = context;
-            }
+        public PedidoClienteController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         // =====================================================
         // INDEX
@@ -29,6 +29,16 @@ namespace FashionM.Controllers
             var pedidos = _context.PedidosCliente
                 .Include(p => p.Cliente)
                 .AsQueryable();
+
+            // =========================
+            // 🔒 FILTRO POR ROL (CLAVE)
+            // =========================
+            if (User.IsInRole("Vendedor"))
+            {
+                var userName = User.Identity.Name;
+
+                pedidos = pedidos.Where(p => p.Agente == userName);
+            }
 
             // =========================
             // 🔍 BUSCADOR INTELIGENTE
@@ -110,154 +120,160 @@ namespace FashionM.Controllers
         // DETAILS
         // =====================================================
         public IActionResult Details(int id)
+        {
+            var pedido = _context.PedidosCliente
+                .Include(p => p.Cliente)
+                .Include(p => p.Detalles)
+                .FirstOrDefault(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            // 🔒 SEGURIDAD
+            if (User.IsInRole("Vendedor") && pedido.Agente != User.Identity.Name)
+                return Forbid();
+
+            return View(pedido);
+        }
+
+        // =====================================================
+        // CREATE GET
+        // =====================================================
+        public IActionResult Create()
+        {
+            return View(new PedidoCliente
             {
-                var pedido = _context.PedidosCliente
-                    .Include(p => p.Cliente)
-                    .Include(p => p.Detalles)
-                        .ThenInclude(d => d.ProveedorCatalogo)
-                            .ThenInclude(p => p.Zapatos)
-                    .FirstOrDefault(p => p.Id == id);
+                FechaPedido = DateTime.UtcNow,
+                FechaEntrega = DateTime.UtcNow.AddDays(60)
+            });
+        }
 
-                if (pedido == null)
-                    return NotFound();
+        // =====================================================
+        // CREATE POST
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(PedidoCliente pedido)
+        {
+            ModelState.Remove("Cliente");
 
+            if (pedido.ClienteCedula == 0)
+                ModelState.AddModelError("", "Debe seleccionar un cliente.");
+
+            if (pedido.Detalles == null || !pedido.Detalles.Any())
+                ModelState.AddModelError("", "Debe agregar productos.");
+
+            if (!ModelState.IsValid)
                 return View(pedido);
-            }
 
-            // =====================================================
-            // CREATE GET
-            // =====================================================
-            public IActionResult Create()
-            {
-                return View(new PedidoCliente
+            // 🔥 AGENTE AUTOMÁTICO
+            pedido.Agente = User.Identity?.Name;
+
+            pedido.FechaPedido = DateTime.UtcNow;
+            pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
+            pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
+
+            _context.PedidosCliente.Add(pedido);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // =====================================================
+        // 🔍 AUTOCOMPLETE CLIENTES
+        // =====================================================
+        [HttpGet]
+        public IActionResult BuscarClientes(string term)
+        {
+            var clientes = _context.Clientes
+                .Where(c =>
+                    c.Nombre.Contains(term) ||
+                    c.Apellidos.Contains(term) ||
+                    c.Cedula.ToString().Contains(term)
+                )
+                .Take(10)
+                .Select(c => new
                 {
-                    FechaPedido = DateTime.UtcNow,
-                    FechaEntrega = DateTime.UtcNow.AddDays(60)
-                });
-            }
+                    cedula = c.Cedula,
+                    nombre = c.Nombre + " " + c.Apellidos
+                })
+                .ToList();
 
-            // =====================================================
-            // CREATE POST
-            // =====================================================
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public IActionResult Create(PedidoCliente pedido)
-            {
-                ModelState.Remove("Cliente");
+            return Json(clientes);
+        }
 
-                if (pedido.ClienteCedula == 0)
-                    ModelState.AddModelError("", "Debe seleccionar un cliente.");
+        // =====================================================
+        // 🔥 NUEVO: PROVEEDORES (CATALOGO)
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerProveedores()
+        {
+            var proveedores = _context.ProveedoresCatalogo
+                .Where(p => p.Activo)
+                .Select(p => new
+                {
+                    id = p.Id,
+                    nombre = p.Nombre
+                })
+                .ToList();
 
-                if (pedido.Detalles == null || !pedido.Detalles.Any())
-                    ModelState.AddModelError("", "Debe agregar productos.");
+            return Json(proveedores);
+        }
 
-                if (!ModelState.IsValid)
-                    return View(pedido);
+        // =====================================================
+        // 🔥 NUEVO: CODIGOS POR PROVEEDOR
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerCodigosPorProveedor(int proveedorId)
+        {
+            var codigos = _context.ZapatosProveedor
+                .Where(z => z.ProveedorCatalogoId == proveedorId)
+                .Select(z => z.Codigo)
+                .Distinct()
+                .ToList();
 
-                pedido.FechaPedido = DateTime.UtcNow;
-                pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
+            return Json(codigos);
+        }
 
-                pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
+        // =====================================================
+        // 🔥 NUEVO: COLORES
+        // =====================================================
+        [HttpGet]
+        public IActionResult ObtenerColoresPorCodigo(string codigo, int proveedorId)
+        {
+            var colores = _context.ZapatosProveedor
+                .Where(z => z.Codigo == codigo && z.ProveedorCatalogoId == proveedorId)
+                .SelectMany(z => z.Colores.Select(c => c.Nombre))
+                .Distinct()
+                .ToList();
 
-                _context.PedidosCliente.Add(pedido);
-                _context.SaveChanges();
+            return Json(colores);
+        }
 
-                return RedirectToAction(nameof(Index));
-            }
+        // =====================================================
+        // EDIT GET
+        // =====================================================
+        [Authorize(Roles = "Admin,Secretaria")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var pedido = await _context.PedidosCliente
+                .Include(p => p.Cliente)
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.ProveedorCatalogo)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            // =====================================================
-            // 🔍 AUTOCOMPLETE CLIENTES
-            // =====================================================
-            [HttpGet]
-            public IActionResult BuscarClientes(string term)
-            {
-                var clientes = _context.Clientes
-                    .Where(c =>
-                        c.Nombre.Contains(term) ||
-                        c.Apellidos.Contains(term) ||
-                        c.Cedula.ToString().Contains(term)
-                    )
-                    .Take(10)
-                    .Select(c => new
-                    {
-                        cedula = c.Cedula,
-                        nombre = c.Nombre + " " + c.Apellidos
-                    })
-                    .ToList();
+            if (pedido == null)
+                return NotFound();
 
-                return Json(clientes);
-            }
-
-            // =====================================================
-            // 🔥 NUEVO: PROVEEDORES (CATALOGO)
-            // =====================================================
-            [HttpGet]
-            public IActionResult ObtenerProveedores()
-            {
-                var proveedores = _context.ProveedoresCatalogo
-                    .Where(p => p.Activo)
-                    .Select(p => new
-                    {
-                        id = p.Id,
-                        nombre = p.Nombre
-                    })
-                    .ToList();
-
-                return Json(proveedores);
-            }
-
-            // =====================================================
-            // 🔥 NUEVO: CODIGOS POR PROVEEDOR
-            // =====================================================
-            [HttpGet]
-            public IActionResult ObtenerCodigosPorProveedor(int proveedorId)
-            {
-                var codigos = _context.ZapatosProveedor
-                    .Where(z => z.ProveedorCatalogoId == proveedorId)
-                    .Select(z => z.Codigo)
-                    .Distinct()
-                    .ToList();
-
-                return Json(codigos);
-            }
-
-            // =====================================================
-            // 🔥 NUEVO: COLORES
-            // =====================================================
-            [HttpGet]
-            public IActionResult ObtenerColoresPorCodigo(string codigo, int proveedorId)
-            {
-                var colores = _context.ZapatosProveedor
-                    .Where(z => z.Codigo == codigo && z.ProveedorCatalogoId == proveedorId)
-                    .SelectMany(z => z.Colores.Select(c => c.Nombre))
-                    .Distinct()
-                    .ToList();
-
-                return Json(colores);
-            }
-
-            // =====================================================
-            // EDIT GET
-            // =====================================================
-            public async Task<IActionResult> Edit(int id)
-            {
-                var pedido = await _context.PedidosCliente
-                    .Include(p => p.Cliente)
-                    .Include(p => p.Detalles)
-                        .ThenInclude(d => d.ProveedorCatalogo)
-                    .FirstOrDefaultAsync(p => p.Id == id);
-
-                if (pedido == null)
-                    return NotFound();
-
-                return View(pedido);
-            }
+            return View(pedido);
+        }
 
         // =====================================================
         // EDIT POST
         // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Secretaria")]
         public async Task<IActionResult> Edit(PedidoCliente model)
         {
             ModelState.Remove("Cliente");
@@ -318,20 +334,22 @@ namespace FashionM.Controllers
         // =====================================================
         // DELETE
         // =====================================================
+        [Authorize(Roles = "Admin,Secretaria")]
         public IActionResult Delete(int id)
-            {
-                var pedido = _context.PedidosCliente
-                    .Include(p => p.Cliente)
-                    .FirstOrDefault(p => p.Id == id);
+        {
+            var pedido = _context.PedidosCliente
+                .Include(p => p.Cliente)
+                .FirstOrDefault(p => p.Id == id);
 
-                if (pedido == null)
-                    return NotFound();
+            if (pedido == null)
+                return NotFound();
 
-                return View(pedido);
-            }
+            return View(pedido);
+        }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Secretaria")]
         public IActionResult DeleteConfirmed(int id)
         {
             var pedido = _context.PedidosCliente
@@ -375,25 +393,25 @@ namespace FashionM.Controllers
             });
         }
 
-      
 
-    [HttpPost]
-    public IActionResult ToggleEntregaDetalle([FromBody] JsonElement data)
-    {
-        int id = data.GetProperty("id").GetInt32();
-        bool entregado = data.GetProperty("entregado").GetBoolean();
 
-        var detalle = _context.PedidoClienteDetalles.Find(id);
+        [HttpPost]
+        public IActionResult ToggleEntregaDetalle([FromBody] JsonElement data)
+        {
+            int id = data.GetProperty("id").GetInt32();
+            bool entregado = data.GetProperty("entregado").GetBoolean();
 
-        if (detalle == null)
-            return NotFound();
+            var detalle = _context.PedidoClienteDetalles.Find(id);
 
-        detalle.Entregado = entregado;
+            if (detalle == null)
+                return NotFound();
 
-        _context.SaveChanges();
+            detalle.Entregado = entregado;
 
-        return Ok();
-    }
+            _context.SaveChanges();
+
+            return Ok();
+        }
 
 
         // =========================
@@ -458,6 +476,68 @@ namespace FashionM.Controllers
             _context.SaveChanges();
 
             return Ok();
+        }
+
+        // NUEVOS
+
+        [HttpGet]
+        public IActionResult BuscarProveedores(string term)
+        {
+            term = term?.Trim() ?? "";
+
+            var query = _context.ProveedoresCatalogo
+                .Where(p => p.Activo);
+
+            if (User.IsInRole("Vendedor"))
+            {
+                var proveedores = query
+                    .Where(p => p.Codigo.Contains(term))
+                    .Take(10)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        codigo = p.Codigo,
+                        nombre = "" // 🔥 NO ENVIAR NOMBRE
+                    })
+                    .ToList();
+
+                return Json(proveedores);
+            }
+            else
+            {
+                var proveedores = query
+                    .Where(p =>
+                        p.Nombre.Contains(term) ||
+                        p.Codigo.Contains(term) ||
+                        p.Cedula.Contains(term)
+                    )
+                    .Take(10)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        codigo = p.Codigo,
+                        nombre = p.Nombre
+                    })
+                    .ToList();
+
+                return Json(proveedores);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult BuscarCodigos(string term, int proveedorId)
+        {
+            term = term?.Trim() ?? "";
+
+            var codigos = _context.ZapatosProveedor
+                .Where(z => z.ProveedorCatalogoId == proveedorId &&
+                            z.Codigo.Contains(term))
+                .Select(z => z.Codigo)
+                .Distinct()
+                .Take(10)
+                .ToList();
+
+            return Json(codigos);
         }
     }
 }

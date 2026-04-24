@@ -1,0 +1,17 @@
+﻿<h2>Crear Usuario</h2>
+
+<form method="post">
+    <input name="nombre" placeholder="Nombre" class="form-control mb-2" />
+    <input name="email" placeholder="Email" class="form-control mb-2" />
+    <input name="password" type="password" placeholder="Password" class="form-control mb-2" />
+
+    <label>Roles</label>
+    @foreach (var r in ViewBag.Roles)
+    {
+        <div>
+            <input type="checkbox" name="roles" value="@r" /> @r
+        </div>
+    }
+
+    <button class="btn btn-success mt-3">Guardar</button>
+</form>

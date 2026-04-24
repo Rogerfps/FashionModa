@@ -111,9 +111,8 @@ namespace FashionM.Data
             modelBuilder.Entity<PedidoProveedor>()
                 .HasOne(p => p.Proveedor)
                 .WithMany()
-                .HasForeignKey(p => p.ProveedorCedula)
-                .HasPrincipalKey(p => p.Cedula)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(p => p.ProveedorCatalogoId)
+                .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<MovimientoInventario>()
                 .HasOne(m => m.Inventario)

@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423152632_AgregarAgentePedido")]
+    partial class AgregarAgentePedido
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -532,7 +535,7 @@ namespace FashionM.Migrations
                     b.Property<int>("PedidoMainId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProveedorCatalogoId")
+                    b.Property<int>("ProveedorCedula")
                         .HasColumnType("integer");
 
                     b.Property<int>("Semana")
@@ -542,7 +545,7 @@ namespace FashionM.Migrations
 
                     b.HasIndex("PedidoMainId");
 
-                    b.HasIndex("ProveedorCatalogoId");
+                    b.HasIndex("ProveedorCedula");
 
                     b.ToTable("PedidosProveedor");
                 });
@@ -1204,9 +1207,9 @@ namespace FashionM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FashionM.Models.Provedor.ProveedorCatalogo", "Proveedor")
+                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
                         .WithMany()
-                        .HasForeignKey("ProveedorCatalogoId")
+                        .HasForeignKey("ProveedorCedula")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -2,79 +2,89 @@
 
 @{
     ViewData["Title"] = "Detalle Pedido Proveedor";
-    var totalPares = Model.Detalles.Sum(d => d.Cantidad);
-}
-
-@{
     var zapatos = ViewBag.Zapatos as List<Zapato>;
+
+    var tallas = Enumerable.Range(30, 15).ToList();
+
+    // ✅ AGRUPACIÓN CORRECTA (SIN PRECIO)
+    var grupos = Model.Detalles
+        .GroupBy(d => new
+        {
+            d.CodigoProducto,
+            d.Color,
+            d.Detalle
+        })
+        .ToList();
+
+    var totalPares = Model.Detalles.Sum(d => d.Cantidad);
 }
 
 <link rel="stylesheet" href="~/css/PedidoProveedor/PedidoProveedorDetails.css" />
 
-
 <!-- Header -->
 <div class="page-header">
     <h1 class="page-title">
-        <span>📋</span> Pedido a Proveedor #@Model.Id
+        📋 Pedido a Proveedor #@Model.Id
     </h1>
-    <a asp-action="Index" class="back-link">
-        <span>←</span> Volver
-    </a>
+    <a asp-action="Index" class="back-link">← Volver</a>
 </div>
 
-<!-- Información General -->
+<!-- INFO -->
 <div class="detail-card">
     <div class="info-grid">
-        <!-- Proveedor -->
+
         <div class="info-box">
-            <div class="info-box-title">
-                <span>🏢</span> Proveedor
-            </div>
+            <div class="info-box-title">🏢 Proveedor</div>
+
             <div class="info-row">
-                <span class="info-label">Nombre</span>
+                <span class="info-label">Proveedor</span>
                 <span class="info-value">
-                    @(Model.Proveedor != null ? Model.Proveedor.Nombre + " " + Model.Proveedor.Apellidos : "—")
+                    @(Model.Proveedor != null
+                        ? $"{Model.Proveedor.Codigo} - {Model.Proveedor.Nombre}"
+                        : "—")
                 </span>
             </div>
+
             <div class="info-row">
-                <span class="info-label">Comercio</span>
-                <span class="info-value">
-                    @(Model.Proveedor != null ? Model.Proveedor.Comercio : "—")
-                </span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Cédula</span>
-                <span class="info-value">@Model.ProveedorCedula</span>
+                <span class="info-label">ID</span>
+                <span class="info-value">@Model.ProveedorCatalogoId</span>
             </div>
         </div>
 
-        <!-- Pedido -->
         <div class="info-box">
-            <div class="info-box-title">
-                <span>📦</span> Pedido
-            </div>
+            <div class="info-box-title">📦 Pedido</div>
+
             <div class="info-row">
                 <span class="info-label">Empresa</span>
                 <span class="info-value">@Model.Empresa</span>
             </div>
+
+            <div class="info-row">
+                <span class="info-label">Semana</span>
+                <span class="info-value">@Model.Semana</span>
+            </div>
+
             <div class="info-row">
                 <span class="info-label">Fecha</span>
-                <span class="info-value">@Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                <span class="info-value">
+                    @Model.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy")
+                </span>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Detalle del Pedido -->
+<!-- DETALLE -->
 <div class="detail-card">
+
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="section-title" style="margin-bottom: 0; border-bottom: none;">
-            <span>🛒</span> Detalle del Pedido
-        </div>
+        <div class="section-title">🛒 Detalle del Pedido</div>
+
         <a asp-action="ExportarExcel"
                asp-route-id="@Model.Id"
                class="btn-excel">
-            <span>📊</span> Descargar Excel
+            📊 Excel
         </a>
     </div>
 
@@ -85,19 +95,30 @@
                     <th>Foto</th>
                     <th>Código</th>
                     <th>Color</th>
-                    <th>Talla</th>
                     <th>Detalle</th>
-                    <th>Cantidad</th>
+
+                    @foreach (var t in tallas)
+                    {
+                        <th>@t</th>
+                    }
+
+                    <th>Total</th>
                 </tr>
             </thead>
+
             <tbody>
-                @foreach (var d in Model.Detalles)
+                @foreach (var g in grupos)
                 {
+                    int totalFila = 0;
+
                     <tr>
+                        <!-- FOTO -->
                         <td>
                             @{
                                 var zapato = zapatos?
-                                .FirstOrDefault(z => z.Codigo == d.CodigoProducto && z.Color == d.Color);
+                                    .FirstOrDefault(z =>
+                                        z.Codigo == g.Key.CodigoProducto &&
+                                        z.Color == g.Key.Color);
 
                                 if (zapato != null && zapato.Imagenes.Any())
                                 {
@@ -110,25 +131,43 @@
                                 }
                             }
                         </td>
-                        <td class="fw-semibold">@d.CodigoProducto</td>
-                        <td>@d.Color</td>
-                        <td>@d.Talla</td>
-                        <td>@d.Detalle</td>
-                        <td class="fw-bold" style="color: var(--deep-blue);">@d.Cantidad</td>
+
+                        <!-- INFO -->
+                        <td>@g.Key.CodigoProducto</td>
+                        <td>@g.Key.Color</td>
+                        <td>@g.Key.Detalle</td>
+
+                        <!-- TALLAS -->
+                        @foreach (var t in tallas)
+                        {
+                            var cantidad = g
+                                .Where(x => x.Talla == t.ToString())
+                                .Sum(x => x.Cantidad);
+
+                            totalFila += cantidad;
+
+                            <td class="text-center">
+                                @(cantidad > 0 ? cantidad.ToString() : "")
+                            </td>
+                        }
+
+                        <!-- TOTAL -->
+                        <td class="fw-bold">@totalFila</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <!-- Total Pares -->
+    <!-- TOTAL GENERAL -->
     <div class="total-box">
         <div class="total-label">Total Pares</div>
         <div class="total-value">@totalPares unidades</div>
     </div>
+
 </div>
 
-<!-- Botón Volver -->
+<!-- VOLVER -->
 <div>
     <a asp-action="Index" class="btn-back">
         ← Volver al listado

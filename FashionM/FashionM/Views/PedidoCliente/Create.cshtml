@@ -15,9 +15,7 @@
     <form asp-action="Create" method="post" onsubmit="prepararDetalles()">
         @Html.AntiForgeryToken()
 
-        <!-- ========================= -->
         <!-- CLIENTE -->
-        <!-- ========================= -->
         <fieldset>
             <legend>👤 Cliente</legend>
 
@@ -44,9 +42,7 @@
             <input asp-for="Semana" type="number" min="1" class="form-control" required />
         </div>
 
-        <!-- ========================= -->
         <!-- DETALLE -->
-        <!-- ========================= -->
         <h4 class="mt-4">🛒 Detalle del Pedido</h4>
 
         <table class="table">
@@ -73,7 +69,6 @@
             <textarea asp-for="Observaciones" class="form-control"></textarea>
         </div>
 
-        <!-- 🔥 AQUI SE GENERA EL POST REAL -->
         <div id="detallesHidden"></div>
 
         <div class="mt-4">
@@ -86,7 +81,7 @@
 @section Scripts {
 
     <script>
-        let proveedoresCache = [];
+
         let filaIndex = 0;
 
         // =========================
@@ -121,61 +116,27 @@
         });
 
         // =========================
-        // PROVEEDORES
-        // =========================
-        async function cargarProveedores() {
-
-            if (proveedoresCache.length > 0)
-                return proveedoresCache;
-
-            const r = await fetch("/PedidoCliente/ObtenerProveedores");
-            proveedoresCache = await r.json();
-
-            return proveedoresCache;
-        }
-
-        // =========================
         // AGREGAR FILA
         // =========================
-        async function agregarFila() {
-
-            const proveedores = await cargarProveedores();
-
-            let options = `<option value="">Seleccione</option>`;
-            proveedores.forEach(p => {
-                options += `<option value="${p.id}">${p.nombre}</option>`;
-            });
+        function agregarFila() {
 
             const row = `
             <tr>
 
                 <td>
-                    <select class="form-control"
-                            id="prov_${filaIndex}"
-                            onchange="cargarCodigos(this, ${filaIndex})">
-                        ${options}
-                    </select>
+                    <input type="text" id="provBuscar_${filaIndex}" class="form-control" placeholder="Buscar proveedor..." />
+                    <input type="hidden" id="prov_${filaIndex}" />
+                    <div id="listaProv_${filaIndex}" class="list-group"></div>
                 </td>
 
                 <td>
-                    <select class="form-control"
-                            id="codigo_${filaIndex}"
-                            onchange="cargarInfoZapato(this, ${filaIndex})">
-                        <option value="">Seleccione</option>
-                    </select>
+                    <input type="text" id="codigo_${filaIndex}" class="form-control" placeholder="Buscar código..." />
+                    <div id="listaCodigos_${filaIndex}" class="list-group"></div>
                 </td>
 
-                <td>
-                    <select class="form-control" id="color_${filaIndex}"></select>
-                </td>
-
-                <td>
-                    <select class="form-control" id="detalle_${filaIndex}"></select>
-                </td>
-
-                <td>
-                    <div id="tallas_${filaIndex}"></div>
-                </td>
+                <td><select class="form-control" id="color_${filaIndex}"></select></td>
+                <td><select class="form-control" id="detalle_${filaIndex}"></select></td>
+                <td><div id="tallas_${filaIndex}"></div></td>
 
                 <td>
                     <button type="button" class="btn btn-danger"
@@ -187,31 +148,111 @@
             document.getElementById("tablaDetalle")
                 .insertAdjacentHTML("beforeend", row);
 
+            activarBusquedaProveedor(filaIndex);
+
             filaIndex++;
+        }
+
+        // =========================
+        // PROVEEDOR (FIX SEGURIDAD)
+        // =========================
+        function activarBusquedaProveedor(i) {
+
+            const input = document.getElementById(`provBuscar_${i}`);
+            const lista = document.getElementById(`listaProv_${i}`);
+
+            input.onkeyup = null;
+
+            input.addEventListener("keyup", function () {
+
+                let term = this.value;
+
+                fetch(`/PedidoCliente/BuscarProveedores?term=${term}`)
+                    .then(r => r.json())
+                    .then(data => {
+
+                        lista.innerHTML = "";
+
+                        data.forEach(p => {
+
+                            let item = document.createElement("a");
+                            item.className = "list-group-item list-group-item-action";
+
+                            // 🔥 CLAVE: NO MOSTRAR NOMBRE SI NO VIENE
+                            item.innerHTML = p.nombre
+                                ? `${p.codigo} - ${p.nombre}`
+                                : `${p.codigo}`;
+
+                            item.onclick = () => {
+
+                                input.value = p.nombre
+                                    ? `${p.codigo} - ${p.nombre}`
+                                    : `${p.codigo}`;
+
+                                document.getElementById(`prov_${i}`).value = p.id;
+
+                                lista.innerHTML = "";
+
+                                document.getElementById(`codigo_${i}`).value = "";
+
+                                activarBusquedaCodigo(i);
+                            };
+
+                            lista.appendChild(item);
+                        });
+                    });
+            });
         }
 
         // =========================
         // CODIGOS
         // =========================
-        function cargarCodigos(select, i) {
+        function activarBusquedaCodigo(i) {
 
-            const proveedorId = select.value;
+            const input = document.getElementById(`codigo_${i}`);
+            const lista = document.getElementById(`listaCodigos_${i}`);
 
-            fetch(`/PedidoCliente/ObtenerCodigosPorProveedor?proveedorId=${proveedorId}`)
-                .then(r => r.json())
-                .then(data => {
+            input.onkeyup = null;
 
-                    let combo = document.getElementById(`codigo_${i}`);
-                    combo.innerHTML = `<option value="">Seleccione</option>`;
+            input.addEventListener("keyup", function () {
 
-                    data.forEach(c => {
-                        combo.innerHTML += `<option value="${c}">${c}</option>`;
+                const proveedorId = document.getElementById(`prov_${i}`).value;
+
+                if (!proveedorId) {
+                    lista.innerHTML = "<div class='list-group-item'>Seleccione proveedor primero</div>";
+                    return;
+                }
+
+                let term = this.value;
+
+                fetch(`/PedidoCliente/BuscarCodigos?term=${term}&proveedorId=${proveedorId}`)
+                    .then(r => r.json())
+                    .then(data => {
+
+                        lista.innerHTML = "";
+
+                        data.forEach(c => {
+
+                            let item = document.createElement("a");
+                            item.className = "list-group-item list-group-item-action";
+                            item.innerText = c;
+
+                            item.onclick = () => {
+
+                                input.value = c;
+                                lista.innerHTML = "";
+
+                                cargarInfoZapato(input, i);
+                            };
+
+                            lista.appendChild(item);
+                        });
                     });
-                });
+            });
         }
 
         // =========================
-        // INFO COMPLETA
+        // INFO ZAPATO
         // =========================
         function cargarInfoZapato(select, i) {
 
@@ -224,54 +265,43 @@
 
                     if (!data) return;
 
-                    // COLORES
                     let color = document.getElementById(`color_${i}`);
-                    color.innerHTML = "";
-                    data.colores.forEach(c => {
-                        color.innerHTML += `<option value="${c}">${c}</option>`;
-                    });
-
-                    // DETALLES
                     let detalle = document.getElementById(`detalle_${i}`);
-                    detalle.innerHTML = "";
-                    data.detalles.forEach(d => {
-                        detalle.innerHTML += `<option value="${d}">${d}</option>`;
-                    });
-
-                    // TALLAS
                     let cont = document.getElementById(`tallas_${i}`);
+
+                    color.innerHTML = data.colores.map(c => `<option>${c}</option>`).join("");
+                    detalle.innerHTML = data.detalles.map(d => `<option>${d}</option>`).join("");
+
                     cont.innerHTML = "";
 
                     data.tallas.forEach(t => {
 
-                                cont.innerHTML += `
-                                    <div class="d-flex mb-1 align-items-center gap-2">
+                        cont.innerHTML += `
+                        <div class="d-flex mb-1 align-items-center gap-2">
 
-                                        <span style="width:40px">${t.numero}</span>
+                            <span style="width:40px">${t.numero}</span>
 
-                                        <!-- PRECIO BLOQUEADO -->
-                                        <input type="text"
-                                               class="form-control form-control-sm"
-                                               value="₡${t.precio}"
-                                               readonly
-                                               style="max-width:100px;" />
+                            <input type="text"
+                                   class="form-control form-control-sm"
+                                   value="₡${t.precio}"
+                                   readonly
+                                   style="max-width:100px;" />
 
-                                        <!-- CANTIDAD -->
-                                        <input type="number"
-                                               min="0"
-                                               class="form-control form-control-sm"
-                                               placeholder="Cant."
-                                               style="max-width:80px;"
-                                               data-talla="${t.numero}"
-                                               data-precio="${t.precio}" />
+                            <input type="number"
+                                   min="0"
+                                   class="form-control form-control-sm"
+                                   placeholder="Cant."
+                                   style="max-width:80px;"
+                                   data-talla="${t.numero}"
+                                   data-precio="${t.precio}" />
 
-                                    </div>`;
+                        </div>`;
                     });
                 });
         }
 
         // =========================
-        // 🔥 GENERAR DETALLES CORRECTO
+        // GENERAR DETALLES
         // =========================
         function prepararDetalles() {
 
@@ -289,8 +319,9 @@
                 const tallasDiv = document.getElementById(`tallas_${i}`);
 
                 if (!prov || !codigo || !tallasDiv) continue;
+                if (!prov.value || !codigo.value) continue;
 
-                const inputs = tallasDiv.querySelectorAll("input");
+                const inputs = tallasDiv.querySelectorAll("input[type='number']");
 
                 inputs.forEach(input => {
 
@@ -316,6 +347,6 @@
 
             console.log("Detalles generados:", index);
         }
-    </script>
 
+    </script>
 }

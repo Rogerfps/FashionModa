@@ -22,13 +22,9 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
-        // LISTA DE PEDIDOS GENERADOS
+        // INDEX
         // =====================================================
-        public async Task<IActionResult> Index(
-    int? pedidoId,
-    string empresa,
-    int? semana,
-    int page = 1)
+        public async Task<IActionResult> Index(int? pedidoId, string empresa, int? semana, int page = 1)
         {
             int pageSize = 25;
 
@@ -37,33 +33,15 @@ namespace FashionM.Controllers
                 .Include(p => p.Detalles)
                 .AsQueryable();
 
-            // =========================
-            // FILTRO POR ID PEDIDO
-            // =========================
             if (pedidoId.HasValue)
-            {
                 query = query.Where(p => p.Id == pedidoId.Value);
-            }
 
-            // =========================
-            // FILTRO POR EMPRESA
-            // =========================
             if (!string.IsNullOrEmpty(empresa))
-            {
                 query = query.Where(p => p.Empresa == empresa);
-            }
 
-            // =========================
-            // FILTRO POR SEMANA
-            // =========================
             if (semana.HasValue)
-            {
                 query = query.Where(p => p.Semana == semana.Value);
-            }
 
-            // =========================
-            // PAGINACIÓN
-            // =========================
             var totalRecords = await query.CountAsync();
 
             var pedidos = await query
@@ -72,14 +50,13 @@ namespace FashionM.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // 👇 IMPORTANTE: lista fija de empresas
             ViewBag.Empresas = new List<string>
-            {
-                "Cocalza Plus S.A",
-                "Fashion Shoes S.A",
-                "LSG MODA S.A",
-                "Maxi Plus 23"
-            };
+        {
+            "Cocalza Plus S.A",
+            "Fashion Shoes S.A",
+            "LSG Moda S.A",
+            "Maxi Plus 23 S.A"
+        };
 
             ViewBag.Page = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
@@ -92,27 +69,63 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
-        // GENERAR PEDIDOS POR SEMANA
+        // GENERAR PEDIDOS
         // =====================================================
         [HttpPost]
         public async Task<IActionResult> GenerarPedidos(int semana)
         {
-            // Buscar pedidos de clientes aprobados
+            // =========================
+            // 🔥 LIMPIAR SI YA EXISTE (REGENERAR)
+            // =========================
+            var existentes = await _context.PedidosProveedor
+                .Where(p => p.Semana == semana)
+                .ToListAsync();
+
+            if (existentes.Any())
+            {
+                _context.PedidosProveedor.RemoveRange(existentes);
+
+                var main = await _context.PedidosMain
+                    .FirstOrDefaultAsync(p => p.Semana == semana);
+
+                if (main != null)
+                    _context.PedidosMain.Remove(main);
+
+                await _context.SaveChangesAsync();
+            }
+
+            // =========================
+            // 🔥 PEDIDOS VALIDOS
+            // =========================
             var pedidosClientes = await _context.PedidosCliente
                 .Include(p => p.Detalles)
                 .Where(p =>
                     p.Semana == semana &&
                     p.EstadoCredito == EstadoCredito.Aprobado &&
-                    !p.FirmaBodega
+                    p.AprobadoSecretaria
                 )
                 .ToListAsync();
 
             if (!pedidosClientes.Any())
             {
-                return BadRequest("No hay pedidos válidos para esta semana.");
+                TempData["Error"] = "No hay pedidos válidos para esta semana";
+                return RedirectToAction("Index");
             }
 
-            // Crear PedidoMain
+            // =========================
+            // 🔥 VALIDAR PROVEEDORES
+            // =========================
+            if (pedidosClientes
+                .SelectMany(p => p.Detalles)
+                .Any(d => d.ProveedorCatalogoId == null))
+            {
+                TempData["Error"] = "Hay productos sin proveedor asignado";
+                return RedirectToAction("Index");
+            }
+
+            // =========================
+            // 🔥 CREAR MAIN
+            // =========================
             var pedidoMain = new PedidoMain
             {
                 Semana = semana,
@@ -122,48 +135,49 @@ namespace FashionM.Controllers
             _context.PedidosMain.Add(pedidoMain);
             await _context.SaveChangesAsync();
 
-            // Agrupar detalles
+            // =========================
+            // 🔥 AGRUPAR DETALLES
+            // =========================
             var detallesAgrupados = pedidosClientes
                 .SelectMany(p => p.Detalles, (pedido, detalle) => new
                 {
-                    Empresa = pedido.Empresa,
-                    //detalle.ProveedorCedula,
+                    pedido.Empresa,
+                    ProveedorCatalogoId = detalle.ProveedorCatalogoId.Value,
                     detalle.CodigoProducto,
                     detalle.Color,
-                    detalle.Talla,
                     detalle.Detalle,
+                    detalle.Talla,
                     detalle.Cantidad
-                    
-
                 })
                 .GroupBy(x => new
                 {
                     x.Empresa,
-                    //x.ProveedorCedula,
+                    x.ProveedorCatalogoId,
                     x.CodigoProducto,
                     x.Color,
-                    x.Talla,
-                    x.Detalle
-                    
+                    x.Detalle,
+                    x.Talla
                 })
                 .Select(g => new
                 {
-                    Empresa = g.Key.Empresa,
-                    //ProveedorCedula = g.Key.ProveedorCedula,
-                    CodigoProducto = g.Key.CodigoProducto,
-                    Color = g.Key.Color,
-                    Talla = g.Key.Talla,
-                    Detalle = g.Key.Detalle, 
+                    g.Key.Empresa,
+                    g.Key.ProveedorCatalogoId,
+                    g.Key.CodigoProducto,
+                    g.Key.Color,
+                    g.Key.Detalle,
+                    g.Key.Talla,
                     Cantidad = g.Sum(x => x.Cantidad)
                 })
                 .ToList();
 
-            // Agrupar por empresa + proveedor
+            // =========================
+            // 🔥 AGRUPAR POR PROVEEDOR
+            // =========================
             var pedidosProveedor = detallesAgrupados
                 .GroupBy(x => new
                 {
                     x.Empresa,
-                    //x.ProveedorCedula
+                    x.ProveedorCatalogoId
                 });
 
             foreach (var grupo in pedidosProveedor)
@@ -172,9 +186,9 @@ namespace FashionM.Controllers
                 {
                     PedidoMainId = pedidoMain.Id,
                     Empresa = grupo.Key.Empresa,
-                    //ProveedorCedula = grupo.Key.ProveedorCedula ?? 0,
                     Semana = semana,
                     FechaPedido = DateTime.UtcNow,
+                    ProveedorCatalogoId = grupo.Key.ProveedorCatalogoId,
                     Detalles = new List<PedidoProveedorDetalle>()
                 };
 
@@ -185,9 +199,8 @@ namespace FashionM.Controllers
                         CodigoProducto = item.CodigoProducto,
                         Color = item.Color,
                         Talla = item.Talla,
-                        Detalle = item.Detalle, 
+                        Detalle = item.Detalle,
                         Cantidad = item.Cantidad
-                        
                     });
                 }
 
@@ -196,60 +209,15 @@ namespace FashionM.Controllers
 
             await _context.SaveChangesAsync();
 
+            TempData["Success"] = "Pedidos generados correctamente";
+
             return RedirectToAction("Index");
         }
 
         // =====================================================
-        // DETALLE DEL PEDIDO PROVEEDOR
+        // DETAILS
         // =====================================================
         public async Task<IActionResult> Details(int id)
-        {
-            var pedido = await _context.PedidosProveedor
-                .Include(p => p.Proveedor)
-                .Include(p => p.Detalles)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (pedido == null)
-                return NotFound();
-
-            // traer todos los códigos de productos del pedido
-            var codigos = pedido.Detalles
-                .Select(d => d.CodigoProducto)
-                .Distinct()
-                .ToList();
-
-            // traer los zapatos con sus imágenes
-            var zapatos = await _context.Zapatos
-                .Where(z => codigos.Contains(z.Codigo))
-                .Include(z => z.Imagenes)
-                .ToListAsync();
-
-            ViewBag.Zapatos = zapatos;
-
-            return View(pedido);
-        }
-
-        // =====================================================
-        // ELIMINAR PEDIDO
-        // =====================================================
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var pedido = await _context.PedidosProveedor
-                .Include(p => p.Detalles)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (pedido == null)
-                return NotFound();
-
-            _context.PedidosProveedor.Remove(pedido);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> ExportarExcel(int id)
         {
             var pedido = await _context.PedidosProveedor
                 .Include(p => p.Proveedor)
@@ -266,193 +234,28 @@ namespace FashionM.Controllers
                 .Include(z => z.Imagenes)
                 .ToListAsync();
 
-            var tallas = Enumerable.Range(15, 31).ToList();
+            ViewBag.Zapatos = zapatos;
 
-            var grupos = pedido.Detalles
-                .GroupBy(d => new { d.CodigoProducto, d.Color, d.Detalle })
-                .ToList();
+            return View(pedido);
+        }
 
-            using var workbook = new XLWorkbook();
-            var ws = workbook.Worksheets.Add("Pedido");
+        // =====================================================
+        // DELETE
+        // =====================================================
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var pedido = await _context.PedidosProveedor
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            // =========================
-            // TITULO
-            // =========================
-            ws.Cell("A1").Value = "PEDIDO DE PRODUCCIÓN";
-            ws.Range("A1:AK1").Merge();
+            if (pedido == null)
+                return NotFound();
 
-            var titulo = ws.Range("A1:AK1");
-            titulo.Style.Font.Bold = true;
-            titulo.Style.Font.FontSize = 22;
-            titulo.Style.Font.FontColor = XLColor.White;
-            titulo.Style.Fill.BackgroundColor = XLColor.FromHtml("#2C3E50");
-            titulo.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            titulo.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            _context.PedidosProveedor.Remove(pedido);
+            await _context.SaveChangesAsync();
 
-            ws.Row(1).Height = 35;
-
-            // =========================
-            // INFORMACIÓN PEDIDO
-            // =========================
-            ws.Cell("A3").Value = "Proveedor:";
-            ws.Cell("B3").Value = pedido.Proveedor?.Comercio;
-
-            ws.Cell("A4").Value = "Empresa:";
-            ws.Cell("B4").Value = pedido.Empresa;
-
-            ws.Cell("A5").Value = "Semana:";
-            ws.Cell("B5").Value = pedido.Semana;
-
-            ws.Cell("A6").Value = "Fecha:";
-            ws.Cell("B6").Value = pedido.FechaPedido.ToString("dd/MM/yyyy");
-
-            var info = ws.Range("A3:D6");
-            info.Style.Fill.BackgroundColor = XLColor.FromHtml("#ECF0F1");
-            info.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
-
-            ws.Range("A3:A6").Style.Font.Bold = true;
-
-            // =========================
-            // ENCABEZADOS
-            // =========================
-            ws.Cell("A8").Value = "Imagen";
-            ws.Cell("B8").Value = "Código";
-            ws.Cell("C8").Value = "Color";
-            ws.Cell("D8").Value = "Detalle";
-
-            int col = 5;
-
-            foreach (var talla in tallas)
-            {
-                ws.Cell(8, col).Value = talla;
-                col++;
-            }
-
-            ws.Cell(8, col).Value = "Total";
-
-            var header = ws.Range(8, 1, 8, col);
-
-            header.Style.Font.Bold = true;
-            header.Style.Font.FontColor = XLColor.White;
-            header.Style.Fill.BackgroundColor = XLColor.FromHtml("#34495E");
-
-            header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            header.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-
-            header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-            header.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
-
-            ws.Row(8).Height = 25;
-
-            // =========================
-            // DATOS
-            // =========================
-            int row = 9;
-            int totalGeneral = 0;
-
-            foreach (var g in grupos)
-            {
-                ws.Row(row).Height = 70;
-
-                ws.Cell(row, 2).Value = g.Key.CodigoProducto;
-                ws.Cell(row, 3).Value = g.Key.Color;
-                ws.Cell(row, 4).Value = g.Key.Detalle;
-
-                int colTalla = 5;
-                int totalModelo = 0;
-
-                foreach (var talla in tallas)
-                {
-                    var cantidad = g
-                        .Where(x => x.Talla == talla.ToString())
-                        .Sum(x => x.Cantidad);
-
-                    if (cantidad > 0)
-                        ws.Cell(row, colTalla).Value = cantidad;
-
-                    ws.Cell(row, colTalla).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-                    totalModelo += cantidad;
-
-                    colTalla++;
-                }
-
-                // TOTAL POR MODELO
-                ws.Cell(row, colTalla).Value = totalModelo;
-                ws.Cell(row, colTalla).Style.Font.Bold = true;
-                ws.Cell(row, colTalla).Style.Fill.BackgroundColor = XLColor.FromHtml("#D5F5E3");
-
-                totalGeneral += totalModelo;
-
-                // BORDES
-                ws.Range(row, 1, row, colTalla).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                // FILAS ALTERNADAS
-                if (row % 2 == 0)
-                {
-                    ws.Range(row, 1, row, colTalla).Style.Fill.BackgroundColor = XLColor.FromHtml("#F8F9F9");
-                }
-
-                // =========================
-                // IMAGEN
-                // =========================
-                var zapato = zapatos
-                    .FirstOrDefault(z => z.Codigo == g.Key.CodigoProducto && z.Color == g.Key.Color);
-
-                if (zapato != null && zapato.Imagenes.Any())
-                {
-                    var imgPath = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot",
-                        zapato.Imagenes.First().Url.TrimStart('/')
-                    );
-
-                    if (System.IO.File.Exists(imgPath))
-                    {
-                        ws.AddPicture(imgPath)
-                            .MoveTo(ws.Cell(row, 1))
-                            .Scale(0.4);
-                    }
-                }
-
-                row++;
-            }
-
-            // =========================
-            // TOTAL GENERAL
-            // =========================
-            ws.Cell(row + 1, 4).Value = "TOTAL GENERAL:";
-            ws.Cell(row + 1, 4).Style.Font.Bold = true;
-
-            ws.Cell(row + 1, 5).Value = totalGeneral;
-
-            var totalRange = ws.Range(row + 1, 4, row + 1, 5);
-            totalRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#F9E79F");
-            totalRange.Style.Font.Bold = true;
-            totalRange.Style.Font.FontSize = 14;
-
-            // =========================
-            // AJUSTES
-            // =========================
-            ws.Column(1).Width = 18;
-
-            ws.Columns().AdjustToContents();
-
-            ws.Columns(5, 35).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-            ws.SheetView.FreezeRows(8);
-
-            using var stream = new MemoryStream();
-            workbook.SaveAs(stream);
-            stream.Position = 0;
-
-            string fileName = $"PedidoProveedor_{pedido.Id}.xlsx";
-
-            return File(
-                stream.ToArray(),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName
-            );
+            return RedirectToAction("Index");
         }
     }
 }
