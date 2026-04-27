@@ -262,6 +262,91 @@ namespace FashionM.Controllers
         }
 
         // =====================================================
+        // CUADRO KARLA
+        // =====================================================
+
+        public async Task<IActionResult> ResumenProveedores(int semana)
+        {
+            // 🔥 Traer pedidos proveedor
+            var pedidos = await _context.PedidosProveedor
+                .Include(p => p.Proveedor)
+                .Include(p => p.Detalles)
+                .Where(p => p.Semana == semana)
+                .ToListAsync();
+
+            if (!pedidos.Any())
+                return View(new List<object>());
+
+            // 🔥 Traer zapatos con precios
+            var codigos = pedidos
+                .SelectMany(p => p.Detalles)
+                .Select(d => d.CodigoProducto)
+                .Distinct()
+                .ToList();
+
+            var zapatos = await _context.ZapatosProveedor
+                .Include(z => z.Tallas)
+                .ToListAsync();
+
+            // 🔥 Diccionario precios Colombia
+            var precios = zapatos.ToDictionary(
+                z => z.Codigo.Trim().ToLower(),
+                z => z.Tallas.ToDictionary(
+                    t => t.Numero,
+                    t => t.PrecioColombia ?? 0
+                )
+            );
+
+            // =========================
+            // 🔥 AGRUPAR
+            // =========================
+            var resultado = pedidos
+                .GroupBy(p => p.Empresa)
+                .Select(emp => new
+                {
+                    Empresa = emp.Key,
+
+                    Proveedores = emp
+                        .GroupBy(p => p.ProveedorCatalogoId)
+                        .Select(g =>
+                        {
+                            int totalPares = 0;
+                            decimal totalMonto = 0;
+
+                            foreach (var pedido in g)
+                            {
+                                foreach (var d in pedido.Detalles)
+                                {
+                                    int cantidad = d.Cantidad;
+                                    int talla = int.TryParse(d.Talla, out var t) ? t : 0;
+
+                                    decimal precio = 0;
+
+                                    var key = d.CodigoProducto.Trim().ToLower();
+
+                                    if (precios.ContainsKey(key) && precios[key].ContainsKey(talla))
+                                        precio = precios[key][talla];
+
+                                    totalPares += cantidad;
+                                    totalMonto += cantidad * precio;
+                                }
+                            }
+
+                            return new
+                            {
+                                Proveedor = g.First().Proveedor.Nombre,
+                                Pares = totalPares,
+                                Monto = totalMonto
+                            };
+                        })
+                        .ToList()
+                })
+                .ToList();
+
+            return View(resultado);
+        }
+
+        // =====================================================
         // ECXEL
         // =====================================================
 
