@@ -1,9 +1,9 @@
 ﻿@model PedidoProveedor
+@using FashionM.Models.Provedor
 
 @{
     ViewData["Title"] = "Detalle Pedido Proveedor";
-    var zapatos = ViewBag.Zapatos as List<Zapato>;
-
+    var zapatos = ViewBag.Zapatos as List<ZapatoProveedor>;
     var tallas = Enumerable.Range(30, 15).ToList();
 
     // ✅ AGRUPACIÓN CORRECTA (SIN PRECIO)
@@ -115,20 +115,31 @@
                         <!-- FOTO -->
                         <td>
                             @{
-                                var zapato = zapatos?
-                                    .FirstOrDefault(z =>
-                                        z.Codigo == g.Key.CodigoProducto &&
-                                        z.Color == g.Key.Color);
+                                var zapato = zapatos?.FirstOrDefault(z =>
+                                    z.Codigo.Trim().ToLower() == g.Key.CodigoProducto.Trim().ToLower()
+                                    && z.ProveedorCatalogoId == Model.ProveedorCatalogoId // 🔥 CLAVE
+                                );
 
-                                if (zapato != null && zapato.Imagenes.Any())
+                                var img = "";
+
+                                if (zapato != null && !string.IsNullOrEmpty(zapato.ImagenUrl))
                                 {
-                                    <img src="@zapato.Imagenes.First().Url"
-                                         class="producto-img" />
+                                    img = zapato.ImagenUrl
+                                        .Replace("\\", "/")
+                                        .Replace("wwwroot/", "")
+                                        .TrimStart('/');
                                 }
-                                else
-                                {
-                                    <div class="no-image">📷</div>
-                                }
+                            }
+
+                            @if (!string.IsNullOrEmpty(img))
+                            {
+                                <img src="/@img"
+                                     class="producto-img"
+                                     asp-append-version="true" />
+                            }
+                            else
+                            {
+                                <div class="no-image">📷</div>
                             }
                         </td>
 

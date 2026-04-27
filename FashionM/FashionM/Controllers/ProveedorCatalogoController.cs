@@ -387,7 +387,8 @@ public class ProveedorCatalogoController : Controller
             zapatoDb.Tallas.Add(new TallaZapato
             {
                 Numero = t.Numero,
-                Precio = t.Precio
+                Precio = t.Precio,
+                PrecioColombia = t.PrecioColombia
             });
 
         await _context.SaveChangesAsync();

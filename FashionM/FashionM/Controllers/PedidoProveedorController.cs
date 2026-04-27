@@ -227,11 +227,14 @@ namespace FashionM.Controllers
             if (pedido == null)
                 return NotFound();
 
-            var codigos = pedido.Detalles.Select(d => d.CodigoProducto).Distinct().ToList();
+            var codigos = pedido.Detalles
+                .Select(d => d.CodigoProducto.Trim())
+                .Distinct()
+                .ToList();
 
-            var zapatos = await _context.Zapatos
-                .Where(z => codigos.Contains(z.Codigo))
-                .Include(z => z.Imagenes)
+            // 🔥 CAMBIO CLAVE AQUÍ
+            var zapatos = await _context.ZapatosProveedor
+                .Where(z => codigos.Contains(z.Codigo.Trim()))
                 .ToListAsync();
 
             ViewBag.Zapatos = zapatos;
@@ -256,6 +259,301 @@ namespace FashionM.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        // =====================================================
+        // ECXEL
+        // =====================================================
+
+        public async Task<IActionResult> ExportarExcel(int id)
+        {
+            var pedido = await _context.PedidosProveedor
+                .Include(p => p.Proveedor)
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            var codigos = pedido.Detalles
+                .Select(d => d.CodigoProducto.Trim())
+                .Distinct()
+                .ToList();
+
+            var zapatos = await _context.ZapatosProveedor
+                .Include(z => z.Tallas)
+                .Where(z =>
+                    codigos.Contains(z.Codigo.Trim()) &&
+                    z.ProveedorCatalogoId == pedido.ProveedorCatalogoId
+                )
+                .ToListAsync();
+
+            // 🔥 Diccionario precios Colombia por talla
+            var tallasZapato = zapatos
+                .ToDictionary(
+                    z => z.Codigo.Trim().ToLower(),
+                    z => z.Tallas.ToDictionary(
+                        t => t.Numero,
+                        t => t.PrecioColombia
+                    )
+                );
+
+            var tallas = Enumerable.Range(30, 15).ToList();
+
+            var grupos = pedido.Detalles
+                .GroupBy(d => new
+                {
+                    d.CodigoProducto,
+                    d.Color,
+                    d.Detalle
+                })
+                .OrderBy(g => g.Key.CodigoProducto)
+                .ToList();
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Pedido");
+
+            // =========================
+            // TITULO
+            // =========================
+            ws.Cell("A1").Value = "PEDIDO DE PRODUCCIÓN";
+            ws.Range("A1:AA1").Merge();
+
+            var titulo = ws.Range("A1:AA1");
+            titulo.Style.Font.Bold = true;
+            titulo.Style.Font.FontSize = 22;
+            titulo.Style.Font.FontColor = XLColor.White;
+            titulo.Style.Fill.BackgroundColor = XLColor.FromHtml("#0F172A");
+            titulo.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            titulo.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            ws.Row(1).Height = 35;
+
+            // =========================
+            // INFO
+            // =========================
+            ws.Cell("A3").Value = "Proveedor:";
+            ws.Cell("B3").Value = pedido.Proveedor?.Nombre;
+
+            ws.Cell("A4").Value = "Empresa:";
+            ws.Cell("B4").Value = pedido.Empresa;
+
+            ws.Cell("A5").Value = "Semana:";
+            ws.Cell("B5").Value = pedido.Semana;
+
+            ws.Cell("A6").Value = "Fecha:";
+            ws.Cell("B6").Value = pedido.FechaPedido.ToString("dd/MM/yyyy");
+
+            var info = ws.Range("A3:D6");
+            info.Style.Fill.BackgroundColor = XLColor.FromHtml("#F1F5F9");
+            info.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+
+            ws.Range("A3:A6").Style.Font.Bold = true;
+
+            // =========================
+            // HEADER
+            // =========================
+            ws.Cell("A8").Value = "Imagen";
+            ws.Cell("B8").Value = "Código";
+            ws.Cell("C8").Value = "Color";
+            ws.Cell("D8").Value = "Detalle";
+
+            int col = 5;
+
+            foreach (var t in tallas)
+            {
+                ws.Cell(8, col).Value = t;
+                col++;
+            }
+
+            ws.Cell(8, col).Value = "Total";
+            ws.Cell(8, col + 1).Value = "Total $";
+
+            var header = ws.Range(8, 1, 8, col + 1);
+
+            header.Style.Font.Bold = true;
+            header.Style.Font.FontColor = XLColor.White;
+            header.Style.Fill.BackgroundColor = XLColor.FromHtml("#1E293B");
+            header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            header.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            header.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+            ws.Row(8).Height = 25;
+            ws.Column(1).Width = 20;
+
+            int row = 9;
+            int totalGeneral = 0;
+            decimal totalGeneralColombia = 0;
+
+            // =========================
+            // DATOS
+            // =========================
+            foreach (var g in grupos)
+            {
+                ws.Row(row).Height = 100;
+
+                ws.Cell(row, 2).Value = g.Key.CodigoProducto;
+                ws.Cell(row, 3).Value = g.Key.Color;
+                ws.Cell(row, 4).Value = g.Key.Detalle;
+
+                int colTalla = 5;
+                int totalModelo = 0;
+                decimal totalColombiaModelo = 0;
+
+                foreach (var t in tallas)
+                {
+                    var cantidad = g
+                        .Where(x => x.Talla == t.ToString())
+                        .Sum(x => x.Cantidad);
+
+                    decimal precioCol = 0;
+
+                    var key = g.Key.CodigoProducto.Trim().ToLower();
+
+                    if (tallasZapato.ContainsKey(key) &&
+                        tallasZapato[key].ContainsKey(t))
+                    {
+                        var p = tallasZapato[key][t];
+                        if (p.HasValue)
+                            precioCol = p.Value;
+                    }
+
+                    if (cantidad > 0)
+                        ws.Cell(row, colTalla).Value = cantidad;
+
+                    ws.Cell(row, colTalla).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    totalModelo += cantidad;
+                    totalColombiaModelo += cantidad * precioCol;
+
+                    colTalla++;
+                }
+
+                // TOTAL PARES
+                ws.Cell(row, colTalla).Value = totalModelo;
+                ws.Cell(row, colTalla).Style.Font.Bold = true;
+                ws.Cell(row, colTalla).Style.Fill.BackgroundColor = XLColor.FromHtml("#DCFCE7");
+
+                // TOTAL $
+                ws.Cell(row, colTalla + 1).Value = totalColombiaModelo;
+                ws.Cell(row, colTalla + 1).Style.NumberFormat.Format = "$ #,##0.00";
+                ws.Cell(row, colTalla + 1).Style.Font.Bold = true;
+                ws.Cell(row, colTalla + 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#FEF3C7");
+
+                totalGeneral += totalModelo;
+                totalGeneralColombia += totalColombiaModelo;
+
+                // =========================
+                // IMAGEN
+                // =========================
+                var zapato = zapatos.FirstOrDefault(z =>
+                    z.Codigo.Trim().ToLower() == g.Key.CodigoProducto.Trim().ToLower()
+                );
+
+                if (zapato != null && !string.IsNullOrEmpty(zapato.ImagenUrl))
+                {
+                    var imgPath = zapato.ImagenUrl
+                        .Replace("\\", "/")
+                        .Replace("wwwroot/", "")
+                        .TrimStart('/');
+
+                    var fullPath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        imgPath
+                    );
+
+                    if (System.IO.File.Exists(fullPath))
+                    {
+                        var pic = ws.AddPicture(fullPath);
+                        pic.MoveTo(ws.Cell(row, 1), 5, 5);
+                        pic.WithSize(90, 90);
+                    }
+                }
+
+                // Zebra
+                if (row % 2 == 0)
+                {
+                    ws.Range(row, 1, row, colTalla + 1)
+                        .Style.Fill.BackgroundColor = XLColor.FromHtml("#F8FAFC");
+                }
+
+                ws.Range(row, 1, row, colTalla + 1)
+                    .Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                row++;
+
+                // =========================
+                // FILA PRECIO COLOMBIA
+                // =========================
+                var codigoKey = g.Key.CodigoProducto.Trim().ToLower();
+
+                if (tallasZapato.ContainsKey(codigoKey))
+                {
+                    ws.Row(row).Height = 30;
+
+                    ws.Cell(row, 2).Value = "PRECIO COL";
+                    ws.Cell(row, 2).Style.Font.Bold = true;
+                    ws.Cell(row, 2).Style.Font.FontColor = XLColor.DarkGreen;
+
+                    int colPrecio = 5;
+
+                    foreach (var t in tallas)
+                    {
+                        if (tallasZapato[codigoKey].ContainsKey(t))
+                        {
+                            var precioCol = tallasZapato[codigoKey][t];
+
+                            if (precioCol.HasValue)
+                            {
+                                ws.Cell(row, colPrecio).Value = precioCol.Value;
+                                ws.Cell(row, colPrecio).Style.NumberFormat.Format = "$ #,##0.00";
+                            }
+                        }
+
+                        ws.Cell(row, colPrecio).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        colPrecio++;
+                    }
+
+                    ws.Range(row, 1, row, colPrecio - 1)
+                        .Style.Fill.BackgroundColor = XLColor.FromHtml("#ECFDF5");
+
+                    row++;
+                }
+            }
+
+            // =========================
+            // TOTAL GENERAL
+            // =========================
+            ws.Cell(row + 1, 4).Value = "TOTAL GENERAL:";
+            ws.Cell(row + 1, 4).Style.Font.Bold = true;
+
+            ws.Cell(row + 1, 5).Value = totalGeneral;
+            ws.Cell(row + 1, 5).Style.Font.Bold = true;
+
+            ws.Cell(row + 1, 6).Value = totalGeneralColombia;
+            ws.Cell(row + 1, 6).Style.NumberFormat.Format = "$ #,##0.00";
+            ws.Cell(row + 1, 6).Style.Font.Bold = true;
+
+            ws.Range(row + 1, 4, row + 1, 6)
+                .Style.Fill.BackgroundColor = XLColor.FromHtml("#FEF9C3");
+
+            // =========================
+            // FINAL
+            // =========================
+            ws.Columns().AdjustToContents();
+            ws.SheetView.FreezeRows(8);
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"PedidoProveedor_{pedido.Id}.xlsx"
+            );
         }
     }
 }

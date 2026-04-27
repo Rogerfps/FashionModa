@@ -27,6 +27,8 @@ namespace FashionM.Models
 
         public string SimpeMovil { get; set; } = string.Empty;
 
+        public string ActividadEco { get; set; } = string.Empty;
+
         public ICollection<Proforma> Proformas { get; set; } = new List<Proforma>();
     }
 }

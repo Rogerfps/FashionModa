@@ -9,6 +9,7 @@ namespace FashionM.Models.Provedor
         public int Numero { get; set; }
 
         public decimal? Precio { get; set; }
+        public decimal? PrecioColombia { get; set; }
 
         public int ZapatoProveedorId { get; set; }
 

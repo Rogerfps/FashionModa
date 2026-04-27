@@ -171,10 +171,20 @@
                 @for (int i = 0; i < Model.Tallas.Count; i++)
                 {
                     <div class="talla-row">
-                        <input type="text" name="Tallas[@i].Numero" value="@Model.Tallas.ElementAt(i).Numero"
-                               class="form-control talla-numero" placeholder="Talla" readonly />
-                        <input type="text" name="Tallas[@i].Precio" value="@Model.Tallas.ElementAt(i).Precio"
-                               class="form-control talla-precio" placeholder="Precio" />
+                        <input type="text" name="Tallas[@i].Numero"
+                               value="@Model.Tallas.ElementAt(i).Numero"
+                               class="form-control talla-numero" readonly />
+
+                        <input type="text" name="Tallas[@i].Precio"
+                               value="@Model.Tallas.ElementAt(i).Precio"
+                               class="form-control talla-precio"
+                               placeholder="₡ Precio" />
+
+                        <input type="text" name="Tallas[@i].PrecioColombia"
+                               value="@Model.Tallas.ElementAt(i).PrecioColombia"
+                               class="form-control talla-precio"
+                               placeholder="$ Precio Col" />
+
                         <button type="button" class="btn-remove" onclick="removeTallaItem(this)">✕</button>
                     </div>
                 }
@@ -198,6 +208,9 @@
         Tallas: @Model.Tallas.Count
     };
 
+    // =========================
+    // AGREGAR ITEMS
+    // =========================
     function addItem(containerId, collectionName, fieldName) {
         const container = document.getElementById(containerId);
         const index = counters[collectionName]++;
@@ -221,6 +234,9 @@
         button.closest(".talla-row").remove();
     }
 
+    // =========================
+    // GENERAR TALLAS
+    // =========================
     function generarTallas() {
         const tipo = document.getElementById("tipoZapato").value;
         const container = document.getElementById("tallasContainer");
@@ -240,25 +256,54 @@
             div.className = "talla-row";
 
             div.innerHTML = `
-                <input type="text" name="Tallas[${index}].Numero" value="${talla}" class="form-control talla-numero" placeholder="Talla" readonly />
-                <input type="text" name="Tallas[${index}].Precio" class="form-control talla-precio" placeholder="Precio" />
-                <button type="button" class="btn-remove" onclick="removeTallaItem(this)">✕</button>
+                <input type="text"
+                       name="Tallas[${index}].Numero"
+                       value="${talla}"
+                       class="form-control talla-numero"
+                       readonly />
+
+                <input type="number"
+                       step="0.01"
+                       name="Tallas[${index}].Precio"
+                       class="form-control talla-precio"
+                       placeholder="₡ Precio" />
+
+                <input type="number"
+                       step="0.01"
+                       name="Tallas[${index}].PrecioColombia"
+                       class="form-control talla-precio"
+                       placeholder="$ Precio Col" />
+
+                <button type="button"
+                        class="btn-remove"
+                        onclick="removeTallaItem(this)">✕</button>
             `;
 
             container.appendChild(div);
         }
     }
 
+    // =========================
+    // COPIAR PRECIO BASE (PRO)
+    // =========================
     function copiarPrecioBase() {
-        const precio = document.querySelector('[name="PrecioVenta"]').value;
 
-        if (!precio) {
-            alert("Primero ingrese un precio de venta");
+        const precioCR = document.querySelector('[name="PrecioVenta"]').value;
+        const precioCOL = document.querySelector('[name="PrecioColombia"]').value;
+
+        if (!precioCR && !precioCOL) {
+            alert("Ingrese al menos un precio base");
             return;
         }
 
+        // Precio Costa Rica
         document.querySelectorAll('[name$=".Precio"]').forEach(input => {
-            input.value = precio;
+            if (precioCR) input.value = precioCR;
+        });
+
+        // Precio Colombia
+        document.querySelectorAll('[name$=".PrecioColombia"]').forEach(input => {
+            if (precioCOL) input.value = precioCOL;
         });
     }
 </script>
