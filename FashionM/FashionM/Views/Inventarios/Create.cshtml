@@ -1,4 +1,5 @@
 ﻿@model FashionM.Models.Inventario
+
 @{
     ViewData["Title"] = "Nuevo Inventario";
 }
@@ -42,12 +43,18 @@
 
                 <div class="form-group">
                     <label asp-for="PrecioCosto"></label>
-                    <input asp-for="PrecioCosto" type="number" step="0.01" class="form-control" />
+                    <input asp-for="PrecioCosto"
+                           type="number"
+                           step="0.01"
+                           class="form-control" />
                 </div>
 
                 <div class="form-group">
                     <label asp-for="PrecioVenta"></label>
-                    <input asp-for="PrecioVenta" type="number" step="0.01" class="form-control" />
+                    <input asp-for="PrecioVenta"
+                           type="number"
+                           step="0.01"
+                           class="form-control" />
                 </div>
 
                 <div class="form-group">
@@ -55,7 +62,7 @@
                     <input asp-for="CodigoCabys" class="form-control" />
                 </div>
 
-                <!-- PROVEEDOR AUTOCOMPLETE -->
+                <!-- 🔥 PROVEEDOR NUEVO -->
                 <div class="form-group position-relative">
                     <label>Proveedor</label>
 
@@ -65,39 +72,54 @@
                            placeholder="Buscar proveedor..."
                            autocomplete="off" />
 
-                    <input type="hidden" asp-for="ProveedorCedula" id="proveedorId" required />
+                    <!-- 🔥 NUEVO -->
+                    <input type="hidden"
+                           asp-for="ProveedorCatalogoId"
+                           id="proveedorId"
+                           required />
 
                     <div id="listaProveedores" class="list-group"></div>
                 </div>
 
+                <!-- EMPRESA -->
                 <div class="form-group">
                     <label class="form-label">Empresa</label>
 
                     <div class="radio-group">
 
                         <label class="radio-option">
-                            <input type="radio" asp-for="Empresa" value="Cocalza Plus S.A" required />
+                            <input type="radio"
+                                   asp-for="Empresa"
+                                   value="Cocalza Plus S.A"
+                                   required />
                             <span>Cocalza Plus S.A</span>
                         </label>
 
                         <label class="radio-option">
-                            <input type="radio" asp-for="Empresa" value="Fashion Shoes S.A" />
+                            <input type="radio"
+                                   asp-for="Empresa"
+                                   value="Fashion Shoes S.A" />
                             <span>Fashion Shoes S.A</span>
                         </label>
 
                         <label class="radio-option">
-                            <input type="radio" asp-for="Empresa" value="LSG Moda S.A" />
+                            <input type="radio"
+                                   asp-for="Empresa"
+                                   value="LSG Moda S.A" />
                             <span>LSG Moda S.A</span>
                         </label>
 
                         <label class="radio-option">
-                            <input type="radio" asp-for="Empresa" value="Maxi Plus 23 S.A" />
+                            <input type="radio"
+                                   asp-for="Empresa"
+                                   value="Maxi Plus 23 S.A" />
                             <span>Maxi Plus 23 S.A</span>
                         </label>
 
                     </div>
 
-                    <span asp-validation-for="Empresa" class="validation-error"></span>
+                    <span asp-validation-for="Empresa"
+                          class="validation-error"></span>
                 </div>
 
             </div>
@@ -120,42 +142,67 @@
                 <tbody>
 
                     <tr>
+
                         <td>
-                            <input type="text" name="Tallas[0].Color" placeholder="Negro" required />
+                            <input type="text"
+                                   name="Tallas[0].Color"
+                                   placeholder="Negro"
+                                   required />
                         </td>
 
                         <td>
-                            <input type="text" name="Tallas[0].Detalle" placeholder="Cuero" />
+                            <input type="text"
+                                   name="Tallas[0].Detalle"
+                                   placeholder="Cuero" />
                         </td>
 
                         <td>
-                            <input type="text" name="Tallas[0].Numero" placeholder="38" required />
+                            <input type="text"
+                                   name="Tallas[0].Numero"
+                                   placeholder="38"
+                                   required />
                         </td>
 
                         <td>
-                            <input type="number" name="Tallas[0].Cantidad" value="0" required />
+                            <input type="number"
+                                   name="Tallas[0].Cantidad"
+                                   value="0"
+                                   required />
                         </td>
 
                         <td></td>
+
                     </tr>
 
                 </tbody>
 
             </table>
 
-            <button type="button" class="btn-add" onclick="agregarTalla()">➕ Agregar</button>
-
+            <button type="button"
+                    class="btn-add"
+                    onclick="agregarTalla()">
+                ➕ Agregar
+            </button>
 
             <!-- FOTOS -->
             <div class="section-title">📸 Fotos</div>
 
-            <input type="file" name="imagenes" multiple class="file-input" />
-
+            <input type="file"
+                   name="imagenes"
+                   multiple
+                   class="file-input" />
 
             <!-- BOTONES -->
             <div class="action-buttons">
-                <a asp-action="Index" class="btn-secondary">Cancelar</a>
-                <button type="submit" class="btn-primary">💾 Guardar</button>
+                <a asp-action="Index"
+                       class="btn-secondary">
+                    Cancelar
+                </a>
+
+                <button type="submit"
+                        class="btn-primary">
+                    💾 Guardar
+                </button>
             </div>
 
         </form>
@@ -170,7 +217,7 @@
     <script>
 
         // =========================
-        // 🔥 TALLAS (TU CÓDIGO)
+        // 🔥 TALLAS
         // =========================
 
         let idx = 1;
@@ -183,23 +230,38 @@
                 <tr>
 
                     <td>
-                        <input type="text" name="Tallas[${idx}].Color" placeholder="Negro" required />
+                        <input type="text"
+                               name="Tallas[${idx}].Color"
+                               placeholder="Negro"
+                               required />
                     </td>
 
                     <td>
-                        <input type="text" name="Tallas[${idx}].Detalle" placeholder="Cuero" />
+                        <input type="text"
+                               name="Tallas[${idx}].Detalle"
+                               placeholder="Cuero" />
                     </td>
 
                     <td>
-                        <input type="text" name="Tallas[${idx}].Numero" placeholder="38" required />
+                        <input type="text"
+                               name="Tallas[${idx}].Numero"
+                               placeholder="38"
+                               required />
                     </td>
 
                     <td>
-                        <input type="number" name="Tallas[${idx}].Cantidad" value="0" required />
+                        <input type="number"
+                               name="Tallas[${idx}].Cantidad"
+                               value="0"
+                               required />
                     </td>
 
                     <td>
-                        <button type="button" class="btn-remove" onclick="eliminarFila(this)">✕</button>
+                        <button type="button"
+                                class="btn-remove"
+                                onclick="eliminarFila(this)">
+                            ✕
+                        </button>
                     </td>
 
                 </tr>
@@ -221,19 +283,25 @@
 
             filas.forEach((fila, i) => {
 
-                fila.querySelectorAll("input")[0].setAttribute("name", `Tallas[${i}].Color`);
-                fila.querySelectorAll("input")[1].setAttribute("name", `Tallas[${i}].Detalle`);
-                fila.querySelectorAll("input")[2].setAttribute("name", `Tallas[${i}].Numero`);
-                fila.querySelectorAll("input")[3].setAttribute("name", `Tallas[${i}].Cantidad`);
+                fila.querySelectorAll("input")[0]
+                    .setAttribute("name", `Tallas[${i}].Color`);
+
+                fila.querySelectorAll("input")[1]
+                    .setAttribute("name", `Tallas[${i}].Detalle`);
+
+                fila.querySelectorAll("input")[2]
+                    .setAttribute("name", `Tallas[${i}].Numero`);
+
+                fila.querySelectorAll("input")[3]
+                    .setAttribute("name", `Tallas[${i}].Cantidad`);
 
             });
 
             idx = filas.length;
         }
 
-
         // =========================
-        // 🔥 AUTOCOMPLETE PROVEEDOR
+        // 🔥 AUTOCOMPLETE PROVEEDOR NUEVO
         // =========================
 
         let timeoutProveedor = null;
@@ -253,8 +321,10 @@
                 timeoutProveedor = setTimeout(() => {
 
                     if (term.length < 1) {
+
                         listaProveedores.innerHTML = "";
                         proveedorId.value = "";
+
                         return;
                     }
 
@@ -267,20 +337,27 @@
                             data.forEach(p => {
 
                                 let item = document.createElement("a");
-                                item.className = "list-group-item list-group-item-action";
+
+                                item.className =
+                                    "list-group-item list-group-item-action";
 
                                 item.innerHTML = `
                                     <strong>${p.nombre}</strong><br>
-                                    <small>${p.comercio}</small>
+                                    <small>${p.codigo}</small>
                                 `;
 
                                 item.onclick = () => {
+
                                     inputProveedor.value = p.nombre;
-                                    proveedorId.value = p.id; // 🔥 Cedula
+
+                                    // 🔥 NUEVO ID
+                                    proveedorId.value = p.id;
+
                                     listaProveedores.innerHTML = "";
                                 };
 
                                 listaProveedores.appendChild(item);
+
                             });
 
                         });
@@ -289,15 +366,15 @@
 
             });
 
-            // cerrar lista si hace click fuera
+            // cerrar lista
             document.addEventListener("click", function (e) {
+
                 if (!inputProveedor.contains(e.target)) {
+
                     listaProveedores.innerHTML = "";
                 }
             });
-
         }
 
     </script>
-
 }

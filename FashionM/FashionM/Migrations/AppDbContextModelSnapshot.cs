@@ -322,7 +322,7 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioVenta")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("ProveedorCedula")
+                    b.Property<int?>("ProveedorCatalogoId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SKU")
@@ -331,7 +331,7 @@ namespace FashionM.Migrations
 
                     b.HasKey("Codigo");
 
-                    b.HasIndex("ProveedorCedula");
+                    b.HasIndex("ProveedorCatalogoId");
 
                     b.ToTable("Inventarios");
                 });
@@ -1145,9 +1145,9 @@ namespace FashionM.Migrations
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
-                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                    b.HasOne("FashionM.Models.Provedor.ProveedorCatalogo", "Proveedor")
                         .WithMany()
-                        .HasForeignKey("ProveedorCedula");
+                        .HasForeignKey("ProveedorCatalogoId");
 
                     b.Navigation("Proveedor");
                 });

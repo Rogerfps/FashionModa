@@ -71,8 +71,8 @@ namespace FashionM.Controllers
         // CREATE GET
         public IActionResult Create()
         {
-            ViewBag.Proveedores = _context.Proveedores
-                .Where(p => p.Estado)
+            ViewBag.Proveedores = _context.ProveedoresCatalogo
+                .Where(p => p.Activo)
                 .ToList();
 
             return View();
@@ -215,8 +215,8 @@ namespace FashionM.Controllers
             if (inventario == null)
                 return NotFound();
 
-            ViewBag.Proveedores = _context.Proveedores
-                .Where(p => p.Estado)
+            ViewBag.Proveedores = _context.ProveedoresCatalogo
+                .Where(p => p.Activo)
                 .ToList();
 
             return View(inventario);
@@ -247,7 +247,7 @@ namespace FashionM.Controllers
             inventario.PrecioCosto = model.PrecioCosto;
             inventario.PrecioVenta = model.PrecioVenta;
             inventario.Empresa = model.Empresa;
-            inventario.ProveedorCedula = model.ProveedorCedula;
+            inventario.ProveedorCatalogoId = model.ProveedorCatalogoId;
 
 
             _context.TallasInventario.RemoveRange(inventario.Tallas);
@@ -496,19 +496,18 @@ namespace FashionM.Controllers
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
-            var proveedores = _context.Proveedores
+            var proveedores = _context.ProveedoresCatalogo
                 .Where(p =>
                     p.Nombre.Contains(term) ||
-                    p.Apellidos.Contains(term) ||
-                    p.Comercio.Contains(term) ||
-                    p.Cedula.ToString().Contains(term)
+                    p.Codigo.Contains(term) ||
+                    p.Cedula.Contains(term)
                 )
                 .Take(10)
                 .Select(p => new
                 {
-                    id = p.Cedula,
-                    nombre = p.Nombre + " " + p.Apellidos,
-                    comercio = p.Comercio
+                    id = p.Id,
+                    nombre = p.Nombre,
+                    codigo = p.Codigo
                 })
                 .ToList();
 

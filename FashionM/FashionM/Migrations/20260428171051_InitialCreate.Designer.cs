@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260417152818_ProveedorCatalogoV2")]
-    partial class ProveedorCatalogoV2
+    [Migration("20260428171051_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -178,6 +178,10 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ActividadEco")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("CedulaJuridica")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -321,7 +325,7 @@ namespace FashionM.Migrations
                     b.Property<decimal>("PrecioVenta")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("ProveedorCedula")
+                    b.Property<int?>("ProveedorCatalogoId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SKU")
@@ -330,7 +334,7 @@ namespace FashionM.Migrations
 
                     b.HasKey("Codigo");
 
-                    b.HasIndex("ProveedorCedula");
+                    b.HasIndex("ProveedorCatalogoId");
 
                     b.ToTable("Inventarios");
                 });
@@ -408,6 +412,9 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Agente")
+                        .HasColumnType("text");
+
                     b.Property<bool>("AprobadoSecretaria")
                         .HasColumnType("boolean");
 
@@ -419,6 +426,9 @@ namespace FashionM.Migrations
 
                     b.Property<int>("EstadoCredito")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("EstadoEntrega")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("FechaEntrega")
                         .HasColumnType("timestamp with time zone");
@@ -467,13 +477,16 @@ namespace FashionM.Migrations
                     b.Property<string>("Detalle")
                         .HasColumnType("text");
 
+                    b.Property<bool>("Entregado")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("PedidoClienteId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("ProveedorCedula")
+                    b.Property<int?>("ProveedorCatalogoId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Talla")
@@ -484,7 +497,7 @@ namespace FashionM.Migrations
 
                     b.HasIndex("PedidoClienteId");
 
-                    b.HasIndex("ProveedorCedula");
+                    b.HasIndex("ProveedorCatalogoId");
 
                     b.ToTable("PedidoClienteDetalles");
                 });
@@ -526,7 +539,7 @@ namespace FashionM.Migrations
                     b.Property<int>("PedidoMainId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProveedorCedula")
+                    b.Property<int>("ProveedorCatalogoId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Semana")
@@ -536,7 +549,7 @@ namespace FashionM.Migrations
 
                     b.HasIndex("PedidoMainId");
 
-                    b.HasIndex("ProveedorCedula");
+                    b.HasIndex("ProveedorCatalogoId");
 
                     b.ToTable("PedidosProveedor");
                 });
@@ -789,6 +802,9 @@ namespace FashionM.Migrations
                     b.Property<decimal?>("Precio")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal?>("PrecioColombia")
+                        .HasColumnType("numeric");
+
                     b.Property<int>("ZapatoProveedorId")
                         .HasColumnType("integer");
 
@@ -821,13 +837,13 @@ namespace FashionM.Migrations
                     b.Property<string>("ImagenUrl")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("PrecioColombia")
+                    b.Property<decimal?>("PrecioColombia")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("PrecioCosto")
+                    b.Property<decimal?>("PrecioCosto")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("PrecioVenta")
+                    b.Property<decimal?>("PrecioVenta")
                         .HasColumnType("numeric");
 
                     b.Property<int>("ProveedorCatalogoId")
@@ -1132,9 +1148,9 @@ namespace FashionM.Migrations
 
             modelBuilder.Entity("FashionM.Models.Inventario", b =>
                 {
-                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                    b.HasOne("FashionM.Models.Provedor.ProveedorCatalogo", "Proveedor")
                         .WithMany()
-                        .HasForeignKey("ProveedorCedula");
+                        .HasForeignKey("ProveedorCatalogoId");
 
                     b.Navigation("Proveedor");
                 });
@@ -1180,14 +1196,14 @@ namespace FashionM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                    b.HasOne("FashionM.Models.Provedor.ProveedorCatalogo", "ProveedorCatalogo")
                         .WithMany()
-                        .HasForeignKey("ProveedorCedula")
+                        .HasForeignKey("ProveedorCatalogoId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("PedidoCliente");
 
-                    b.Navigation("Proveedor");
+                    b.Navigation("ProveedorCatalogo");
                 });
 
             modelBuilder.Entity("FashionM.Models.PedidoProveedor", b =>
@@ -1198,9 +1214,9 @@ namespace FashionM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FashionM.Models.Proveedor", "Proveedor")
+                    b.HasOne("FashionM.Models.Provedor.ProveedorCatalogo", "Proveedor")
                         .WithMany()
-                        .HasForeignKey("ProveedorCedula")
+                        .HasForeignKey("ProveedorCatalogoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FashionM.Models.Provedor;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FashionM.Models
@@ -17,8 +18,10 @@ namespace FashionM.Models
         public decimal PrecioCosto { get; set; }
         public decimal PrecioVenta { get; set; }
 
-        public int? ProveedorCedula { get; set; }
-        public Proveedor? Proveedor { get; set; }
+        public int? ProveedorCatalogoId { get; set; }
+
+        [ForeignKey("ProveedorCatalogoId")]
+        public ProveedorCatalogo? Proveedor { get; set; }
 
         public List<TallaInventario> Tallas { get; set; } = new();
         public List<Foto> Fotos { get; set; } = new();

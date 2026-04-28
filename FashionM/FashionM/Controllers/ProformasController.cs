@@ -39,7 +39,7 @@ namespace FashionM.Controllers
                 buscar = buscar.ToLower();
 
                 query = query.Where(p =>
-                    p.Numero.ToString().Contains(buscar) // 🔥 CAMBIO
+                    p.Numero.ToString().Contains(buscar) 
                     || p.Cliente.Nombre.ToLower().Contains(buscar)
                     || p.Cliente.Apellidos.ToLower().Contains(buscar)
                     || p.Cliente.Codigo.ToLower().Contains(buscar)
@@ -486,25 +486,34 @@ namespace FashionM.Controllers
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
-            // 🔥 Obtener la empresa de la proforma
+            term = term.ToLower().Trim();
+
+            // 🔥 EMPRESA DE LA PROFORMA
             var empresaNombre = _context.Proformas
                 .Where(p => p.Id == proformaId)
-                .Select(p => p.Empresa.Nombre)
+                .Select(p => p.Empresa!.Nombre)
                 .FirstOrDefault();
 
-            if (string.IsNullOrEmpty(empresaNombre))
+            if (string.IsNullOrWhiteSpace(empresaNombre))
                 return Json(new List<object>());
 
+            empresaNombre = empresaNombre.ToLower().Trim();
+
+            // 🔥 BUSCAR INVENTARIO
             var productos = _context.Inventarios
                 .Where(i =>
-                    i.Empresa.ToLower().Trim() == empresaNombre.ToLower().Trim() && // 🔥 filtro correcto
-                    (i.Codigo.Contains(term) || i.Marca.Contains(term))
+                    i.Empresa.ToLower().Trim() == empresaNombre &&
+                    (
+                        i.Codigo.ToLower().Contains(term)
+                        || (i.Marca != null && i.Marca.ToLower().Contains(term))
+                    )
                 )
-                .Take(10)
+                .OrderBy(i => i.Codigo)
+                .Take(15)
                 .Select(i => new
                 {
                     codigo = i.Codigo,
-                    marca = i.Marca
+                    marca = i.Marca ?? ""
                 })
                 .ToList();
 
@@ -516,6 +525,7 @@ namespace FashionM.Controllers
         {
             var variantes = _context.TallasInventario
                 .Where(t => t.InventarioCodigo == codigo)
+                .OrderBy(t => t.Numero)
                 .Select(t => new
                 {
                     color = t.Color ?? "",
@@ -529,4 +539,5 @@ namespace FashionM.Controllers
             return Json(variantes);
         }
     }
+    
 }
