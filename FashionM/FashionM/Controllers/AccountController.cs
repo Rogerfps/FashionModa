@@ -1,4 +1,5 @@
 ﻿using FashionM.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ namespace FashionM.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Usuarios()
         {
             var usuarios = _userManager.Users.ToList();
@@ -50,12 +52,14 @@ namespace FashionM.Controllers
             return View(lista);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult CrearUsuario()
         {
             ViewBag.Roles = _roleManager.Roles.Select(r => r.Name).ToList();
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CrearUsuario(
     string nombre,
@@ -114,6 +118,7 @@ namespace FashionM.Controllers
             return RedirectToAction("Usuarios");
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditarUsuario(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -128,6 +133,7 @@ namespace FashionM.Controllers
             return View(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> EditarUsuario(string id, string nombre, List<string> roles)
         {
@@ -150,6 +156,7 @@ namespace FashionM.Controllers
             return RedirectToAction("Usuarios");
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EliminarUsuario(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
