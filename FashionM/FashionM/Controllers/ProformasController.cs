@@ -269,6 +269,7 @@ namespace FashionM.Controllers
                 "fashion shoes s.a" => "fashion.png",
                 "lsg moda s.a" => "lsg.jpg",
                 "maxiplus" => "maxiplus.png",
+                "kyroz" => "KYROZ.png",
                 _ => "default.png"
             };
 

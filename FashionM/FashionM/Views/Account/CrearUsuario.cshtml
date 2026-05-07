@@ -1,17 +1,115 @@
-﻿<h2>Crear Usuario</h2>
+﻿@{
+    ViewData["Title"] = "Crear Usuario";
+}
 
-<form method="post">
-    <input name="nombre" placeholder="Nombre" class="form-control mb-2" />
-    <input name="email" placeholder="Email" class="form-control mb-2" />
-    <input name="password" type="password" placeholder="Password" class="form-control mb-2" />
+<link rel="stylesheet" href="~/css/Home/CrearUsuario.css" />
 
-    <label>Roles</label>
-    @foreach (var r in ViewBag.Roles)
-    {
-        <div>
-            <input type="checkbox" name="roles" value="@r" /> @r
-        </div>
-    }
+<div class="container mt-4">
 
-    <button class="btn btn-success mt-3">Guardar</button>
-</form>
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>👤</span> Crear Usuario
+        </h1>
+
+        <a asp-action="Usuarios" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <!-- CARD -->
+    <div class="form-card">
+
+        <!-- ERRORES -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-custom">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        <!-- FORM -->
+        <form asp-action="CrearUsuario" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-grid">
+
+                <!-- NOMBRE -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Nombre
+                    </label>
+
+                    <input name="nombre"
+                           placeholder="Ingrese el nombre"
+                           class="form-control"
+                           required />
+                </div>
+
+                <!-- EMAIL -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Correo Electrónico
+                    </label>
+
+                    <input name="email"
+                           type="text"
+                           placeholder="correo@empresa.com"
+                           class="form-control"
+                           required />
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Contraseña
+                    </label>
+
+                    <input name="password"
+                           type="password"
+                           placeholder="********"
+                           class="form-control"
+                           required />
+                </div>
+
+            </div>
+
+            <!-- ROLES -->
+            <div class="roles-section">
+
+                <div class="roles-title">
+                    🔐 Roles del Usuario
+                </div>
+
+                <div class="roles-grid">
+
+                    @foreach (string r in ViewBag.Roles)
+                    {
+                        <label class="role-item">
+
+                            <input type="checkbox"
+                                   name="roles"
+                                   value="@r" />
+
+                            <span class="role-text">
+                                @r
+                            </span>
+
+                        </label>
+                    }
+
+                </div>
+            </div>
+
+            <!-- BOTÓN -->
+            <div class="actions">
+                <button type="submit" class="btn-save">
+                    💾 Guardar Usuario
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>

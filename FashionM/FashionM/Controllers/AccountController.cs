@@ -57,8 +57,17 @@ namespace FashionM.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CrearUsuario(string nombre, string email, string password, List<string> roles)
+        public async Task<IActionResult> CrearUsuario(
+    string nombre,
+    string email,
+    string password,
+    List<string> roles)
         {
+            // 🔥 volver a cargar roles si hay error
+            ViewBag.Roles = _roleManager.Roles
+                .Select(r => r.Name)
+                .ToList();
+
             var user = new ApplicationUser
             {
                 UserName = email,
@@ -68,11 +77,39 @@ namespace FashionM.Controllers
 
             var result = await _userManager.CreateAsync(user, password);
 
+            // 🔥 VALIDACIONES BONITAS
             if (!result.Succeeded)
-                return Json(result.Errors);
+            {
+                foreach (var error in result.Errors)
+                {
+                    var mensaje = error.Description;
 
-            if (roles != null)
+                    if (error.Code == "DuplicateUserName")
+                        mensaje = "Ya existe un usuario con ese correo.";
+
+                    if (error.Code == "DuplicateEmail")
+                        mensaje = "Ese correo ya está registrado.";
+
+                    if (error.Code == "PasswordRequiresUpper")
+                        mensaje = "La contraseña debe tener al menos una mayúscula.";
+
+                    if (error.Code == "PasswordRequiresNonAlphanumeric")
+                        mensaje = "La contraseña debe tener un carácter especial.";
+
+                    if (error.Code == "PasswordTooShort")
+                        mensaje = "La contraseña es demasiado corta.";
+
+                    ModelState.AddModelError("", mensaje);
+                }
+
+                return View();
+            }
+
+            // 🔥 ROLES
+            if (roles != null && roles.Any())
                 await _userManager.AddToRolesAsync(user, roles);
+
+            TempData["Success"] = "Usuario creado correctamente";
 
             return RedirectToAction("Usuarios");
         }

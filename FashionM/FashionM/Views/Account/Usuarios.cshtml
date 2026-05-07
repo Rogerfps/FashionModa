@@ -1,32 +1,92 @@
 ﻿@model List<dynamic>
 
-<h2>👥 Usuarios</h2>
+@{
+    ViewData["Title"] = "Usuarios";
+}
 
-<a asp-action="CrearUsuario" class="btn btn-success mb-3">➕ Nuevo</a>
+<link rel="stylesheet" href="~/css/Home/Usuarios.css" />
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Roles</th>
-            <th></th>
-        </tr>
-    </thead>
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <span>👥</span> Usuarios del Sistema
+        </h1>
+        <a asp-action="CrearUsuario" class="btn-neo">
+            <span>➕</span> Nuevo Usuario
+        </a>
+    </div>
 
-    <tbody>
-        @foreach (var u in Model)
-        {
-            <tr>
-                <td>@u.Nombre</td>
-                <td>@u.Email</td>
-                <td>@u.Roles</td>
-
-                <td>
-                    <a asp-action="EditarUsuario" asp-route-id="@u.Id" class="btn btn-warning btn-sm">✏️</a>
-                    <a asp-action="EliminarUsuario" asp-route-id="@u.Id" class="btn btn-danger btn-sm">🗑️</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <!-- Tabla -->
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <div class="empty-icon">👥</div>
+                                    <div class="empty-text">No hay usuarios registrados</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@u.Nombre</td>
+                                <td>@u.Email</td>
+                                <td>
+                                    @{
+                                        var roles = u.Roles as IEnumerable<string>;
+                                        if (roles != null && roles.Any())
+                                        {
+                                            foreach (var rol in roles)
+                                            {
+                                                var roleClass = rol.ToLower() switch
+                                                {
+                                                    "admin" => "admin",
+                                                    "secretaria" => "secretaria",
+                                                    "bodega" => "bodega",
+                                                    _ => "default"
+                                                };
+                                                <span class="role-badge @roleClass">@rol</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="role-badge default">Sin rol</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-group">
+                                        <a asp-action="EditarUsuario" asp-route-id="@u.Id" class="btn-action btn-edit" title="Editar usuario">
+                                            ✏️
+                                        </a>
+                                        <a asp-action="EliminarUsuario" asp-route-id="@u.Id" class="btn-action btn-delete" title="Eliminar usuario"
+                                               onclick="return confirm('¿Eliminar este usuario?')">
+                                            🗑️
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
