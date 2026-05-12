@@ -1,0 +1,669 @@
+﻿@model IEnumerable<Venta>
+
+@{
+    ViewData["Title"] = "Ventas";
+}
+
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --text-gray: #64748b;
+        --border-light: #e2e8f0;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .ventas-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .page-subtitle {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--pure-white);
+        border-radius: 20px;
+        padding: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        transition: all 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: #f8fafc;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--text-gray);
+        letter-spacing: 0.3px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--deep-blue);
+    }
+
+    .filter-card {
+        background: var(--pure-white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+        .filter-group label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--deep-blue);
+            letter-spacing: 0.3px;
+        }
+
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        background: #fafcff;
+        width: 100%;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--electric-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(87, 108, 188, 0.1);
+        }
+
+    .filter-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-clear {
+        background: #f1f5f9;
+        color: var(--deep-blue);
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-clear:hover {
+            background: var(--deep-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .table-card {
+        background: var(--pure-white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .table-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #eef2f6;
+    }
+
+        .table-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .ventas-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        min-width: 800px;
+    }
+
+        .ventas-table th {
+            background: var(--deep-blue);
+            color: white;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 0.8rem 0.5rem;
+            white-space: nowrap;
+        }
+
+            .ventas-table th:first-child {
+                border-radius: 12px 0 0 12px;
+            }
+
+            .ventas-table th:last-child {
+                border-radius: 0 12px 12px 0;
+            }
+
+        .ventas-table td {
+            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        .ventas-table tbody tr:hover {
+            background: rgba(87, 108, 188, 0.02);
+        }
+
+    .client-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .client-info strong {
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        .client-info small {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+        }
+
+    .agent-badge {
+        background: #E9EEF5;
+        color: var(--deep-blue);
+        padding: 0.2rem 0.6rem;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        display: inline-block;
+    }
+
+    .type-badge {
+        display: inline-block;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+        .type-badge.proforma {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .type-badge.factura {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.canceled {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+    .fw-bold {
+        font-weight: 600;
+        color: var(--deep-blue);
+    }
+
+    .btn-details {
+        background: #e6f0fa;
+        color: var(--info);
+        border: none;
+        border-radius: 8px;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.75rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+    }
+
+        .btn-details:hover {
+            background: var(--info);
+            color: white;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        font-size: 1.2rem;
+        color: var(--deep-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+    }
+
+    @@media (max-width: 1024px) {
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .ventas-container {
+            padding: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .filter-actions {
+            justify-content: stretch;
+        }
+        
+        .btn-clear {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="ventas-container">
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <span>📊</span> Módulo de Ventas
+            </h1>
+            <p class="page-subtitle">
+                Historial general de ventas y métricas
+            </p>
+        </div>
+    </div>
+
+    <!-- CARDS ESTADÍSTICAS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div>
+                <div class="stat-label">Total Ventas</div>
+                <div class="stat-value" id="cardTotalVentas">@Model.Count()</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div>
+                <div class="stat-label">Total Vendido</div>
+                <div class="stat-value" id="cardTotalVendido">₡ @Model.Sum(x => x.Total).ToString("N2")</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">👤</div>
+            <div>
+                <div class="stat-label">Agentes Activos</div>
+                <div class="stat-value" id="cardAgentes">@Model.Select(x => x.AgenteVenta).Distinct().Count()</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🏢</div>
+            <div>
+                <div class="stat-label">Empresas</div>
+                <div class="stat-value" id="cardEmpresas">@Model.Select(x => x.EmpresaId).Distinct().Count()</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filter-card">
+        <div class="filter-grid">
+            <div class="filter-group">
+                <label>🔍 Buscar Cliente o Comercio</label>
+                <input type="text" id="buscarInput" class="form-control" placeholder="Buscar..." />
+            </div>
+
+            <div class="filter-group">
+                <label>🏢 Empresa</label>
+                <select id="empresaFilter" class="form-select">
+                    <option value="">Todas</option>
+                    @if (ViewBag.Empresas != null)
+                    {
+                        foreach (var empresa in ViewBag.Empresas)
+                        {
+                            <option value="@empresa.Nombre.ToLower()">@empresa.Nombre</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>📄 Tipo Documento</label>
+                <select id="tipoFilter" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="proforma">PROFORMA</option>
+                    <option value="factura_electronica">FACTURA ELECTRÓNICA</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>👤 Agente</label>
+                <input type="text" id="agenteFilter" class="form-control" placeholder="Buscar agente..." />
+            </div>
+
+            <div class="filter-group">
+                <label>📅 Semana</label>
+                <input type="number" id="semanaFilter" class="form-control" placeholder="Semana" />
+            </div>
+
+            <div class="filter-group">
+                <label>📆 Mes</label>
+                <select id="mesFilter" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="enero">Enero</option>
+                    <option value="febrero">Febrero</option>
+                    <option value="marzo">Marzo</option>
+                    <option value="abril">Abril</option>
+                    <option value="mayo">Mayo</option>
+                    <option value="junio">Junio</option>
+                    <option value="julio">Julio</option>
+                    <option value="agosto">Agosto</option>
+                    <option value="septiembre">Septiembre</option>
+                    <option value="octubre">Octubre</option>
+                    <option value="noviembre">Noviembre</option>
+                    <option value="diciembre">Diciembre</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button type="button" id="btnLimpiar" class="btn-clear">✖ Limpiar Filtros</button>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>📄 Historial de Ventas</h3>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="ventas-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Empresa</th>
+                            <th>Agente</th>
+                            <th>Tipo</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="venta-row"
+                                data-total="@item.Total"
+                                data-agente="@(item.AgenteVenta?.ToLower() ?? "")"
+                                data-empresa="@(item.Empresa?.Nombre?.ToLower() ?? "")"
+                                data-tipo="@(item.TipoDocumento?.ToLower() ?? "")"
+                                data-semana="@item.Semana"
+                                data-mes="@(new DateTime(DateTime.Now.Year, item.Mes, 1).ToString("MMMM").ToLower())"
+                                data-buscar="@($"{item.Cliente?.Nombre} {item.Cliente?.Apellidos} {item.Cliente?.Comercio}".ToLower())">
+                                <td>#@item.Id</td>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="client-info">
+                                        <strong>@item.Cliente?.Nombre @item.Cliente?.Apellidos</strong>
+                                        <small>@item.Cliente?.Comercio</small>
+                                    </div>
+                                </td>
+                                <td>@item.Empresa?.Nombre</td>
+                                <td>
+                                    <span class="agent-badge">👤 @item.AgenteVenta</span>
+                                </td>
+                                <td>
+                                    @if (item.TipoDocumento == "PROFORMA")
+                                    {
+                                        <span class="type-badge proforma">📄 PROFORMA</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="type-badge factura">🧾 FACTURA</span>
+                                    }
+                                </td>
+                                <td class="fw-bold">₡ @item.Total.ToString("N2")</td>
+                                <td>
+                                    @if (item.Estado == "ACTIVA")
+                                    {
+                                        <span class="status-badge active">✅ ACTIVA</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge canceled">❌ @item.Estado</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-details">👁 Ver</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No hay ventas registradas</h3>
+                <p>Las ventas aparecerán automáticamente cuando se creen proformas o facturas.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buscarInput = document.getElementById("buscarInput");
+        const empresaFilter = document.getElementById("empresaFilter");
+        const tipoFilter = document.getElementById("tipoFilter");
+        const agenteFilter = document.getElementById("agenteFilter");
+        const semanaFilter = document.getElementById("semanaFilter");
+        const mesFilter = document.getElementById("mesFilter");
+        const filas = document.querySelectorAll(".venta-row");
+
+        const cardTotalVentas = document.getElementById("cardTotalVentas");
+        const cardTotalVendido = document.getElementById("cardTotalVendido");
+        const cardAgentes = document.getElementById("cardAgentes");
+        const cardEmpresas = document.getElementById("cardEmpresas");
+
+        function filtrarVentas() {
+            const buscar = buscarInput ? buscarInput.value.trim().toLowerCase() : "";
+            const empresa = empresaFilter ? empresaFilter.value : "";
+            const tipo = tipoFilter ? tipoFilter.value.trim().toLowerCase() : "";
+            const agente = agenteFilter ? agenteFilter.value.trim().toLowerCase() : "";
+            const semana = semanaFilter ? semanaFilter.value.trim() : "";
+            const mes = mesFilter ? mesFilter.value.trim().toLowerCase() : "";
+
+            let ventasVisibles = 0;
+            let totalVendido = 0;
+            let agentes = new Set();
+            let empresas = new Set();
+
+            filas.forEach(fila => {
+                const textoBuscar = fila.dataset.buscar || "";
+                const textoEmpresa = fila.dataset.empresa || "";
+                const textoTipo = fila.dataset.tipo || "";
+                const textoAgente = fila.dataset.agente || "";
+                const textoSemana = fila.dataset.semana || "";
+                const textoMes = fila.dataset.mes || "";
+
+                const coincideBuscar = !buscar || textoBuscar.includes(buscar);
+                const coincideEmpresa = !empresa || textoEmpresa === empresa;
+                const coincideTipo = !tipo || textoTipo === tipo;
+                const coincideAgente = !agente || textoAgente.includes(agente);
+                const coincideSemana = !semana || textoSemana === semana;
+                const coincideMes = !mes || textoMes === mes;
+
+                const mostrar = coincideBuscar && coincideEmpresa && coincideTipo && coincideAgente && coincideSemana && coincideMes;
+
+                fila.style.display = mostrar ? "" : "none";
+
+                if (mostrar) {
+                    ventasVisibles++;
+                    totalVendido += parseFloat(fila.dataset.total || 0);
+                    if (textoAgente) agentes.add(textoAgente);
+                    if (textoEmpresa) empresas.add(textoEmpresa);
+                }
+            });
+
+            if (cardTotalVentas) cardTotalVentas.innerText = ventasVisibles;
+            if (cardTotalVendido) cardTotalVendido.innerText = `₡ ${totalVendido.toLocaleString("es-CR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            if (cardAgentes) cardAgentes.innerText = agentes.size;
+            if (cardEmpresas) cardEmpresas.innerText = empresas.size;
+        }
+
+        if (buscarInput) buscarInput.addEventListener("input", filtrarVentas);
+        if (agenteFilter) agenteFilter.addEventListener("input", filtrarVentas);
+        if (semanaFilter) semanaFilter.addEventListener("input", filtrarVentas);
+        if (empresaFilter) empresaFilter.addEventListener("change", filtrarVentas);
+        if (tipoFilter) tipoFilter.addEventListener("change", filtrarVentas);
+        if (mesFilter) mesFilter.addEventListener("change", filtrarVentas);
+
+        const btnLimpiar = document.getElementById("btnLimpiar");
+        if (btnLimpiar) {
+            btnLimpiar.addEventListener("click", () => {
+                if (buscarInput) buscarInput.value = "";
+                if (empresaFilter) empresaFilter.value = "";
+                if (tipoFilter) tipoFilter.value = "";
+                if (agenteFilter) agenteFilter.value = "";
+                if (semanaFilter) semanaFilter.value = "";
+                if (mesFilter) mesFilter.value = "";
+                filtrarVentas();
+            });
+        }
+
+        filtrarVentas();
+    });
+</script>

@@ -103,14 +103,41 @@
         </div>
         <div class="card-body">
             <div class="data-row">
+
                 <div class="data-col">
                     <div class="info-label">Facturado por</div>
-                    <div class="info-value">@Model.FacturadoPor</div>
+                    <div class="info-value">
+                        @Model.FacturadoPor
+                    </div>
                 </div>
+
+                <div class="data-col">
+                    <div class="info-label">Agente de Venta</div>
+
+                    <div class="info-value">
+
+                        @if (!string.IsNullOrWhiteSpace(Model.AgenteVenta))
+                        {
+                            <span class="agent-badge">
+                                👤 @Model.AgenteVenta
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">—</span>
+                        }
+
+                    </div>
+                </div>
+
                 <div class="data-col">
                     <div class="info-label">Número de Cajas</div>
-                    <div class="info-value">@Model.NumeroCajas</div>
+
+                    <div class="info-value">
+                        @Model.NumeroCajas
+                    </div>
                 </div>
+
             </div>
 
             @if (!string.IsNullOrWhiteSpace(Model.Detalle))

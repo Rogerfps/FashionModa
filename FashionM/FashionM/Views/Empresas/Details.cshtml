@@ -106,6 +106,36 @@
         </div>
     </div>
 
+    <!-- AGENTES -->
+    <div class="card-modern">
+        <div class="section-title">
+            <span>👥</span> Agentes de Venta
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Agentes))
+        {
+            var agentes = Model.Agentes
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(a => a.Trim())
+                .ToList();
+
+            <div class="agents-container">
+                @foreach (var agente in agentes)
+                {
+                    <div class="agent-badge">
+                        👤 @agente
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-agents">
+                No hay agentes registrados
+            </div>
+        }
+    </div>
+
     <!-- ACCIONES -->
     <div class="action-bar">
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-edit">

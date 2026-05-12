@@ -47,6 +47,11 @@ namespace FashionM.Data
         public DbSet<DetalleZapato> DetallesZapato { get; set; }
         public DbSet<TallaZapato> TallasZapato { get; set; }
 
+        //Ventas
+        public DbSet<Venta> Ventas { get; set; }
+
+        public DbSet<VentaDetalle> VentaDetalles { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

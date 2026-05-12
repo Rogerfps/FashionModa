@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -188,7 +189,10 @@ namespace FashionM.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // 🔥 CREAR O ACTUALIZAR VENTA
+            await CrearActualizarVenta(proformaId);
             return RedirectToAction("AgregarProducto", new { id = proformaId });
+            
         }
 
         // ==========================
@@ -204,6 +208,86 @@ namespace FashionM.Controllers
                 return;
 
             proforma.Total = proforma.Detalles.Sum(d => d.SubTotal);
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CrearActualizarVenta(int proformaId)
+        {
+            var proforma = await _context.Proformas
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == proformaId);
+
+            if (proforma == null)
+                return;
+
+            // 🔥 BUSCAR SI YA EXISTE
+            var venta = await _context.Ventas
+                .Include(v => v.Detalles)
+                .FirstOrDefaultAsync(v =>
+                    v.DocumentoId == proforma.Id &&
+                    v.TipoDocumento == "PROFORMA");
+
+            // 🔥 SI NO EXISTE → CREAR
+            if (venta == null)
+            {
+                venta = new Venta
+                {
+                    Fecha = proforma.Fecha,
+                    TipoDocumento = "PROFORMA",
+                    DocumentoId = proforma.Id,
+
+                    ClienteCedula = proforma.ClienteCedula,
+                    EmpresaId = proforma.EmpresaId,
+
+                    Total = proforma.Total,
+                    NumeroCajas = proforma.NumeroCajas,
+
+                    FacturadoPor = proforma.FacturadoPor,
+                    AgenteVenta = proforma.AgenteVenta,
+
+                    Estado = "ACTIVA",
+
+                    Semana = ISOWeek.GetWeekOfYear(proforma.Fecha),
+                    Mes = proforma.Fecha.Month,
+                    Año = proforma.Fecha.Year
+                };
+
+                _context.Ventas.Add(venta);
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // 🔥 ACTUALIZAR
+                venta.Total = proforma.Total;
+                venta.NumeroCajas = proforma.NumeroCajas;
+                venta.AgenteVenta = proforma.AgenteVenta;
+
+                // 🔥 LIMPIAR DETALLES
+                _context.VentaDetalles.RemoveRange(venta.Detalles);
+
+                await _context.SaveChangesAsync();
+            }
+
+            // 🔥 AGREGAR DETALLES NUEVOS
+            foreach (var item in proforma.Detalles)
+            {
+                var detalleVenta = new VentaDetalle
+                {
+                    VentaId = venta.Id,
+
+                    InventarioCodigo = item.InventarioCodigo,
+                    Color = item.Color,
+                    Talla = item.Talla,
+
+                    Cantidad = item.Cantidad,
+                    PrecioUnitario = item.PrecioUnitario,
+                    SubTotal = item.SubTotal
+                };
+
+                _context.VentaDetalles.Add(detalleVenta);
+            }
 
             await _context.SaveChangesAsync();
         }
@@ -538,6 +622,25 @@ namespace FashionM.Controllers
                 .ToList();
 
             return Json(variantes);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> ObtenerAgentes(int empresaId)
+        {
+            var empresa = await _context.Empresas
+                .FirstOrDefaultAsync(e => e.Id == empresaId);
+
+            if (empresa == null || string.IsNullOrWhiteSpace(empresa.Agentes))
+            {
+                return Json(new List<string>());
+            }
+
+            var agentes = empresa.Agentes
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(a => a.Trim())
+                .ToList();
+
+            return Json(agentes);
         }
     }
     

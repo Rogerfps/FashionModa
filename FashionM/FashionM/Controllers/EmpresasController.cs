@@ -94,6 +94,7 @@ namespace FashionM.Controllers
                     empresaDb.CuentaBCR = empresa.CuentaBCR;
                     empresaDb.CuentaBN = empresa.CuentaBN;
                     empresaDb.SimpeMovil = empresa.SimpeMovil;
+                    empresaDb.Agentes = empresa.Agentes;
 
                     await _context.SaveChangesAsync();
                 }

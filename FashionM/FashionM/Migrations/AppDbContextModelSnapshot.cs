@@ -179,6 +179,10 @@ namespace FashionM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Agentes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("CedulaJuridica")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -595,6 +599,10 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AgenteVenta")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("ClienteCedula")
                         .HasColumnType("integer");
 
@@ -935,6 +943,105 @@ namespace FashionM.Migrations
                     b.HasIndex("InventarioCodigo");
 
                     b.ToTable("TallasInventario");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Venta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AgenteVenta")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Año")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ClienteCedula")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DocumentoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FacturadoPor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Mes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NumeroCajas")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Semana")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TipoDocumento")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteCedula");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("Ventas");
+                });
+
+            modelBuilder.Entity("FashionM.Models.VentaDetalle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("InventarioCodigo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Talla")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VentaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VentaId");
+
+                    b.ToTable("VentaDetalles");
                 });
 
             modelBuilder.Entity("FashionM.Models.Zapato", b =>
@@ -1331,6 +1438,36 @@ namespace FashionM.Migrations
                     b.Navigation("Inventario");
                 });
 
+            modelBuilder.Entity("FashionM.Models.Venta", b =>
+                {
+                    b.HasOne("FashionM.Models.Clientes", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteCedula")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FashionM.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("FashionM.Models.VentaDetalle", b =>
+                {
+                    b.HasOne("FashionM.Models.Venta", "Venta")
+                        .WithMany("Detalles")
+                        .HasForeignKey("VentaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Venta");
+                });
+
             modelBuilder.Entity("FashionM.Models.Zapato", b =>
                 {
                     b.HasOne("FashionM.Models.Proveedor", "Proveedor")
@@ -1454,6 +1591,11 @@ namespace FashionM.Migrations
             modelBuilder.Entity("FashionM.Models.Proveedor", b =>
                 {
                     b.Navigation("Zapatos");
+                });
+
+            modelBuilder.Entity("FashionM.Models.Venta", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 
             modelBuilder.Entity("FashionM.Models.Zapato", b =>

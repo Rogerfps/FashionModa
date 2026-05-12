@@ -1,0 +1,565 @@
+﻿@model Venta
+
+@{
+    ViewData["Title"] = "Detalle Venta";
+}
+
+<style>
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --text-gray: #64748b;
+        --border-light: #e2e8f0;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Contenedor principal */
+    .venta-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .page-subtitle {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+        margin-top: 0.2rem;
+    }
+
+    .btn-back {
+        background: #f1f5f9;
+        color: var(--deep-blue);
+        border: none;
+        border-radius: 30px;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+        .btn-back:hover {
+            background: var(--deep-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* Summary Grid */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        background: var(--pure-white);
+        border-radius: 16px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .summary-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--text-gray);
+        letter-spacing: 0.3px;
+        margin-bottom: 0.3rem;
+    }
+
+    .summary-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+    }
+
+    .summary-total {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    /* Badges */
+    .type-badge {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+        .type-badge.proforma {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .type-badge.factura {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.canceled {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+    .agent-badge {
+        background: #E9EEF5;
+        color: var(--deep-blue);
+        padding: 0.2rem 0.6rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+
+    /* Cards */
+    .card-modern {
+        background: var(--pure-white);
+        border-radius: 20px;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--deep-blue);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+        .info-item.full {
+            grid-column: span 2;
+        }
+
+    .info-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--text-gray);
+        letter-spacing: 0.3px;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--deep-blue);
+    }
+
+    /* Tabla de productos */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .productos-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        min-width: 600px;
+    }
+
+        .productos-table th {
+            background: var(--deep-blue);
+            color: white;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 0.8rem 0.5rem;
+        }
+
+            .productos-table th:first-child {
+                border-radius: 12px 0 0 12px;
+            }
+
+            .productos-table th:last-child {
+                border-radius: 0 12px 12px 0;
+            }
+
+        .productos-table td {
+            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        .productos-table tbody tr:hover {
+            background: rgba(87, 108, 188, 0.02);
+        }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .fw-bold {
+        font-weight: 600;
+        color: var(--deep-blue);
+    }
+
+    .tallas-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+    }
+
+    /* Total */
+    .total-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--border-light);
+    }
+
+    .total-box {
+        text-align: right;
+    }
+
+    .total-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: var(--text-gray);
+        letter-spacing: 0.5px;
+    }
+
+    .total-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--deep-blue);
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        font-size: 1rem;
+        color: var(--text-gray);
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .venta-container {
+            padding: 1rem;
+        }
+        
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-item.full {
+            grid-column: span 1;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .total-value {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<div class="venta-container">
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <span>📊</span> Venta #@Model.Id
+            </h1>
+            <p class="page-subtitle">
+                Detalle completo de la venta
+            </p>
+        </div>
+        <a asp-action="Index" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Fecha</div>
+            <div class="summary-value">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Tipo Documento</div>
+            <div class="summary-value">
+                @if (Model.TipoDocumento == "PROFORMA")
+                {
+                    <span class="type-badge proforma">📄 PROFORMA</span>
+                }
+                else
+                {
+                    <span class="type-badge factura">🧾 FACTURA</span>
+                }
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Estado</div>
+            <div class="summary-value">
+                @if (Model.Estado == "ACTIVA")
+                {
+                    <span class="status-badge active">✅ ACTIVA</span>
+                }
+                else
+                {
+                    <span class="status-badge canceled">❌ @Model.Estado</span>
+                }
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Total</div>
+            <div class="summary-total">₡ @Model.Total.ToString("N2")</div>
+        </div>
+    </div>
+
+    <!-- EMPRESA -->
+    <div class="card-modern">
+        <div class="card-header">
+            <span>🏢</span> Empresa
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">@Model.Empresa?.Nombre</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono</span>
+                    <span class="info-value">@Model.Empresa?.Telefono</span>
+                </div>
+                <div class="info-item full">
+                    <span class="info-label">Dirección</span>
+                    <span class="info-value">@Model.Empresa?.Direccion</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENTE -->
+    <div class="card-modern">
+        <div class="card-header">
+            <span>👤</span> Cliente
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Comercio</span>
+                    <span class="info-value">@Model.Cliente?.Comercio</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono</span>
+                    <span class="info-value">@Model.Cliente?.Telefonos</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Transporte</span>
+                    <span class="info-value">@Model.Cliente?.Transporte</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATOS VENTA -->
+    <div class="card-modern">
+        <div class="card-header">
+            <span>📋</span> Información de Venta
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Facturado Por</span>
+                    <span class="info-value">@Model.FacturadoPor</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Agente de Venta</span>
+                    <span class="info-value">
+                        <span class="agent-badge">👤 @Model.AgenteVenta</span>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Número de Cajas</span>
+                    <span class="info-value">@Model.NumeroCajas</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Semana</span>
+                    <span class="info-value">@Model.Semana</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Mes</span>
+                    <span class="info-value">@Model.Mes</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Año</span>
+                    <span class="info-value">@Model.Año</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="card-modern">
+        <div class="card-header">
+            <span>🛒</span> Productos Vendidos
+        </div>
+        <div class="card-body">
+            @if (Model.Detalles != null && Model.Detalles.Any())
+            {
+                var productosAgrupados = Model.Detalles
+                    .GroupBy(x => new { x.InventarioCodigo, x.Color, x.PrecioUnitario })
+                    .Select(g => new
+                    {
+                        Codigo = g.Key.InventarioCodigo,
+                        Color = g.Key.Color,
+                        Tallas = string.Join(", ", g.Select(x => $"{x.Talla} ({x.Cantidad})")),
+                        Cantidad = g.Sum(x => x.Cantidad),
+                        Precio = g.Key.PrecioUnitario,
+                        SubTotal = g.Sum(x => x.SubTotal)
+                    })
+                    .ToList();
+
+                <div class="table-responsive">
+                    <table class="productos-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Color</th>
+                                <th>Tallas</th>
+                                <th class="text-right">Cantidad</th>
+                                <th class="text-right">Precio</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in productosAgrupados)
+                            {
+                                <tr>
+                                    <td>@item.Codigo</td>
+                                    <td>@item.Color</td>
+                                    <td>
+                                        <div class="tallas-container">@item.Tallas</div>
+                                    </td>
+                                    <td class="text-right">@item.Cantidad</td>
+                                    <td class="text-right">₡ @item.Precio.ToString("N2")</td>
+                                    <td class="text-right fw-bold">₡ @item.SubTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="total-section">
+                    <div class="total-box">
+                        <div class="total-label">TOTAL GENERAL</div>
+                        <div class="total-value">₡ @Model.Total.ToString("N2")</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No hay productos registrados</h3>
+                </div>
+            }
+        </div>
+    </div>
+</div>

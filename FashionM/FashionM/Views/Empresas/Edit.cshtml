@@ -71,6 +71,21 @@
                 <span asp-validation-for="SimpeMovil" class="text-danger"></span>
             </div>
 
+            <!-- Agente -->
+            <div class="col-md-12 mb-3">
+                <label>Agentes</label>
+
+                <textarea asp-for="Agentes"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Juan|Maria|Pedro"></textarea>
+
+                <small class="text-muted">
+                    Separar agentes con |
+                </small>
+            </div>
+
+
         </div>
 
         <!-- BOTONES -->

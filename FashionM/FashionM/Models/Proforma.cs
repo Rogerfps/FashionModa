@@ -23,6 +23,7 @@ namespace FashionM.Models
         public string Observaciones { get; set; } = string.Empty;
 
         public string FacturadoPor { get; set; } = string.Empty;
+        public string AgenteVenta { get; set; } = string.Empty;
 
         public int NumeroCajas { get; set; }
 
