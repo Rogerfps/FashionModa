@@ -1,0 +1,581 @@
+﻿@model IEnumerable<Venta>
+
+@{
+    ViewData["Title"] = "Dashboard Ventas";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<style>
+    :root {
+    --deep-blue: #0B2447;
+    --ocean-blue: #19376D;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-gray: #64748b;
+    --border-light: #e2e8f0;
+    }
+
+    body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+    }
+
+    .dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    }
+
+    .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    }
+
+    .dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .dashboard-subtitle {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    }
+
+    .btn-back {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+    background: var(--deep-blue);
+    color: white;
+    transform: translateY(-2px);
+    }
+
+    .dashboard-filters {
+    background: var(--pure-white);
+    border-radius: 20px;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+    }
+
+    .filter-group {
+    max-width: 250px;
+    }
+
+    .filter-group label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    }
+
+    .form-select {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    background: #fafcff;
+    }
+
+    .form-select:focus {
+    border-color: var(--electric-blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(87, 108, 188, 0.1);
+    }
+
+    .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    }
+
+    .chart-card {
+    background: var(--pure-white);
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: all 0.2s;
+    }
+
+    .chart-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .chart-card.large {
+    grid-column: span 2;
+    }
+
+    .chart-header {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    }
+
+    .chart-header small {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    }
+
+    .chart-body {
+    padding: 1.5rem;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    canvas {
+    max-height: 350px;
+    width: 100% !important;
+    }
+
+    @@media (max-width: 1024px) {
+    .charts-grid {
+    grid-template-columns: 1fr;
+    }
+        
+    .chart-card.large {
+    grid-column: span 1;
+    }
+    }
+
+    @@media (max-width: 768px) {
+    .dashboard-container {
+    padding: 1rem;
+    }
+        
+    .dashboard-title {
+    font-size: 1.5rem;
+    }
+        
+    .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    }
+        
+    .filter-group {
+    max-width: 100%;
+    }
+        
+    .chart-body {
+    padding: 1rem;
+    }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div>
+            <h1 class="dashboard-title">
+                <span>📊</span> Dashboard de Ventas
+            </h1>
+            <p class="dashboard-subtitle">
+                Estadísticas y métricas generales
+            </p>
+        </div>
+        <a asp-action="Index" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <!-- FILTRO MES -->
+    <div class="dashboard-filters">
+        <form method="get">
+            <div class="filter-group">
+                <label>📅 Filtrar por Mes</label>
+                <select name="mes" class="form-select" onchange="this.form.submit()">
+                    <option value="0">--- Todos ---</option>
+                    @{
+                        string[] mesesFiltro = { "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+                        for (int i = 1; i <= 12; i++)
+                        {
+                            if (ViewBag.MesSeleccionado == i)
+                            {
+                                <option value="@i" selected="selected">@mesesFiltro[i]</option>
+                            }
+                            else
+                            {
+                                <option value="@i">@mesesFiltro[i]</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- GRID DE GRÁFICOS -->
+    <div class="charts-grid">
+
+        <!-- VENTAS POR SEMANA -->
+        <div class="chart-card large">
+            <div class="chart-header">📅 Ventas por Semana</div>
+            <div class="chart-body">
+                <canvas id="ventasSemanaChart"></canvas>
+            </div>
+        </div>
+
+        <!-- VENTAS POR MES Y EMPRESA -->
+        <div class="chart-card large">
+            <div class="chart-header">📆 Ventas por Mes y Empresa</div>
+            <div class="chart-body">
+                <canvas id="ventasMesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- VENTAS POR AGENTE -->
+        <div class="chart-card">
+            <div class="chart-header">
+                👤 Ventas por Agente
+                <small>(@ViewBag.MesActual)</small>
+            </div>
+            <div class="chart-body">
+                <canvas id="agentesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- VENTAS POR EMPRESA -->
+        <div class="chart-card">
+            <div class="chart-header">
+                🏢 Ventas por Empresa
+                <small>(@ViewBag.MesActual)</small>
+            </div>
+            <div class="chart-body">
+                <canvas id="empresasChart"></canvas>
+            </div>
+        </div>
+
+        <!-- PROFORMA VS FACTURA -->
+        <div class="chart-card">
+            <div class="chart-header">
+                📄 PROFORMA vs FACTURA
+                <small>(@ViewBag.MesActual)</small>
+            </div>
+            <div class="chart-body">
+                <canvas id="tipoDocumentoChart"></canvas>
+            </div>
+        </div>
+
+        <!-- PRODUCTOS MÁS VENDIDOS -->
+        <div class="chart-card large">
+            <div class="chart-header">
+                👟 Productos Más Vendidos
+                <small>(@ViewBag.MesActual)</small>
+            </div>
+            <div class="chart-body">
+                <canvas id="productosChart"></canvas>
+            </div>
+        </div>
+
+        <!-- CLIENTES QUE MÁS COMPRAN -->
+        <div class="chart-card large">
+            <div class="chart-header">
+                🛍 Clientes que Más Compran
+                <small>(@ViewBag.MesActual)</small>
+            </div>
+            <div class="chart-body">
+                <canvas id="clientesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========================================
+    // 🎨 COLORES EMPRESAS
+    // ========================================
+    const coloresEmpresas = {
+    "Cocalza Plus S.A": "#DC2626",
+    "LSG MODA S.A": "#16A34A",
+    "Fashion Shoes S.A": "#EC4899",
+    "Maxi Plus 23 S.A": "#EAB308",
+    "KAYROS": "#111827"
+    };
+
+    // ========================================
+    // 📅 VENTAS POR SEMANA
+    // ========================================
+    const semanas = @Html.Raw(Json.Serialize(ViewBag.Semanas));
+    const semanaTotales = @Html.Raw(Json.Serialize(ViewBag.SemanaTotales));
+
+    if (semanas && semanas.length > 0) {
+    new Chart(document.getElementById('ventasSemanaChart'), {
+    type: 'line',
+    data: {
+    labels: semanas,
+    datasets: [{
+    label: 'Ventas',
+    data: semanaTotales,
+    borderWidth: 3,
+    tension: 0.4,
+    fill: true,
+    borderColor: "#2563EB",
+    backgroundColor: "rgba(37,99,235,0.15)"
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { display: false } }
+    }
+    });
+    }
+
+    // ========================================
+    // 📆 VENTAS POR MES Y EMPRESA
+    // ========================================
+    const empresasVentasMes = @Html.Raw(Json.Serialize(ViewBag.EmpresasVentasMes));
+    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const empresas = [...new Set(empresasVentasMes.map(x => x.empresa))];
+
+    const datasets = empresas.map(empresa => ({
+    label: empresa,
+    backgroundColor: coloresEmpresas[empresa] || "#3B82F6",
+    borderColor: coloresEmpresas[empresa] || "#3B82F6",
+    data: meses.map(mes => {
+    const venta = empresasVentasMes.find(x => x.empresa === empresa && x.mes === mes);
+    return venta ? venta.total : 0;
+    }),
+    borderWidth: 1,
+    borderRadius: 8
+    }));
+
+    new Chart(document.getElementById('ventasMesChart'), {
+    type: 'bar',
+    plugins: [ChartDataLabels],
+    data: { labels: meses, datasets: datasets },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    datalabels: {
+    color: '#111827',
+    anchor: 'end',
+    align: 'top',
+    font: { weight: 'bold', size: 10 },
+    formatter: value => value > 0 ? `₡ ${value.toLocaleString()}` : ''
+    }
+    }
+    }
+    });
+
+    // ========================================
+    // 👤 AGENTES
+    // ========================================
+    const agentes = @Html.Raw(Json.Serialize(ViewBag.Agentes));
+    const agenteTotales = @Html.Raw(Json.Serialize(ViewBag.AgenteTotales));
+
+    if (agentes && agentes.length > 0) {
+    new Chart(document.getElementById('agentesChart'), {
+    type: 'doughnut',
+    plugins: [ChartDataLabels],
+    data: { labels: agentes, datasets: [{ data: agenteTotales }] },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    datalabels: {
+    color: '#fff',
+    font: { weight: 'bold', size: 14 },
+    formatter: (value, context) => {
+    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+    return ((value / total) * 100).toFixed(1) + "%";
+    }
+    },
+    legend: { position: 'bottom' }
+    }
+    }
+    });
+    }
+
+    // ========================================
+    // 🏢 EMPRESAS
+    // ========================================
+    const empresasLabels = @Html.Raw(Json.Serialize(ViewBag.Empresas));
+    const empresaTotales = @Html.Raw(Json.Serialize(ViewBag.EmpresaTotales));
+
+    if (empresasLabels && empresasLabels.length > 0) {
+    new Chart(document.getElementById('empresasChart'), {
+    type: 'pie',
+    plugins: [ChartDataLabels],
+    data: {
+    labels: empresasLabels,
+    datasets: [{
+    backgroundColor: ["#DC2626", "#16A34A", "#EC4899", "#EAB308", "#111827"],
+    data: empresaTotales
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    datalabels: {
+    color: '#fff',
+    font: { weight: 'bold', size: 14 },
+    formatter: (value, context) => {
+    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+    return ((value / total) * 100).toFixed(1) + "%";
+    }
+    },
+    legend: { position: 'bottom' }
+    }
+    }
+    });
+    }
+
+    // ========================================
+    // 📄 PROFORMA VS FACTURA
+    // ========================================
+    const tipoDocumento = @Html.Raw(Json.Serialize(ViewBag.TipoDocumento));
+    const tipoDocumentoTotales = @Html.Raw(Json.Serialize(ViewBag.TipoDocumentoTotales));
+
+    if (tipoDocumento && tipoDocumento.length > 0) {
+    new Chart(document.getElementById('tipoDocumentoChart'), {
+    type: 'doughnut',
+    plugins: [ChartDataLabels],
+    data: {
+    labels: tipoDocumento,
+    datasets: [{
+    backgroundColor: ["#2563EB", "#10B981"],
+    data: tipoDocumentoTotales
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    datalabels: {
+    color: '#fff',
+    font: { weight: 'bold', size: 14 },
+    formatter: (value, context) => {
+    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+    return ((value / total) * 100).toFixed(1) + "%";
+    }
+    },
+    legend: { position: 'bottom' }
+    }
+    }
+    });
+    }
+
+    // ========================================
+    // 👟 PRODUCTOS MÁS VENDIDOS
+    // ========================================
+    const productos = @Html.Raw(Json.Serialize(ViewBag.Productos));
+    const productosCantidad = @Html.Raw(Json.Serialize(ViewBag.ProductosCantidad));
+
+    if (productos && productos.length > 0) {
+    new Chart(document.getElementById('productosChart'), {
+    type: 'bar',
+    plugins: [ChartDataLabels],
+    data: {
+    labels: productos,
+    datasets: [{
+    label: 'Cantidad Vendida',
+    data: productosCantidad,
+    borderWidth: 1,
+    backgroundColor: "#2563EB",
+    borderRadius: 8
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    indexAxis: 'y',
+    plugins: {
+    datalabels: {
+    anchor: 'end',
+    align: 'end',
+    color: '#111827',
+    font: { weight: 'bold' },
+    formatter: value => value
+    },
+    legend: { display: false }
+    }
+    }
+    });
+    }
+
+    // ========================================
+    // 🛍 CLIENTES TOP
+    // ========================================
+    const clientes = @Html.Raw(Json.Serialize(ViewBag.Clientes));
+    const clientesTotales = @Html.Raw(Json.Serialize(ViewBag.ClientesTotales));
+
+    if (clientes && clientes.length > 0) {
+    new Chart(document.getElementById('clientesChart'), {
+    type: 'bar',
+    plugins: [ChartDataLabels],
+    data: {
+    labels: clientes,
+    datasets: [{
+    label: 'Monto Comprado',
+    data: clientesTotales,
+    borderWidth: 1,
+    backgroundColor: "#7C3AED",
+    borderRadius: 8
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    indexAxis: 'y',
+    plugins: {
+    datalabels: {
+    anchor: 'end',
+    align: 'end',
+    color: '#111827',
+    font: { weight: 'bold' },
+    formatter: value => `₡ ${value.toLocaleString()}`
+    },
+    legend: { display: false }
+    }
+    }
+    });
+    }
+</script>

@@ -31,6 +31,7 @@ wwwroot\css\ProveedorV2\IndexProveedorV2.css
 wwwroot\css\ProveedorV2\ZapatoEditarProveedoresV2.css
 wwwroot\css\site.css
 wwwroot\css\Ventas\VentasDetails.css
+wwwroot\css\Ventas\VentasGraficos.css
 wwwroot\css\Ventas\VentasIndex.css
 wwwroot\favicon.ico
 wwwroot\imagenes\ZapatosProveedor\22a7b974-5970-4456-9805-2d527ea46f29.png
@@ -94,6 +95,7 @@ wwwroot\images\inventarios\d98be7ea-8403-4a2c-abbb-3f308e5aecee.jpg
 wwwroot\images\inventarios\d9bcf52e-8f1f-486a-abee-8f39e7bb0d2b.png
 wwwroot\images\inventarios\db587956-fda9-450a-a007-361bec7490d7.webp
 wwwroot\images\inventarios\ea641d22-07dc-4726-9756-bcbe78b02f1f.jpg
+wwwroot\images\inventarios\ecb17db0-516a-4ccb-a68f-0d956c4c6547.png
 wwwroot\images\inventarios\f26a9647-d2a8-4ef0-915c-d24e9ae8b81e.jpg
 wwwroot\images\inventarios\ffd144ee-f194-40e5-9308-e9097f7fb72a.png
 wwwroot\images\Jade.jpg
@@ -257,3 +259,4 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Home\Login.cs
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Home\Home.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Ventas\VentasIndex.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Ventas\VentasDetails.css
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Ventas\VentasGraficos.css
