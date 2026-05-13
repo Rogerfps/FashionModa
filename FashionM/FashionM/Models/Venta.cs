@@ -48,6 +48,9 @@ namespace FashionM.Models
         // Navegación
         public ICollection<VentaDetalle> Detalles { get; set; }
             = new List<VentaDetalle>();
+
+        public ICollection<NotaCredito> NotasCredito { get; set; }
+            = new List<NotaCredito>();
     }
 }
 

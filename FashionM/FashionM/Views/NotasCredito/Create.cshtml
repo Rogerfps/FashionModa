@@ -1,0 +1,560 @@
+﻿@model Venta
+
+@{
+    ViewData["Title"] = "Generar Nota Crédito";
+}
+
+<link rel="stylesheet"
+      href="~/css/NotasCredito/NotasCreditoCreate.css" />
+
+<div class="nc-container">
+
+    <!-- HEADER -->
+    <div class="nc-header">
+
+        <div>
+
+            <h1 class="nc-title">
+                ↩️ Generar Nota Crédito
+            </h1>
+
+            <p class="nc-subtitle">
+                Venta #@Model.Id
+            </p>
+
+        </div>
+
+        <a asp-controller="Ventas"
+               asp-action="Details"
+               asp-route-id="@Model.Id"
+               class="btn-back">
+
+            ← Volver
+
+        </a>
+
+    </div>
+
+
+    <!-- INFO -->
+    <div class="info-card">
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Cliente
+                </span>
+
+                <span class="info-value">
+
+                    @Model.Cliente?.Nombre
+                    @Model.Cliente?.Apellidos
+
+                </span>
+
+            </div>
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Empresa
+                </span>
+
+                <span class="info-value">
+
+                    @Model.Empresa?.Nombre
+
+                </span>
+
+            </div>
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Agente
+                </span>
+
+                <span class="info-value">
+
+                    @Model.AgenteVenta
+
+                </span>
+
+            </div>
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Total Venta
+                </span>
+
+                <span class="info-value total-original">
+
+                    ₡ @Model.Total.ToString("N2")
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ALERTAS -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">
+
+            ⚠️ @TempData["Error"]
+
+        </div>
+    }
+
+
+    <!-- FORM -->
+    <form asp-action="Create"
+          method="post">
+
+        <input type="hidden"
+               name="ventaId"
+               value="@Model.Id" />
+
+        <!-- MOTIVO -->
+        <div class="form-card">
+
+            <div class="section-title">
+                📝 Motivo General
+            </div>
+
+            <textarea name="motivo"
+                      class="form-control"
+                      rows="3"
+                      required
+                      placeholder="Ingrese el motivo general de la nota crédito..."></textarea>
+
+        </div>
+
+
+        <!-- DESCUENTO GLOBAL -->
+        <div class="form-card">
+
+            <div class="section-title">
+                💸 Descuento Global
+            </div>
+
+            <div class="discount-global">
+
+                <input type="number"
+                       step="0.01"
+                       min="0"
+                       max="100"
+                       name="descuentoGlobal"
+                       id="descuentoGlobal"
+                       class="form-control"
+                       value="0" />
+
+                <span class="discount-symbol">
+                    %
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRODUCTOS -->
+        <div class="form-card">
+
+            <div class="section-title">
+                📦 Ajustes de Productos
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="productos-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Código</th>
+                            <th>Color</th>
+                            <th>Talla</th>
+                            <th>Vendidos</th>
+                            <th>Disponible</th>
+                            <th>Precio Original</th>
+                            <th>Precio Corregido</th>
+                            <th>Devolver</th>
+                            <th>Desc. Línea %</th>
+                            <th>Eliminar</th>
+                            <th>Observación</th>
+                            <th>Subtotal</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @for (int i = 0; i < Model.Detalles.Count; i++)
+                        {
+                            var item = Model.Detalles.ElementAt(i);
+
+                            int disponible =
+                                (int)(ViewData[$"Disponible_{item.Id}"] ?? 0);
+
+                            bool agotado =
+                                disponible <= 0;
+
+                            <tr class="producto-row">
+
+                                <!-- ID -->
+                                <input type="hidden"
+                                       name="detalleIds"
+                                       value="@item.Id" />
+
+                                <!-- CÓDIGO -->
+                                <td>
+
+                                    @item.InventarioCodigo
+
+                                </td>
+
+                                <!-- COLOR -->
+                                <td>
+
+                                    @item.Color
+
+                                </td>
+
+                                <!-- TALLA -->
+                                <td>
+
+                                    @item.Talla
+
+                                </td>
+
+                                <!-- VENDIDOS -->
+                                <td class="cantidad-original">
+
+                                    @item.Cantidad
+
+                                </td>
+
+                                <!-- DISPONIBLE -->
+                                <td>
+
+                                    @if (agotado)
+                                    {
+                                        <span class="badge-danger">
+                                            AGOTADO
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-success">
+                                            @disponible
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <!-- PRECIO ORIGINAL -->
+                                <td class="precio-original">
+
+                                    @item.PrecioUnitario
+
+                                </td>
+
+                                <!-- PRECIO CORREGIDO -->
+                                <td>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           min="0"
+                                           name="preciosCorregidos"
+                                           class="form-control precio-corregido"
+                                           value="@item.PrecioUnitario"
+                                           disabled="@agotado" />
+
+                                </td>
+
+                                <!-- DEVOLVER -->
+                                <td>
+
+                                    <input type="number"
+                                           min="0"
+                                           max="@disponible"
+                                           name="cantidadesDevueltas"
+                                           class="form-control cantidad-devuelta"
+                                           value="0"
+                                           disabled="@agotado" />
+
+                                </td>
+
+                                <!-- DESCUENTO -->
+                                <td>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           min="0"
+                                           max="100"
+                                           name="descuentosLinea"
+                                           class="form-control descuento-linea"
+                                           value="0"
+                                           disabled="@agotado" />
+
+                                </td>
+
+                                <!-- ELIMINAR -->
+                                <td class="text-center">
+
+                                    <input type="checkbox"
+                                           name="eliminarLineaIds"
+                                           value="@item.Id"
+                                           class="eliminar-linea"
+                                           disabled="@agotado" />
+
+                                </td>
+
+                                <!-- OBSERVACIÓN -->
+                                <td>
+
+                                    <input type="text"
+                                           name="observaciones"
+                                           class="form-control"
+                                           placeholder="Observación..."
+                                           disabled="@agotado" />
+
+                                </td>
+
+                                <!-- SUBTOTAL -->
+                                <td class="subtotal-linea">
+
+                                    ₡ 0.00
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESUMEN -->
+        <div class="summary-card">
+
+            <div class="summary-row">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <strong id="subtotalGeneral">
+
+                    ₡ 0.00
+
+                </strong>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>
+                    Descuento Global
+                </span>
+
+                <strong id="descuentoTotal">
+
+                    ₡ 0.00
+
+                </strong>
+
+            </div>
+
+            <div class="summary-row total-final">
+
+                <span>
+                    Total Nota Crédito
+                </span>
+
+                <strong id="totalFinal">
+
+                    ₡ 0.00
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOTONES -->
+        <div class="action-buttons">
+
+            <a asp-controller="Ventas"
+                   asp-action="Details"
+                   asp-route-id="@Model.Id"
+                   class="btn-cancel">
+
+                Cancelar
+
+            </a>
+
+            <button type="submit"
+                    class="btn-save">
+
+                💾 Generar Nota Crédito
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+    const rows =
+        document.querySelectorAll(
+            '.producto-row'
+        );
+
+    const descuentoGlobalInput =
+        document.getElementById(
+            'descuentoGlobal'
+        );
+
+    function formatMoney(value) {
+        return value.toLocaleString(
+            'es-CR',
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+    }
+
+    function calcularTotales() {
+        let subtotalGeneral = 0;
+
+        rows.forEach(row => {
+
+            const cantidadVendida =
+                parseFloat(
+                    row.children[3].innerText
+                ) || 0;
+
+            const precioOriginal =
+                parseFloat(
+                    row.querySelector(
+                        '.precio-original'
+                    ).innerText
+                ) || 0;
+
+            const precioCorregido =
+                parseFloat(
+                    row.querySelector(
+                        '.precio-corregido'
+                    ).value
+                ) || 0;
+
+            const cantidadDevuelta =
+                parseFloat(
+                    row.querySelector(
+                        '.cantidad-devuelta'
+                    ).value
+                ) || 0;
+
+            const descuentoLinea =
+                parseFloat(
+                    row.querySelector(
+                        '.descuento-linea'
+                    ).value
+                ) || 0;
+
+            const eliminar =
+                row.querySelector(
+                    '.eliminar-linea'
+                ).checked;
+
+            let cantidad =
+                cantidadDevuelta;
+
+            if (eliminar) {
+                cantidad =
+                    cantidadVendida;
+            }
+
+            let subtotal =
+                cantidad *
+                precioCorregido;
+
+            subtotal -=
+                subtotal *
+                (descuentoLinea / 100);
+
+            subtotalGeneral += subtotal;
+
+            row.querySelector(
+                '.subtotal-linea'
+            ).innerText =
+                `₡ ${formatMoney(subtotal)}`;
+        });
+
+        const descuentoGlobal =
+            parseFloat(
+                descuentoGlobalInput.value
+            ) || 0;
+
+        const descuentoMonto =
+            subtotalGeneral *
+            (descuentoGlobal / 100);
+
+        const totalFinal =
+            subtotalGeneral -
+            descuentoMonto;
+
+        document.getElementById(
+            'subtotalGeneral'
+        ).innerText =
+            `₡ ${formatMoney(subtotalGeneral)}`;
+
+        document.getElementById(
+            'descuentoTotal'
+        ).innerText =
+            `₡ ${formatMoney(descuentoMonto)}`;
+
+        document.getElementById(
+            'totalFinal'
+        ).innerText =
+            `₡ ${formatMoney(totalFinal)}`;
+    }
+
+    document.querySelectorAll('input')
+        .forEach(input => {
+
+            input.addEventListener(
+                'input',
+                calcularTotales
+            );
+
+            input.addEventListener(
+                'change',
+                calcularTotales
+            );
+        });
+
+    calcularTotales();
+
+</script>

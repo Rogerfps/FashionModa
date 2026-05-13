@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513141917_NotasCredito2")]
+    partial class NotasCredito2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,9 +426,6 @@ namespace FashionM.Migrations
                     b.Property<int>("ClienteCedula")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("DescuentoGlobal")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("EmpresaId")
                         .HasColumnType("integer");
 
@@ -445,9 +445,6 @@ namespace FashionM.Migrations
 
                     b.Property<int>("Semana")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("numeric");
 
                     b.Property<string>("TipoDocumento")
                         .IsRequired()
@@ -478,21 +475,12 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CantidadDevuelta")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CantidadOriginal")
+                    b.Property<int>("Cantidad")
                         .HasColumnType("integer");
 
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("DescuentoLinea")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("InventarioCodigo")
                         .IsRequired()
@@ -501,14 +489,7 @@ namespace FashionM.Migrations
                     b.Property<int>("NotaCreditoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Observaciones")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("PrecioCorregido")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("PrecioOriginal")
+                    b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("SubTotal")

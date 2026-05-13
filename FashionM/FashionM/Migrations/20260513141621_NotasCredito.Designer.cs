@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513141621_NotasCredito")]
+    partial class NotasCredito
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,9 +426,6 @@ namespace FashionM.Migrations
                     b.Property<int>("ClienteCedula")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("DescuentoGlobal")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("EmpresaId")
                         .HasColumnType("integer");
 
@@ -446,9 +446,6 @@ namespace FashionM.Migrations
                     b.Property<int>("Semana")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("numeric");
-
                     b.Property<string>("TipoDocumento")
                         .IsRequired()
                         .HasColumnType("text");
@@ -467,7 +464,7 @@ namespace FashionM.Migrations
 
                     b.HasIndex("VentaId");
 
-                    b.ToTable("NotasCredito");
+                    b.ToTable("NotaCredito");
                 });
 
             modelBuilder.Entity("FashionM.Models.NotaCreditoDetalle", b =>
@@ -478,21 +475,12 @@ namespace FashionM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CantidadDevuelta")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CantidadOriginal")
+                    b.Property<int>("Cantidad")
                         .HasColumnType("integer");
 
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("DescuentoLinea")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("InventarioCodigo")
                         .IsRequired()
@@ -501,14 +489,7 @@ namespace FashionM.Migrations
                     b.Property<int>("NotaCreditoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Observaciones")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("PrecioCorregido")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("PrecioOriginal")
+                    b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("SubTotal")
@@ -527,7 +508,7 @@ namespace FashionM.Migrations
 
                     b.HasIndex("VentaDetalleId");
 
-                    b.ToTable("NotaCreditoDetalles");
+                    b.ToTable("NotaCreditoDetalle");
                 });
 
             modelBuilder.Entity("FashionM.Models.PedidoCliente", b =>
@@ -1423,7 +1404,7 @@ namespace FashionM.Migrations
                     b.HasOne("FashionM.Models.Venta", "Venta")
                         .WithMany("NotasCredito")
                         .HasForeignKey("VentaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -1443,8 +1424,7 @@ namespace FashionM.Migrations
 
                     b.HasOne("FashionM.Models.VentaDetalle", "VentaDetalle")
                         .WithMany("NotasCreditoDetalle")
-                        .HasForeignKey("VentaDetalleId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("VentaDetalleId");
 
                     b.Navigation("NotaCredito");
 

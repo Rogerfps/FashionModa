@@ -1,0 +1,378 @@
+﻿@model NotaCredito
+
+@{
+    ViewData["Title"] = "Detalle Nota Crédito";
+}
+
+<link rel="stylesheet"
+      href="~/css/NotasCredito/NotasCreditoDetails.css" />
+
+<div class="nc-details-container">
+
+    <!-- HEADER -->
+    <div class="details-header">
+
+        <div>
+
+            <h1 class="details-title">
+                ↩️ Nota Crédito #@Model.Id
+            </h1>
+
+            <p class="details-subtitle">
+
+                @(Model.Fecha.ToString("dd/MM/yyyy HH:mm"))
+
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a asp-controller="Ventas"
+                   asp-action="Details"
+                   asp-route-id="@Model.VentaId"
+                   class="btn-secondary">
+
+                📄 Ver Venta
+
+            </a>
+
+            <a asp-action="Index"
+                   class="btn-back">
+
+                ← Volver
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESUMEN -->
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Cliente
+            </div>
+
+            <div class="summary-value">
+
+                @Model.Cliente?.Nombre
+                @Model.Cliente?.Apellidos
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Empresa
+            </div>
+
+            <div class="summary-value">
+
+                @Model.Empresa?.Nombre
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Agente
+            </div>
+
+            <div class="summary-value">
+
+                @Model.AgenteVenta
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Documento
+            </div>
+
+            <div class="summary-value">
+
+                @Model.TipoDocumento
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Estado
+            </div>
+
+            <div class="summary-value">
+
+                <span class="status-badge">
+
+                    @Model.Estado
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Total Devuelto
+            </div>
+
+            <div class="summary-total">
+
+                ₡ @(Model.TotalDevuelto.ToString("N2"))
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MOTIVO -->
+    <div class="motivo-card">
+
+        <div class="section-title">
+            📝 Motivo
+        </div>
+
+        <div class="motivo-content">
+
+            @Model.Motivo
+
+        </div>
+
+    </div>
+
+
+    <!-- PRODUCTOS -->
+    <div class="table-card">
+
+        <div class="section-title">
+            📦 Productos Ajustados
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="productos-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Código</th>
+                        <th>Color</th>
+                        <th>Talla</th>
+                        <th>Cant. Original</th>
+                        <th>Cant. Devuelta</th>
+                        <th>Precio Original</th>
+                        <th>Precio Corregido</th>
+                        <th>Desc. Línea</th>
+                        <th>Eliminado</th>
+                        <th>Subtotal</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model.Detalles)
+                    {
+                        <tr>
+
+                            <td>
+
+                                @item.InventarioCodigo
+
+                            </td>
+
+                            <td>
+
+                                @item.Color
+
+                            </td>
+
+                            <td>
+
+                                @item.Talla
+
+                            </td>
+
+                            <td>
+
+                                @item.CantidadOriginal
+
+                            </td>
+
+                            <td>
+
+                                <span class="qty-badge">
+
+                                    @item.CantidadDevuelta
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                ₡ @(item.PrecioOriginal.ToString("N2"))
+
+                            </td>
+
+                            <td>
+
+                                ₡ @(item.PrecioCorregido.ToString("N2"))
+
+                            </td>
+
+                            <td>
+
+                                @item.DescuentoLinea %
+
+                            </td>
+
+                            <td>
+
+                                @if (item.Eliminado)
+                                {
+                                    <span class="badge-danger">
+
+                                        ELIMINADO
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-success">
+
+                                        ACTIVO
+
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td class="subtotal">
+
+                                ₡ @(item.SubTotal.ToString("N2"))
+
+                            </td>
+
+                        </tr>
+
+                        @if (!string.IsNullOrWhiteSpace(item.Observaciones))
+                        {
+                            <tr class="obs-row">
+
+                                <td colspan="10">
+
+                                    <div class="obs-box">
+
+                                        <strong>
+                                            Observación:
+                                        </strong>
+
+                                        @item.Observaciones
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTALES -->
+    <div class="totales-card">
+
+        <div class="total-row">
+
+            <span>
+                Subtotal
+            </span>
+
+            <strong>
+
+                ₡ @(Model.SubTotal.ToString("N2"))
+
+            </strong>
+
+        </div>
+
+        <div class="total-row">
+
+            <span>
+                Descuento Global
+            </span>
+
+            <strong class="discount">
+
+                @Model.DescuentoGlobal %
+
+            </strong>
+
+        </div>
+
+        <div class="total-row total-final">
+
+            <span>
+                TOTAL DEVUELTO
+            </span>
+
+            <strong>
+
+                ₡ @(Model.TotalDevuelto.ToString("N2"))
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div class="footer-actions">
+
+        <a asp-controller="Ventas"
+               asp-action="Details"
+               asp-route-id="@Model.VentaId"
+               class="btn-secondary">
+
+            📄 Ver Venta Original
+
+        </a>
+
+    </div>
+
+</div>

@@ -49,8 +49,11 @@ namespace FashionM.Data
 
         //Ventas
         public DbSet<Venta> Ventas { get; set; }
-
         public DbSet<VentaDetalle> VentaDetalles { get; set; }
+
+        //NotasCredito
+        public DbSet<NotaCredito> NotasCredito { get; set; }
+        public DbSet<NotaCreditoDetalle> NotaCreditoDetalles { get; set; }
 
 
 
@@ -203,6 +206,37 @@ namespace FashionM.Data
                 .HasOne(d => d.ProveedorCatalogo)
                 .WithMany()
                 .HasForeignKey(d => d.ProveedorCatalogoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ========================================
+            // NOTA CRÉDITO -> VENTA
+            // ========================================
+
+            modelBuilder.Entity<NotaCredito>()
+                .HasOne(n => n.Venta)
+                .WithMany(v => v.NotasCredito)
+                .HasForeignKey(n => n.VentaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ========================================
+            // NOTA CRÉDITO DETALLE
+            // ========================================
+
+            modelBuilder.Entity<NotaCreditoDetalle>()
+                .HasOne(d => d.NotaCredito)
+                .WithMany(n => n.Detalles)
+                .HasForeignKey(d => d.NotaCreditoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ========================================
+            // RELACIÓN OPCIONAL
+            // VENTA DETALLE
+            // ========================================
+
+            modelBuilder.Entity<NotaCreditoDetalle>()
+                .HasOne(d => d.VentaDetalle)
+                .WithMany(v => v.NotasCreditoDetalle)
+                .HasForeignKey(d => d.VentaDetalleId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

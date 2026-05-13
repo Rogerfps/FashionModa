@@ -22,5 +22,8 @@ namespace FashionM.Models
         public decimal PrecioUnitario { get; set; }
 
         public decimal SubTotal { get; set; }
+
+        public ICollection<NotaCreditoDetalle> NotasCreditoDetalle { get; set; }
+            = new List<NotaCreditoDetalle>();
     }
 }

@@ -7,214 +7,550 @@
 <link rel="stylesheet" href="~/css/Ventas/VentasDetails.css" />
 
 <div class="venta-container">
+
     <!-- HEADER -->
     <div class="page-header">
+
         <div>
+
             <h1 class="page-title">
                 <span>📊</span> Venta #@Model.Id
             </h1>
+
             <p class="page-subtitle">
                 Detalle completo de la venta
             </p>
+
         </div>
-        <a asp-action="Index" class="btn-back">
+
+        <a asp-action="Index"
+               class="btn-back">
+
             ← Volver
+
         </a>
+
     </div>
+
+
+    <!-- ACTIONS -->
+    <div class="top-actions">
+
+        @if (Model.Estado != "ANULADA")
+        {
+            <a asp-controller="NotasCredito"
+                   asp-action="Create"
+                   asp-route-ventaId="@Model.Id"
+                   class="btn-nota-credito">
+
+                ↩️ Generar Nota Crédito
+
+            </a>
+        }
+
+    </div>
+
 
     <!-- RESUMEN -->
     <div class="summary-grid">
+
         <div class="summary-card">
-            <div class="summary-label">Fecha</div>
-            <div class="summary-value">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</div>
+
+            <div class="summary-label">
+                Fecha
+            </div>
+
+            <div class="summary-value">
+                @Model.Fecha.ToString("dd/MM/yyyy HH:mm")
+            </div>
+
         </div>
 
         <div class="summary-card">
-            <div class="summary-label">Tipo Documento</div>
+
+            <div class="summary-label">
+                Tipo Documento
+            </div>
+
             <div class="summary-value">
+
                 @if (Model.TipoDocumento == "PROFORMA")
                 {
-                    <span class="type-badge proforma">📄 PROFORMA</span>
+                    <span class="type-badge proforma">
+                        📄 PROFORMA
+                    </span>
                 }
                 else
                 {
-                    <span class="type-badge factura">🧾 FACTURA</span>
+                    <span class="type-badge factura">
+                        🧾 FACTURA
+                    </span>
                 }
+
             </div>
+
         </div>
 
         <div class="summary-card">
-            <div class="summary-label">Estado</div>
+
+            <div class="summary-label">
+                Estado
+            </div>
+
             <div class="summary-value">
+
                 @if (Model.Estado == "ACTIVA")
                 {
-                    <span class="status-badge active">✅ ACTIVA</span>
+                    <span class="status-badge active">
+                        ✅ ACTIVA
+                    </span>
+                }
+                else if (Model.Estado == "DEVUELTA_PARCIAL")
+                {
+                    <span class="status-badge partial">
+                        ↩️ DEVUELTA PARCIAL
+                    </span>
                 }
                 else
                 {
-                    <span class="status-badge canceled">❌ @Model.Estado</span>
+                    <span class="status-badge canceled">
+                        ❌ @Model.Estado
+                    </span>
                 }
+
             </div>
+
         </div>
 
         <div class="summary-card">
-            <div class="summary-label">Total</div>
-            <div class="summary-total">₡ @Model.Total.ToString("N2")</div>
+
+            <div class="summary-label">
+                Total
+            </div>
+
+            <div class="summary-total">
+                ₡ @Model.Total.ToString("N2")
+            </div>
+
         </div>
+
     </div>
+
 
     <!-- EMPRESA -->
     <div class="card-modern">
+
         <div class="card-header">
             <span>🏢</span> Empresa
         </div>
+
         <div class="card-body">
+
             <div class="info-grid">
+
                 <div class="info-item">
-                    <span class="info-label">Nombre</span>
-                    <span class="info-value">@Model.Empresa?.Nombre</span>
+
+                    <span class="info-label">
+                        Nombre
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Empresa?.Nombre
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Teléfono</span>
-                    <span class="info-value">@Model.Empresa?.Telefono</span>
+
+                    <span class="info-label">
+                        Teléfono
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Empresa?.Telefono
+                    </span>
+
                 </div>
+
                 <div class="info-item full">
-                    <span class="info-label">Dirección</span>
-                    <span class="info-value">@Model.Empresa?.Direccion</span>
+
+                    <span class="info-label">
+                        Dirección
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Empresa?.Direccion
+                    </span>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 
     <!-- CLIENTE -->
     <div class="card-modern">
+
         <div class="card-header">
             <span>👤</span> Cliente
         </div>
+
         <div class="card-body">
+
             <div class="info-grid">
+
                 <div class="info-item">
-                    <span class="info-label">Nombre</span>
-                    <span class="info-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</span>
+
+                    <span class="info-label">
+                        Nombre
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Cliente?.Nombre
+                        @Model.Cliente?.Apellidos
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Comercio</span>
-                    <span class="info-value">@Model.Cliente?.Comercio</span>
+
+                    <span class="info-label">
+                        Comercio
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Cliente?.Comercio
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Teléfono</span>
-                    <span class="info-value">@Model.Cliente?.Telefonos</span>
+
+                    <span class="info-label">
+                        Teléfono
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Cliente?.Telefonos
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Transporte</span>
-                    <span class="info-value">@Model.Cliente?.Transporte</span>
+
+                    <span class="info-label">
+                        Transporte
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Cliente?.Transporte
+                    </span>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 
     <!-- DATOS VENTA -->
     <div class="card-modern">
+
         <div class="card-header">
             <span>📋</span> Información de Venta
         </div>
+
         <div class="card-body">
+
             <div class="info-grid">
+
                 <div class="info-item">
-                    <span class="info-label">Facturado Por</span>
-                    <span class="info-value">@Model.FacturadoPor</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Agente de Venta</span>
-                    <span class="info-value">
-                        <span class="agent-badge">👤 @Model.AgenteVenta</span>
+
+                    <span class="info-label">
+                        Facturado Por
                     </span>
+
+                    <span class="info-value">
+                        @Model.FacturadoPor
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Número de Cajas</span>
-                    <span class="info-value">@Model.NumeroCajas</span>
+
+                    <span class="info-label">
+                        Agente de Venta
+                    </span>
+
+                    <span class="info-value">
+
+                        <span class="agent-badge">
+                            👤 @Model.AgenteVenta
+                        </span>
+
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Semana</span>
-                    <span class="info-value">@Model.Semana</span>
+
+                    <span class="info-label">
+                        Número de Cajas
+                    </span>
+
+                    <span class="info-value">
+                        @Model.NumeroCajas
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Mes</span>
-                    <span class="info-value">@Model.Mes</span>
+
+                    <span class="info-label">
+                        Semana
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Semana
+                    </span>
+
                 </div>
+
                 <div class="info-item">
-                    <span class="info-label">Año</span>
-                    <span class="info-value">@Model.Año</span>
+
+                    <span class="info-label">
+                        Mes
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Mes
+                    </span>
+
                 </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Año
+                    </span>
+
+                    <span class="info-value">
+                        @Model.Año
+                    </span>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
+
+    <!-- NOTAS CRÉDITO -->
+    @if (Model.NotasCredito.Any())
+    {
+        <div class="notas-credito-card">
+
+            <div class="section-title">
+                ↩️ Notas Crédito
+            </div>
+
+            <div class="notas-list">
+
+                @foreach (var nota in Model.NotasCredito
+               .OrderByDescending(x => x.Fecha))
+                {
+                    <a asp-controller="NotasCredito"
+                           asp-action="Details"
+                           asp-route-id="@nota.Id"
+                           class="nota-item">
+
+                        <div class="nota-info">
+
+                            <strong>
+                                Nota #@nota.Id
+                            </strong>
+
+                            <small>
+                                @(nota.Fecha.ToString("dd/MM/yyyy"))
+                            </small>
+
+                        </div>
+
+                        <div class="nota-right">
+
+                            <div class="nota-total">
+
+                                ₡ @(nota.TotalDevuelto.ToString("N2"))
+
+                            </div>
+
+                            <div class="nota-arrow">
+                                →
+                            </div>
+
+                        </div>
+
+                    </a>
+                }
+
+            </div>
+
+        </div>
+    }
+
 
     <!-- PRODUCTOS -->
     <div class="card-modern">
+
         <div class="card-header">
             <span>🛒</span> Productos Vendidos
         </div>
+
         <div class="card-body">
-            @if (Model.Detalles != null && Model.Detalles.Any())
+
+            @if (Model.Detalles != null &&
+           Model.Detalles.Any())
             {
                 var productosAgrupados = Model.Detalles
-                    .GroupBy(x => new { x.InventarioCodigo, x.Color, x.PrecioUnitario })
+                    .GroupBy(x => new
+                    {
+                        x.InventarioCodigo,
+                        x.Color,
+                        x.PrecioUnitario
+                    })
                     .Select(g => new
                     {
                         Codigo = g.Key.InventarioCodigo,
+
                         Color = g.Key.Color,
-                        Tallas = string.Join(", ", g.Select(x => $"{x.Talla} ({x.Cantidad})")),
+
+                        Tallas = string.Join(
+                            ", ",
+                            g.Select(x =>
+                                $"{x.Talla} ({x.Cantidad})")
+                        ),
+
                         Cantidad = g.Sum(x => x.Cantidad),
+
                         Precio = g.Key.PrecioUnitario,
+
                         SubTotal = g.Sum(x => x.SubTotal)
                     })
                     .ToList();
 
                 <div class="table-responsive">
+
                     <table class="productos-table">
+
                         <thead>
+
                             <tr>
+
                                 <th>Código</th>
+
                                 <th>Color</th>
+
                                 <th>Tallas</th>
-                                <th class="text-right">Cantidad</th>
-                                <th class="text-right">Precio</th>
-                                <th class="text-right">Subtotal</th>
+
+                                <th class="text-right">
+                                    Cantidad
+                                </th>
+
+                                <th class="text-right">
+                                    Precio
+                                </th>
+
+                                <th class="text-right">
+                                    Subtotal
+                                </th>
+
                             </tr>
+
                         </thead>
+
                         <tbody>
+
                             @foreach (var item in productosAgrupados)
                             {
                                 <tr>
-                                    <td>@item.Codigo</td>
-                                    <td>@item.Color</td>
+
                                     <td>
-                                        <div class="tallas-container">@item.Tallas</div>
+                                        @item.Codigo
                                     </td>
-                                    <td class="text-right">@item.Cantidad</td>
-                                    <td class="text-right">₡ @item.Precio.ToString("N2")</td>
-                                    <td class="text-right fw-bold">₡ @item.SubTotal.ToString("N2")</td>
+
+                                    <td>
+                                        @item.Color
+                                    </td>
+
+                                    <td>
+
+                                        <div class="tallas-container">
+                                            @item.Tallas
+                                        </div>
+
+                                    </td>
+
+                                    <td class="text-right">
+                                        @item.Cantidad
+                                    </td>
+
+                                    <td class="text-right">
+                                        ₡ @item.Precio.ToString("N2")
+                                    </td>
+
+                                    <td class="text-right fw-bold">
+                                        ₡ @item.SubTotal.ToString("N2")
+                                    </td>
+
                                 </tr>
                             }
+
                         </tbody>
+
                     </table>
+
                 </div>
 
                 <div class="total-section">
+
                     <div class="total-box">
-                        <div class="total-label">TOTAL GENERAL</div>
-                        <div class="total-value">₡ @Model.Total.ToString("N2")</div>
+
+                        <div class="total-label">
+                            TOTAL GENERAL
+                        </div>
+
+                        <div class="total-value">
+                            ₡ @Model.Total.ToString("N2")
+                        </div>
+
                     </div>
+
                 </div>
             }
             else
             {
                 <div class="empty-state">
-                    <div class="empty-icon">📭</div>
-                    <h3>No hay productos registrados</h3>
+
+                    <div class="empty-icon">
+                        📭
+                    </div>
+
+                    <h3>
+                        No hay productos registrados
+                    </h3>
+
                 </div>
             }
+
         </div>
+
     </div>
+
 </div>

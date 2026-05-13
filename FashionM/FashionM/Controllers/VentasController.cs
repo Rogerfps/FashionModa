@@ -37,8 +37,13 @@ namespace FashionM.Controllers
         {
             var venta = await _context.Ventas
                 .Include(v => v.Cliente)
+
                 .Include(v => v.Empresa)
+
                 .Include(v => v.Detalles)
+
+                .Include(v => v.NotasCredito)
+
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (venta == null)
