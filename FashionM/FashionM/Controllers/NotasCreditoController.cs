@@ -552,6 +552,498 @@ namespace FashionM.Controllers
                 new { id = venta.Id });
         }
 
+
+        // ========================================
+        // EDIT GET
+        // ========================================
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var nota = await _context.NotasCredito
+                .Include(n => n.Detalles)
+
+                .Include(n => n.Venta)
+
+                .ThenInclude(v => v!.Cliente)
+
+                .Include(n => n.Venta)
+
+                .ThenInclude(v => v!.Empresa)
+
+                .Include(n => n.Venta)
+
+                .ThenInclude(v => v!.Detalles)
+
+                .FirstOrDefaultAsync(n => n.Id == id);
+
+            if (nota == null)
+                return NotFound();
+
+            // ========================================
+            // DISPONIBLE POR PRODUCTO
+            // ========================================
+
+            foreach (var detalle in nota.Venta!.Detalles)
+            {
+                int yaDevuelto =
+                    await _context.NotaCreditoDetalles
+                        .Where(x =>
+                            x.VentaDetalleId == detalle.Id &&
+                            x.NotaCreditoId != nota.Id)
+                        .SumAsync(x =>
+                            x.CantidadDevuelta);
+
+                ViewData[$"Disponible_{detalle.Id}"] =
+                    detalle.Cantidad - yaDevuelto;
+            }
+
+            return View(nota);
+        }
+
+
+        // ========================================
+        // EDIT POST
+        // ========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            string motivo,
+            decimal descuentoGlobal,
+            List<int> detalleIds,
+            List<int> cantidadesDevueltas,
+            List<decimal> preciosCorregidos,
+            List<decimal> descuentosLinea,
+            List<int> eliminarLineaIds,
+            List<string> observaciones)
+        {
+            var nota = await _context.NotasCredito
+                .Include(n => n.Detalles)
+
+                .Include(n => n.Venta)
+
+                .ThenInclude(v => v!.Detalles)
+
+                .FirstOrDefaultAsync(n => n.Id == id);
+
+            if (nota == null)
+                return NotFound();
+
+            var venta = nota.Venta;
+
+            if (venta == null)
+                return NotFound();
+
+            // ========================================
+            // ELIMINAR DETALLES ANTERIORES
+            // ========================================
+
+            _context.NotaCreditoDetalles.RemoveRange(
+                nota.Detalles
+            );
+
+            nota.Detalles.Clear();
+
+            // ========================================
+            // RESET
+            // ========================================
+
+            nota.Motivo =
+                motivo;
+
+            nota.DescuentoGlobal =
+                descuentoGlobal;
+
+            nota.SubTotal = 0;
+
+            nota.TotalDevuelto = 0;
+
+            decimal subtotalGeneral = 0;
+
+            decimal totalDevueltoReal = 0;
+
+            // ========================================
+            // RECORRER PRODUCTOS
+            // ========================================
+
+            for (int i = 0; i < detalleIds.Count; i++)
+            {
+                int detalleId =
+                    detalleIds[i];
+
+                int cantidadDevuelta =
+                    cantidadesDevueltas.Count > i
+                        ? cantidadesDevueltas[i]
+                        : 0;
+
+                decimal precioCorregidoInput =
+                    preciosCorregidos.Count > i
+                        ? preciosCorregidos[i]
+                        : 0;
+
+                decimal descuentoLinea =
+                    descuentosLinea.Count > i
+                        ? descuentosLinea[i]
+                        : 0;
+
+                bool eliminado =
+                    eliminarLineaIds != null &&
+                    eliminarLineaIds.Contains(detalleId);
+
+                string observacion =
+                    observaciones.Count > i
+                        ? observaciones[i]
+                        : string.Empty;
+
+                var detalleVenta =
+                    venta.Detalles
+                        .FirstOrDefault(x =>
+                            x.Id == detalleId);
+
+                if (detalleVenta == null)
+                    continue;
+
+                // ========================================
+                // VALIDAR DEVOLUCIONES PREVIAS
+                // ========================================
+
+                int yaDevuelto =
+                    await _context.NotaCreditoDetalles
+                        .Where(x =>
+                            x.VentaDetalleId ==
+                            detalleVenta.Id &&
+                            x.NotaCreditoId != nota.Id)
+                        .SumAsync(x =>
+                            x.CantidadDevuelta);
+
+                int disponible =
+                    detalleVenta.Cantidad -
+                    yaDevuelto;
+
+                if (disponible <= 0)
+                    continue;
+
+                // ========================================
+                // ELIMINAR
+                // ========================================
+
+                if (eliminado)
+                {
+                    cantidadDevuelta =
+                        disponible;
+                }
+
+                // ========================================
+                // VALIDAR DISPONIBLE
+                // ========================================
+
+                if (cantidadDevuelta > disponible)
+                {
+                    TempData["Error"] =
+                        $"La cantidad máxima disponible para devolver del producto {detalleVenta.InventarioCodigo} es {disponible}.";
+
+                    return RedirectToAction(
+                        nameof(Edit),
+                        new { id });
+                }
+
+                // ========================================
+                // PRECIO FINAL
+                // ========================================
+
+                decimal precioFinal =
+                    precioCorregidoInput > 0
+                        ? precioCorregidoInput
+                        : detalleVenta.PrecioUnitario;
+
+                // ========================================
+                // VALIDAR PRECIO
+                // ========================================
+
+                if (precioFinal >
+                    detalleVenta.PrecioUnitario)
+                {
+                    TempData["Error"] =
+                        $"El precio corregido no puede ser mayor al original para el producto {detalleVenta.InventarioCodigo}.";
+
+                    return RedirectToAction(
+                        nameof(Edit),
+                        new { id });
+                }
+
+                // ========================================
+                // TIENE CAMBIOS
+                // ========================================
+
+                bool tieneCambios =
+                    cantidadDevuelta > 0 ||
+                    descuentoLinea > 0 ||
+                    precioFinal != detalleVenta.PrecioUnitario ||
+                    eliminado;
+
+                if (!tieneCambios)
+                    continue;
+
+                // ========================================
+                // CANTIDAD AFECTADA
+                // ========================================
+
+                int cantidadAfectada = 0;
+
+                if (cantidadDevuelta > 0)
+                {
+                    cantidadAfectada =
+                        cantidadDevuelta;
+                }
+                else if (
+                    descuentoLinea > 0 ||
+                    precioFinal != detalleVenta.PrecioUnitario
+                )
+                {
+                    cantidadAfectada =
+                        detalleVenta.Cantidad;
+                }
+
+                if (eliminado)
+                {
+                    cantidadAfectada =
+                        disponible;
+                }
+
+                // ========================================
+                // ORIGINAL
+                // ========================================
+
+                decimal totalOriginal =
+                    cantidadAfectada *
+                    detalleVenta.PrecioUnitario;
+
+                // ========================================
+                // NUEVO SUBTOTAL
+                // ========================================
+
+                decimal subtotal =
+                    cantidadAfectada *
+                    precioFinal;
+
+                // ========================================
+                // DESCUENTO
+                // ========================================
+
+                if (descuentoLinea > 0)
+                {
+                    subtotal -=
+                        subtotal *
+                        (descuentoLinea / 100);
+                }
+
+                // ========================================
+                // DEVOLUCIÓN REAL
+                // ========================================
+
+                decimal devolucionLinea = 0;
+
+                if (
+                    cantidadDevuelta > 0 &&
+                    descuentoLinea <= 0 &&
+                    precioFinal == detalleVenta.PrecioUnitario
+                )
+                {
+                    devolucionLinea =
+                        subtotal;
+                }
+                else
+                {
+                    devolucionLinea =
+                        totalOriginal - subtotal;
+                }
+
+                subtotalGeneral += subtotal;
+
+                totalDevueltoReal +=
+                    devolucionLinea;
+
+                // ========================================
+                // GUARDAR DETALLE
+                // ========================================
+
+                nota.Detalles.Add(
+                    new NotaCreditoDetalle
+                    {
+                        VentaDetalleId =
+                            detalleVenta.Id,
+
+                        InventarioCodigo =
+                            detalleVenta.InventarioCodigo,
+
+                        Color =
+                            detalleVenta.Color,
+
+                        Talla =
+                            detalleVenta.Talla,
+
+                        CantidadOriginal =
+                            detalleVenta.Cantidad,
+
+                        CantidadDevuelta =
+                            cantidadDevuelta,
+
+                        PrecioOriginal =
+                            detalleVenta.PrecioUnitario,
+
+                        PrecioCorregido =
+                            precioFinal,
+
+                        DescuentoLinea =
+                            descuentoLinea,
+
+                        Eliminado =
+                            eliminado,
+
+                        Observaciones =
+                            observacion ?? string.Empty,
+
+                        SubTotal =
+                            subtotal
+                    });
+            }
+
+            // ========================================
+            // SOLO DESCUENTO GLOBAL
+            // ========================================
+
+            bool soloDescuentoGlobal =
+                descuentoGlobal > 0 &&
+                nota.Detalles.Count == 0;
+
+            if (soloDescuentoGlobal)
+            {
+                subtotalGeneral =
+                    venta.Total;
+
+                totalDevueltoReal =
+                    0;
+            }
+
+            // ========================================
+            // VALIDAR
+            // ========================================
+
+            if (!nota.Detalles.Any() &&
+                !soloDescuentoGlobal)
+            {
+                TempData["Error"] =
+                    "La nota crédito no contiene ajustes válidos.";
+
+                return RedirectToAction(
+                    nameof(Edit),
+                    new { id });
+            }
+
+            // ========================================
+            // SUBTOTAL
+            // ========================================
+
+            nota.SubTotal =
+                subtotalGeneral;
+
+            // ========================================
+            // DESCUENTO GLOBAL
+            // ========================================
+
+            decimal devolucionGlobal = 0;
+
+            if (descuentoGlobal > 0)
+            {
+                devolucionGlobal =
+                    subtotalGeneral *
+                    (descuentoGlobal / 100);
+            }
+
+            // ========================================
+            // TOTAL DEVUELTO
+            // ========================================
+
+            nota.TotalDevuelto =
+                totalDevueltoReal +
+                devolucionGlobal;
+
+            // ========================================
+            // RECALCULAR ESTADO VENTA
+            // ========================================
+
+            bool ventaAnulada = true;
+
+            foreach (var detalle in venta.Detalles)
+            {
+                int totalDevuelto =
+                    await _context.NotaCreditoDetalles
+                        .Where(x =>
+                            x.VentaDetalleId ==
+                            detalle.Id)
+                        .SumAsync(x =>
+                            x.CantidadDevuelta);
+
+                totalDevuelto +=
+                    nota.Detalles
+                        .Where(x =>
+                            x.VentaDetalleId ==
+                            detalle.Id)
+                        .Sum(x =>
+                            x.CantidadDevuelta);
+
+                if (totalDevuelto <
+                    detalle.Cantidad)
+                {
+                    ventaAnulada = false;
+                    break;
+                }
+            }
+
+            if (ventaAnulada)
+            {
+                venta.Estado =
+                    "ANULADA";
+            }
+            else if (nota.Detalles.Any(x =>
+                x.CantidadDevuelta > 0))
+            {
+                venta.Estado =
+                    "DEVUELTA_PARCIAL";
+            }
+            else
+            {
+                venta.Estado =
+                    "ACTIVA";
+            }
+
+            // ========================================
+            // SAVE
+            // ========================================
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Nota crédito actualizada correctamente.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = nota.Id });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
         //========================================
         //PDF
         //========================================
@@ -781,13 +1273,13 @@ namespace FashionM.Controllers
                                 {
                                     table.ColumnsDefinition(columns =>
                                     {
-                                        columns.RelativeColumn(2);
-                                        columns.RelativeColumn();
-                                        columns.RelativeColumn();
-                                        columns.RelativeColumn();
-                                        columns.RelativeColumn();
-                                        columns.RelativeColumn();
-                                        columns.RelativeColumn();
+                                        columns.RelativeColumn(2); // Código
+                                        columns.RelativeColumn(2); // Color
+                                        columns.RelativeColumn(1); // Cant
+                                        columns.RelativeColumn(2); // Precio
+                                        columns.RelativeColumn(1); // Desc
+                                        columns.RelativeColumn(2); // Estado
+                                        columns.RelativeColumn(2); // Subtotal
                                     });
 
                                     // HEADER
