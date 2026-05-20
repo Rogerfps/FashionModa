@@ -1,0 +1,270 @@
+﻿@model CuentaPorCobrar
+
+@{
+    ViewData["Title"] = "Crear Cuenta por Cobrar";
+}
+
+<link rel="stylesheet"
+      href="~/css/CuentasPorCobrar/CuentasPorCobrarCreate.css" />
+
+<div class="cxc-create-container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+
+            <h1 class="page-title">
+                💳 Generar Cuenta por Cobrar
+            </h1>
+
+            <p class="page-subtitle">
+                Venta #@Model.VentaId
+            </p>
+
+        </div>
+
+        <a asp-controller="Ventas"
+           asp-action="Details"
+           asp-route-id="@Model.VentaId"
+           class="btn-back">
+
+            ← Volver
+
+        </a>
+
+    </div>
+
+    <!-- ALERTAS -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">
+
+            ⚠️ @TempData["Error"]
+
+        </div>
+    }
+
+    <!-- FORM -->
+    <form asp-action="Create"
+          method="post">
+
+        <!-- HIDDEN -->
+        <input type="hidden"
+               asp-for="VentaId" />
+
+        <input type="hidden"
+               asp-for="ClienteCedula" />
+
+        <input type="hidden"
+               asp-for="MontoOriginal" />
+
+        <!-- INFO -->
+        <div class="summary-grid">
+
+            <!-- CLIENTE -->
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Cliente
+                </div>
+
+                <div class="summary-value">
+
+                    @Model.ClienteCedula
+
+                </div>
+
+            </div>
+
+            <!-- VENTA -->
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Venta
+                </div>
+
+                <div class="summary-value">
+
+                    #@Model.VentaId
+
+                </div>
+
+            </div>
+
+            <!-- TOTAL -->
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Monto Original
+                </div>
+
+                <div class="summary-total">
+
+                    ₡ @Model.MontoOriginal.ToString("N2")
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+
+            <div class="section-title">
+                📋 Información Cuenta
+            </div>
+
+            <div class="form-grid">
+
+                <!-- DIAS CREDITO -->
+                <div class="form-group">
+
+                    <label>
+                        Días Crédito
+                    </label>
+
+                    <input asp-for="DiasCredito"
+                           type="number"
+                           min="1"
+                           class="form-control" />
+
+                    <small class="form-help">
+
+                        La fecha vencimiento se calculará automáticamente.
+
+                    </small>
+
+                </div>
+
+                <!-- FECHA VENCIMIENTO -->
+                <div class="form-group">
+
+                    <label>
+                        Fecha Vencimiento
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="fechaVencimiento"
+                           readonly />
+
+                </div>
+
+                <!-- OBS -->
+                <div class="form-group full">
+
+                    <label>
+                        Observaciones
+                    </label>
+
+                    <textarea asp-for="Observaciones"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Observaciones de la cuenta..."></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="total-card">
+
+            <div class="total-row">
+
+                <span>
+                    Monto Cuenta
+                </span>
+
+                <strong>
+
+                    ₡ @Model.MontoOriginal.ToString("N2")
+
+                </strong>
+
+            </div>
+
+            <div class="total-row total-final">
+
+                <span>
+                    Estado Inicial
+                </span>
+
+                <strong class="status-pending">
+
+                    PENDIENTE
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        <!-- BOTONES -->
+        <div class="action-buttons">
+
+            <a asp-controller="Ventas"
+               asp-action="Details"
+               asp-route-id="@Model.VentaId"
+               class="btn-cancel">
+
+                Cancelar
+
+            </a>
+
+            <button type="submit"
+                    class="btn-save">
+
+                💾 Crear Cuenta
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+    const diasCredito =
+        document.getElementById(
+            'DiasCredito'
+        );
+
+    const fechaVencimiento =
+        document.getElementById(
+            'fechaVencimiento'
+        );
+
+    function calcularFecha()
+    {
+        const dias =
+            parseInt(
+                diasCredito.value || 0
+            );
+
+        const fecha =
+            new Date();
+
+        fecha.setDate(
+            fecha.getDate() + dias
+        );
+
+        fechaVencimiento.value =
+            fecha.toLocaleDateString(
+                'es-CR'
+            );
+    }
+
+    diasCredito.addEventListener(
+        'input',
+        calcularFecha
+    );
+
+    calcularFecha();
+
+</script>

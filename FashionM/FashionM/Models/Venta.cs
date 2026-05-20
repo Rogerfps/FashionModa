@@ -51,6 +51,8 @@ namespace FashionM.Models
 
         public ICollection<NotaCredito> NotasCredito { get; set; }
             = new List<NotaCredito>();
+
+        public CuentaPorCobrar? CuentaPorCobrar { get; set; }
     }
 }
 

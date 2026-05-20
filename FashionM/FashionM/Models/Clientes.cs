@@ -60,6 +60,10 @@ namespace FashionM.Models
 
         public ICollection<PedidoCliente> Pedidos { get; set; }
         = new List<PedidoCliente>();
+
+        public ICollection<CuentaPorCobrar> CuentasPorCobrar
+        { get; set; }
+        = new List<CuentaPorCobrar>();
     }
 }
 

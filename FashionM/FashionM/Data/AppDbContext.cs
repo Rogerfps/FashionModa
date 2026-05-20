@@ -55,6 +55,11 @@ namespace FashionM.Data
         public DbSet<NotaCredito> NotasCredito { get; set; }
         public DbSet<NotaCreditoDetalle> NotaCreditoDetalles { get; set; }
 
+        //CuentasPorCobrar
+        public DbSet<CuentaPorCobrar> CuentasPorCobrar { get; set; }
+
+        public DbSet<CuentaPorCobrarPago> CuentasPorCobrarPagos { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -238,6 +243,39 @@ namespace FashionM.Data
                 .WithMany(v => v.NotasCreditoDetalle)
                 .HasForeignKey(d => d.VentaDetalleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ========================================
+            // VENTA -> CUENTA POR COBRAR
+            // ========================================
+
+            modelBuilder.Entity<CuentaPorCobrar>()
+                .HasOne(c => c.Venta)
+                .WithOne(v => v.CuentaPorCobrar)
+                .HasForeignKey<CuentaPorCobrar>(
+                    c => c.VentaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // ========================================
+            // CLIENTE -> CUENTAS POR COBRAR
+            // ========================================
+
+            modelBuilder.Entity<CuentaPorCobrar>()
+                .HasOne(c => c.Cliente)
+                .WithMany(c => c.CuentasPorCobrar)
+                .HasForeignKey(c => c.ClienteCedula)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // ========================================
+            // CUENTA -> PAGOS
+            // ========================================
+
+            modelBuilder.Entity<CuentaPorCobrarPago>()
+                .HasOne(p => p.CuentaPorCobrar)
+                .WithMany(c => c.Pagos)
+                .HasForeignKey(p => p.CuentaPorCobrarId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

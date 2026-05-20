@@ -39,11 +39,35 @@
         @if (Model.Estado != "ANULADA")
         {
             <a asp-controller="NotasCredito"
-                   asp-action="Create"
-                   asp-route-ventaId="@Model.Id"
-                   class="btn-nota-credito">
+               asp-action="Create"
+               asp-route-ventaId="@Model.Id"
+               class="btn-nota-credito">
 
                 ↩️ Generar Nota Crédito
+
+            </a>
+        }
+
+        @if (Model.CuentaPorCobrar == null)
+        {
+            <a asp-controller="CuentasPorCobrar"
+               asp-action="Create"
+               asp-route-ventaId="@Model.Id"
+               class="btn-cuenta-cobrar">
+
+                💳 Generar Cuenta por Cobrar
+
+            </a>
+        }
+
+        @if (Model.CuentaPorCobrar != null)
+        {
+            <a asp-controller="CuentasPorCobrar"
+               asp-action="Details"
+               asp-route-clienteCedula="@Model.ClienteCedula"
+               class="btn-cuenta-creada">
+
+                📄 Ver Cuenta por Cobrar
 
             </a>
         }

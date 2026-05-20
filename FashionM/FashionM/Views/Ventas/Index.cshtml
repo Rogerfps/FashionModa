@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<Venta>
 
+@using System.Globalization
+
 @{
     ViewData["Title"] = "Ventas";
 }
@@ -7,6 +9,7 @@
 <link rel="stylesheet" href="~/css/Ventas/VentasIndex.css" />
 
 <div class="ventas-container">
+
     <!-- HEADER -->
     <div class="page-header">
 
@@ -25,7 +28,7 @@
         <div class="header-actions">
 
             <a asp-action="Graficos"
-                   class="btn-graficos">
+               class="btn-graficos">
 
                 📈 Dashboard
 
@@ -35,86 +38,192 @@
 
     </div>
 
-    <!-- CARDS ESTADÍSTICAS -->
+    <!-- CARDS -->
     <div class="stats-grid">
+
         <div class="stat-card">
+
             <div class="stat-icon">💰</div>
+
             <div>
-                <div class="stat-label">Total Ventas</div>
-                <div class="stat-value" id="cardTotalVentas">@Model.Count()</div>
+
+                <div class="stat-label">
+                    Total Ventas
+                </div>
+
+                <div class="stat-value" id="cardTotalVentas">
+                    @Model.Count()
+                </div>
+
             </div>
+
         </div>
 
         <div class="stat-card">
+
             <div class="stat-icon">📦</div>
+
             <div>
-                <div class="stat-label">Total Vendido</div>
-                <div class="stat-value" id="cardTotalVendido">₡ @Model.Sum(x => x.Total).ToString("N2")</div>
+
+                <div class="stat-label">
+                    Total Vendido
+                </div>
+
+                <div class="stat-value" id="cardTotalVendido">
+                    ₡ @Model.Sum(x => x.Total).ToString("N2")
+                </div>
+
             </div>
+
         </div>
 
         <div class="stat-card">
+
             <div class="stat-icon">👤</div>
+
             <div>
-                <div class="stat-label">Agentes Activos</div>
-                <div class="stat-value" id="cardAgentes">@Model.Select(x => x.AgenteVenta).Distinct().Count()</div>
+
+                <div class="stat-label">
+                    Agentes Activos
+                </div>
+
+                <div class="stat-value" id="cardAgentes">
+                    @Model.Select(x => x.AgenteVenta).Distinct().Count()
+                </div>
+
             </div>
+
         </div>
 
         <div class="stat-card">
+
             <div class="stat-icon">🏢</div>
+
             <div>
-                <div class="stat-label">Empresas</div>
-                <div class="stat-value" id="cardEmpresas">@Model.Select(x => x.EmpresaId).Distinct().Count()</div>
+
+                <div class="stat-label">
+                    Empresas
+                </div>
+
+                <div class="stat-value" id="cardEmpresas">
+                    @Model.Select(x => x.EmpresaId).Distinct().Count()
+                </div>
+
             </div>
+
         </div>
+
     </div>
 
     <!-- FILTROS -->
     <div class="filter-card">
+
         <div class="filter-grid">
+
             <div class="filter-group">
-                <label>🔍 Buscar Cliente o Comercio</label>
-                <input type="text" id="buscarInput" class="form-control" placeholder="Buscar..." />
+
+                <label>
+                    🔍 Buscar Cliente o Comercio
+                </label>
+
+                <input type="text"
+                       id="buscarInput"
+                       class="form-control"
+                       placeholder="Buscar..." />
+
             </div>
 
             <div class="filter-group">
-                <label>🏢 Empresa</label>
-                <select id="empresaFilter" class="form-select">
-                    <option value="">Todas</option>
+
+                <label>
+                    🏢 Empresa
+                </label>
+
+                <select id="empresaFilter"
+                        class="form-select">
+
+                    <option value="">
+                        Todas
+                    </option>
+
                     @if (ViewBag.Empresas != null)
                     {
                         foreach (var empresa in ViewBag.Empresas)
                         {
-                            <option value="@empresa.Nombre.ToLower()">@empresa.Nombre</option>
+                            <option value="@empresa.Nombre.ToLower()">
+                                @empresa.Nombre
+                            </option>
                         }
                     }
+
                 </select>
+
             </div>
 
             <div class="filter-group">
-                <label>📄 Tipo Documento</label>
-                <select id="tipoFilter" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="proforma">PROFORMA</option>
-                    <option value="factura_electronica">FACTURA ELECTRÓNICA</option>
+
+                <label>
+                    📄 Tipo Documento
+                </label>
+
+                <select id="tipoFilter"
+                        class="form-select">
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="proforma">
+                        PROFORMA
+                    </option>
+
+                    <option value="factura_electronica">
+                        FACTURA ELECTRÓNICA
+                    </option>
+
                 </select>
+
             </div>
 
             <div class="filter-group">
-                <label>👤 Agente</label>
-                <input type="text" id="agenteFilter" class="form-control" placeholder="Buscar agente..." />
+
+                <label>
+                    👤 Agente
+                </label>
+
+                <input type="text"
+                       id="agenteFilter"
+                       class="form-control"
+                       placeholder="Buscar agente..." />
+
             </div>
 
             <div class="filter-group">
-                <label>📅 Semana</label>
-                <input type="number" id="semanaFilter" class="form-control" placeholder="Semana" />
+
+                <label>
+                    📅 Semana
+                </label>
+
+                <input type="number"
+                       id="semanaFilter"
+                       class="form-control"
+                       placeholder="Semana" />
+
             </div>
 
             <div class="filter-group">
-                <label>📆 Mes</label>
-                <select id="mesFilter" class="form-select">
-                    <option value="">Todos</option>
+
+                <label>
+                    📆 Mes
+                </label>
+
+                <select id="mesFilter"
+                        class="form-select">
+
+                    <option value="">
+                        Todos
+                    </option>
+
                     <option value="enero">Enero</option>
                     <option value="febrero">Febrero</option>
                     <option value="marzo">Marzo</option>
@@ -127,27 +236,48 @@
                     <option value="octubre">Octubre</option>
                     <option value="noviembre">Noviembre</option>
                     <option value="diciembre">Diciembre</option>
+
                 </select>
+
             </div>
+
         </div>
 
         <div class="filter-actions">
-            <button type="button" id="btnLimpiar" class="btn-clear">✖ Limpiar Filtros</button>
+
+            <button type="button"
+                    id="btnLimpiar"
+                    class="btn-clear">
+
+                ✖ Limpiar Filtros
+
+            </button>
+
         </div>
+
     </div>
 
     <!-- TABLA -->
     <div class="table-card">
+
         <div class="table-header">
-            <h3>📄 Historial de Ventas</h3>
+
+            <h3>
+                📄 Historial de Ventas
+            </h3>
+
         </div>
 
         @if (Model.Any())
         {
             <div class="table-responsive">
+
                 <table class="ventas-table">
+
                     <thead>
+
                         <tr>
+
                             <th>#</th>
                             <th>Fecha</th>
                             <th>Cliente</th>
@@ -157,9 +287,13 @@
                             <th>Total</th>
                             <th>Estado</th>
                             <th></th>
+
                         </tr>
+
                     </thead>
+
                     <tbody>
+
                         @foreach (var item in Model)
                         {
                             <tr class="venta-row"
@@ -167,79 +301,163 @@
                                 data-agente="@(item.AgenteVenta?.ToLower() ?? "")"
                                 data-empresa="@(item.Empresa?.Nombre?.ToLower() ?? "")"
                                 data-tipo="@(item.TipoDocumento?.ToLower() ?? "")"
-                                data-semana="@item.Semana"
-                                data-mes="@(new DateTime(DateTime.Now.Year, item.Mes, 1).ToString("MMMM").ToLower())"
+                                data-fecha="@item.Fecha.ToString("yyyy-MM-dd")"
+                                data-mes="@(CultureInfo
+                                                                    .GetCultureInfo("es-CR")
+                                                                    .DateTimeFormat
+                                                                    .GetMonthName(item.Fecha.Month)
+                                                                    .ToLower())"
                                 data-buscar="@($"{item.Cliente?.Nombre} {item.Cliente?.Apellidos} {item.Cliente?.Comercio}".ToLower())">
-                                <td>#@item.Id</td>
-                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+
                                 <td>
+                                    #@item.Id
+                                </td>
+
+                                <td>
+                                    @item.Fecha.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+
                                     <div class="client-info">
-                                        <strong>@item.Cliente?.Nombre @item.Cliente?.Apellidos</strong>
-                                        <small>@item.Cliente?.Comercio</small>
+
+                                        <strong>
+                                            @item.Cliente?.Nombre
+                                            @item.Cliente?.Apellidos
+                                        </strong>
+
+                                        <small>
+                                            @item.Cliente?.Comercio
+                                        </small>
+
                                     </div>
+
                                 </td>
-                                <td>@item.Empresa?.Nombre</td>
+
                                 <td>
-                                    <span class="agent-badge">👤 @item.AgenteVenta</span>
+                                    @item.Empresa?.Nombre
                                 </td>
+
                                 <td>
+
+                                    <span class="agent-badge">
+                                        👤 @item.AgenteVenta
+                                    </span>
+
+                                </td>
+
+                                <td>
+
                                     @if (item.TipoDocumento == "PROFORMA")
                                     {
-                                        <span class="type-badge proforma">📄 PROFORMA</span>
+                                        <span class="type-badge proforma">
+                                            📄 PROFORMA
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="type-badge factura">🧾 FACTURA</span>
+                                        <span class="type-badge factura">
+                                            🧾 FACTURA
+                                        </span>
                                     }
+
                                 </td>
-                                <td class="fw-bold">₡ @item.Total.ToString("N2")</td>
+
+                                <td class="fw-bold">
+                                    ₡ @item.Total.ToString("N2")
+                                </td>
+
                                 <td>
+
                                     @if (item.Estado == "ACTIVA")
                                     {
-                                        <span class="status-badge active">✅ ACTIVA</span>
+                                        <span class="status-badge active">
+                                            ✅ ACTIVA
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="status-badge canceled">❌ @item.Estado</span>
+                                        <span class="status-badge canceled">
+                                            ❌ @item.Estado
+                                        </span>
                                     }
+
                                 </td>
+
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-details">👁 Ver</a>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn-details">
+
+                                        👁 Ver
+
+                                    </a>
+
                                 </td>
+
                             </tr>
                         }
+
                     </tbody>
+
                 </table>
+
                 <div class="pagination-container">
 
-                    <button id="prevPage" class="pagination-btn">
+                    <button id="prevPage"
+                            class="pagination-btn">
+
                         ← Anterior
+
                     </button>
 
-                    <div id="paginationInfo" class="pagination-info">
+                    <div id="paginationInfo"
+                         class="pagination-info">
                     </div>
 
-                    <button id="nextPage" class="pagination-btn">
+                    <button id="nextPage"
+                            class="pagination-btn">
+
                         Siguiente →
+
                     </button>
 
                 </div>
+
             </div>
         }
         else
         {
             <div class="empty-state">
-                <div class="empty-icon">📭</div>
-                <h3>No hay ventas registradas</h3>
-                <p>Las ventas aparecerán automáticamente cuando se creen proformas o facturas.</p>
+
+                <div class="empty-icon">
+                    📭
+                </div>
+
+                <h3>
+                    No hay ventas registradas
+                </h3>
+
+                <p>
+                    Las ventas aparecerán automáticamente
+                    cuando se creen proformas o facturas.
+                </p>
+
             </div>
         }
+
     </div>
+
 </div>
 
 <script>
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ========================================
+        // INPUTS
+        // ========================================
 
         const buscarInput =
             document.getElementById("buscarInput");
@@ -264,7 +482,10 @@
                 document.querySelectorAll(".venta-row")
             );
 
-        // 🔥 CARDS
+        // ========================================
+        // CARDS
+        // ========================================
+
         const cardTotalVentas =
             document.getElementById("cardTotalVentas");
 
@@ -277,7 +498,10 @@
         const cardEmpresas =
             document.getElementById("cardEmpresas");
 
-        // 🔥 PAGINACIÓN
+        // ========================================
+        // PAGINACIÓN
+        // ========================================
+
         const prevPage =
             document.getElementById("prevPage");
 
@@ -293,38 +517,59 @@
 
         let filasFiltradas = [];
 
-        // 🔥 FILTRAR
+        // ========================================
+        // FUNCIÓN SEMANA
+        // ========================================
+
+        function obtenerSemana(fecha) {
+
+            const primerDia =
+                new Date(fecha.getFullYear(), 0, 1);
+
+            const dias =
+                Math.floor(
+                    (fecha - primerDia) / 86400000
+                );
+
+            return Math.ceil(
+                (dias + primerDia.getDay() + 1) / 7
+            );
+        }
+
+        // ========================================
+        // FILTRAR
+        // ========================================
+
         function filtrarVentas() {
 
             const buscar =
-                buscarInput
-                    ? buscarInput.value.trim().toLowerCase()
-                    : "";
+                buscarInput.value
+                    .trim()
+                    .toLowerCase();
 
             const empresa =
-                empresaFilter
-                    ? empresaFilter.value
-                    : "";
+                empresaFilter.value
+                    .trim()
+                    .toLowerCase();
 
             const tipo =
-                tipoFilter
-                    ? tipoFilter.value.trim().toLowerCase()
-                    : "";
+                tipoFilter.value
+                    .trim()
+                    .toLowerCase();
 
             const agente =
-                agenteFilter
-                    ? agenteFilter.value.trim().toLowerCase()
-                    : "";
+                agenteFilter.value
+                    .trim()
+                    .toLowerCase();
 
             const semana =
-                semanaFilter
-                    ? semanaFilter.value.trim()
-                    : "";
+                semanaFilter.value
+                    .trim();
 
             const mes =
-                mesFilter
-                    ? mesFilter.value.trim().toLowerCase()
-                    : "";
+                mesFilter.value
+                    .trim()
+                    .toLowerCase();
 
             let totalVendido = 0;
 
@@ -337,22 +582,42 @@
             filas.forEach(fila => {
 
                 const textoBuscar =
-                    fila.dataset.buscar || "";
+                    (fila.dataset.buscar || "")
+                        .trim()
+                        .toLowerCase();
 
                 const textoEmpresa =
-                    fila.dataset.empresa || "";
+                    (fila.dataset.empresa || "")
+                        .trim()
+                        .toLowerCase();
 
                 const textoTipo =
-                    fila.dataset.tipo || "";
+                    (fila.dataset.tipo || "")
+                        .trim()
+                        .toLowerCase();
 
                 const textoAgente =
-                    fila.dataset.agente || "";
-
-                const textoSemana =
-                    fila.dataset.semana || "";
+                    (fila.dataset.agente || "")
+                        .trim()
+                        .toLowerCase();
 
                 const textoMes =
-                    fila.dataset.mes || "";
+                    (fila.dataset.mes || "")
+                        .trim()
+                        .toLowerCase();
+
+                const fechaTexto =
+                    fila.dataset.fecha;
+
+                const fecha =
+                    new Date(fechaTexto);
+
+                const semanaFila =
+                    obtenerSemana(fecha);
+
+                // ========================================
+                // VALIDACIONES
+                // ========================================
 
                 const coincideBuscar =
                     !buscar ||
@@ -372,11 +637,15 @@
 
                 const coincideSemana =
                     !semana ||
-                    textoSemana === semana;
+                    semanaFila === Number(semana);
 
                 const coincideMes =
                     !mes ||
                     textoMes === mes;
+
+                // ========================================
+                // RESULTADO
+                // ========================================
 
                 const mostrar =
                     coincideBuscar &&
@@ -400,47 +669,43 @@
 
                     if (textoEmpresa)
                         empresas.add(textoEmpresa);
+
                 }
 
             });
 
-            // 🔥 ACTUALIZAR CARDS
-            if (cardTotalVentas) {
+            // ========================================
+            // ACTUALIZAR CARDS
+            // ========================================
 
-                cardTotalVentas.innerText =
-                    filasFiltradas.length;
-            }
+            cardTotalVentas.innerText =
+                filasFiltradas.length;
 
-            if (cardTotalVendido) {
+            cardTotalVendido.innerText =
+                `₡ ${totalVendido.toLocaleString(
+                    "es-CR",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                )}`;
 
-                cardTotalVendido.innerText =
-                    `₡ ${totalVendido.toLocaleString(
-                        "es-CR",
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}`;
-            }
+            cardAgentes.innerText =
+                agentes.size;
 
-            if (cardAgentes) {
-
-                cardAgentes.innerText =
-                    agentes.size;
-            }
-
-            if (cardEmpresas) {
-
-                cardEmpresas.innerText =
-                    empresas.size;
-            }
+            cardEmpresas.innerText =
+                empresas.size;
 
             currentPage = 1;
 
             renderPagination();
+
         }
 
-        // 🔥 PAGINACIÓN
+        // ========================================
+        // PAGINACIÓN
+        // ========================================
+
         function renderPagination() {
 
             filas.forEach(fila => {
@@ -469,45 +734,93 @@
                     filasFiltradas.length / rowsPerPage
                 ) || 1;
 
-            if (paginationInfo) {
+            paginationInfo.innerText =
+                `Página ${currentPage} de ${totalPages}`;
 
-                paginationInfo.innerText =
-                    `Página ${currentPage} de ${totalPages}`;
-            }
+            prevPage.disabled =
+                currentPage === 1;
 
-            if (prevPage) {
+            nextPage.disabled =
+                currentPage === totalPages;
 
-                prevPage.disabled =
-                    currentPage === 1;
-            }
-
-            if (nextPage) {
-
-                nextPage.disabled =
-                    currentPage === totalPages;
-            }
         }
 
-        // 🔥 BOTÓN ANTERIOR
-        if (prevPage) {
+        // ========================================
+        // EVENTOS
+        // ========================================
 
-            prevPage.addEventListener("click", () => {
+        buscarInput.addEventListener(
+            "input",
+            filtrarVentas
+        );
+
+        empresaFilter.addEventListener(
+            "change",
+            filtrarVentas
+        );
+
+        tipoFilter.addEventListener(
+            "change",
+            filtrarVentas
+        );
+
+        agenteFilter.addEventListener(
+            "input",
+            filtrarVentas
+        );
+
+        semanaFilter.addEventListener(
+            "input",
+            filtrarVentas
+        );
+
+        mesFilter.addEventListener(
+            "change",
+            filtrarVentas
+        );
+
+        // ========================================
+        // LIMPIAR
+        // ========================================
+
+        document
+            .getElementById("btnLimpiar")
+            .addEventListener(
+                "click",
+                () => {
+
+                    buscarInput.value = "";
+                    empresaFilter.value = "";
+                    tipoFilter.value = "";
+                    agenteFilter.value = "";
+                    semanaFilter.value = "";
+                    mesFilter.value = "";
+
+                    filtrarVentas();
+
+                });
+
+        // ========================================
+        // PAGINACIÓN BOTONES
+        // ========================================
+
+        prevPage.addEventListener(
+            "click",
+            () => {
 
                 if (currentPage > 1) {
 
                     currentPage--;
 
                     renderPagination();
+
                 }
 
             });
 
-        }
-
-        // 🔥 BOTÓN SIGUIENTE
-        if (nextPage) {
-
-            nextPage.addEventListener("click", () => {
+        nextPage.addEventListener(
+            "click",
+            () => {
 
                 const totalPages =
                     Math.ceil(
@@ -519,83 +832,15 @@
                     currentPage++;
 
                     renderPagination();
+
                 }
 
             });
 
-        }
+        // ========================================
+        // INIT
+        // ========================================
 
-        // 🔥 INPUTS
-        if (buscarInput)
-            buscarInput.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-        if (agenteFilter)
-            agenteFilter.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-        if (semanaFilter)
-            semanaFilter.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-        // 🔥 SELECTS
-        if (empresaFilter)
-            empresaFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-        if (tipoFilter)
-            tipoFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-        if (mesFilter)
-            mesFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-        // 🔥 LIMPIAR
-        const btnLimpiar =
-            document.getElementById("btnLimpiar");
-
-        if (btnLimpiar) {
-
-            btnLimpiar.addEventListener("click", () => {
-
-                if (buscarInput)
-                    buscarInput.value = "";
-
-                if (empresaFilter)
-                    empresaFilter.value = "";
-
-                if (tipoFilter)
-                    tipoFilter.value = "";
-
-                if (agenteFilter)
-                    agenteFilter.value = "";
-
-                if (semanaFilter)
-                    semanaFilter.value = "";
-
-                if (mesFilter)
-                    mesFilter.value = "";
-
-                filtrarVentas();
-
-            });
-
-        }
-
-        // 🔥 INICIALIZAR
         filtrarVentas();
 
     });

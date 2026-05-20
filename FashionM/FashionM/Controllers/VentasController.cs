@@ -36,6 +36,7 @@ namespace FashionM.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var venta = await _context.Ventas
+
                 .Include(v => v.Cliente)
 
                 .Include(v => v.Empresa)
@@ -43,6 +44,8 @@ namespace FashionM.Controllers
                 .Include(v => v.Detalles)
 
                 .Include(v => v.NotasCredito)
+
+                 .Include(v => v.CuentaPorCobrar)
 
                 .FirstOrDefaultAsync(v => v.Id == id);
 
