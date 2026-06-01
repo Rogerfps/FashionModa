@@ -128,71 +128,169 @@ namespace FashionM.Controllers
             string[] tallas,
             int[] cantidades,
             decimal[] preciosVenta
-)
+        )
         {
+            // ========================================
+            // VALIDAR TALLAS
+            // ========================================
+
             if (tallas == null || tallas.Length == 0)
             {
-                TempData["Error"] = "Debe agregar al menos una talla";
-                return RedirectToAction("AgregarProducto", new { id = proformaId });
+                TempData["Error"] =
+                    "Debe agregar al menos una talla";
+
+                return RedirectToAction(
+                    "AgregarProducto",
+                    new { id = proformaId });
             }
+
+            // ========================================
+            // VALIDAR PRECIOS
+            // ========================================
+
+            if (preciosVenta == null)
+            {
+                TempData["Error"] =
+                    "No se recibieron precios.";
+
+                return RedirectToAction(
+                    "AgregarProducto",
+                    new { id = proformaId });
+            }
+
+            // ========================================
+            // RECORRER TALLAS
+            // ========================================
 
             for (int i = 0; i < tallas.Length; i++)
             {
-                if (i >= cantidades.Length) continue;
-                if (cantidades[i] <= 0) continue;
+                // 🔥 VALIDAR ÍNDICES
+                if (i >= cantidades.Length ||
+                    i >= preciosVenta.Length)
+                {
+                    continue;
+                }
 
-                // 🔥 BUSCAR INVENTARIO
-                var inventario = await _context.TallasInventario
-                    .FirstOrDefaultAsync(t =>
-                        t.InventarioCodigo == codigo &&
-                        t.Color == color &&
-                        t.Numero == tallas[i]);
+                // 🔥 VALIDAR CANTIDAD
+                if (cantidades[i] <= 0)
+                    continue;
+
+                // ========================================
+                // BUSCAR INVENTARIO
+                // ========================================
+
+                var inventario =
+                    await _context.TallasInventario
+                        .FirstOrDefaultAsync(t =>
+                            t.InventarioCodigo == codigo &&
+                            t.Color == color &&
+                            t.Numero == tallas[i]);
 
                 if (inventario == null)
                     continue;
 
-                // ❌ VALIDAR STOCK
+                // ========================================
+                // VALIDAR STOCK
+                // ========================================
+
                 if (inventario.Cantidad < cantidades[i])
                 {
-                    TempData["Error"] = $"Stock insuficiente para talla {tallas[i]}";
-                    return RedirectToAction("AgregarProducto", new { id = proformaId });
+                    TempData["Error"] =
+                        $"Stock insuficiente para talla {tallas[i]}";
+
+                    return RedirectToAction(
+                        "AgregarProducto",
+                        new { id = proformaId });
                 }
 
-                // 🔥 RESTAR INVENTARIO
-                inventario.Cantidad -= cantidades[i];
+                // ========================================
+                // RESTAR INVENTARIO
+                // ========================================
 
-                // 🔥 GUARDAR DETALLE
-                var detalle = new ProformaDetalle
-                {
-                    ProformaId = proformaId,
-                    InventarioCodigo = codigo,
-                    Color = color,
-                    Talla = tallas[i],
-                    Cantidad = cantidades[i],
-                    PrecioUnitario = preciosVenta[i],
-                    SubTotal = cantidades[i] * preciosVenta[i]
-                };
+                inventario.Cantidad -=
+                    cantidades[i];
 
-                _context.ProformaDetalles.Add(detalle);
+                // ========================================
+                // CREAR DETALLE
+                // ========================================
+
+                var detalle =
+                    new ProformaDetalle
+                    {
+                        ProformaId =
+                            proformaId,
+
+                        InventarioCodigo =
+                            codigo,
+
+                        Color =
+                            color,
+
+                        Talla =
+                            tallas[i],
+
+                        Cantidad =
+                            cantidades[i],
+
+                        PrecioUnitario =
+                            preciosVenta[i],
+
+                        SubTotal =
+                            cantidades[i]
+                            * preciosVenta[i]
+                    };
+
+                _context.ProformaDetalles
+                    .Add(detalle);
             }
+
+            // ========================================
+            // GUARDAR DETALLES
+            // ========================================
 
             await _context.SaveChangesAsync();
 
-            // 🔥 actualizar total
-            var proforma = await _context.Proformas
-                .Include(p => p.Detalles)
-                .FirstOrDefaultAsync(p => p.Id == proformaId);
+            // ========================================
+            // ACTUALIZAR TOTAL
+            // ========================================
+
+            var proforma =
+                await _context.Proformas
+                    .Include(p => p.Detalles)
+                    .FirstOrDefaultAsync(p =>
+                        p.Id == proformaId);
 
             if (proforma != null)
             {
-                proforma.Total = proforma.Detalles.Sum(d => d.SubTotal);
+                proforma.Total =
+                    proforma.Detalles
+                        .Sum(d => d.SubTotal);
+
                 await _context.SaveChangesAsync();
             }
 
-            // 🔥 CREAR O ACTUALIZAR VENTA
+            // ========================================
+            // RECARGAR PROFORMA
+            // ========================================
+
+            await _context.Entry(
+                await _context.Proformas
+                    .FirstAsync(x => x.Id == proformaId)
+            ).ReloadAsync();
+
+            // ========================================
+            // CREAR / ACTUALIZAR VENTA
+            // ========================================
+
             await CrearActualizarVenta(proformaId);
-            return RedirectToAction("AgregarProducto", new { id = proformaId });
-            
+
+            // ========================================
+            // REDIRECT
+            // ========================================
+
+            return RedirectToAction(
+                "AgregarProducto",
+                new { id = proformaId });
         }
 
         // ==========================
@@ -214,83 +312,179 @@ namespace FashionM.Controllers
 
         private async Task CrearActualizarVenta(int proformaId)
         {
+            // ========================================
+            // PROFORMA
+            // ========================================
+
             var proforma = await _context.Proformas
                 .Include(p => p.Detalles)
-                .FirstOrDefaultAsync(p => p.Id == proformaId);
+                .FirstOrDefaultAsync(p =>
+                    p.Id == proformaId);
 
             if (proforma == null)
                 return;
 
-            // 🔥 BUSCAR SI YA EXISTE
+            // ========================================
+            // BUSCAR VENTA
+            // ========================================
+
             var venta = await _context.Ventas
                 .Include(v => v.Detalles)
                 .FirstOrDefaultAsync(v =>
-                    v.DocumentoId == proforma.Id &&
-                    v.TipoDocumento == "PROFORMA");
 
-            // 🔥 SI NO EXISTE → CREAR
+                    v.DocumentoId == proforma.Id &&
+
+                    v.TipoDocumento == "PROFORMA"
+                );
+
+            // ========================================
+            // CREAR
+            // ========================================
+
             if (venta == null)
             {
                 venta = new Venta
                 {
                     Fecha = proforma.Fecha,
+
                     TipoDocumento = "PROFORMA",
+
                     DocumentoId = proforma.Id,
 
                     ClienteCedula = proforma.ClienteCedula,
+
                     EmpresaId = proforma.EmpresaId,
 
                     Total = proforma.Total,
+
                     NumeroCajas = proforma.NumeroCajas,
 
                     FacturadoPor = proforma.FacturadoPor,
+
                     AgenteVenta = proforma.AgenteVenta,
 
                     Estado = "ACTIVA",
 
-                    Semana = ISOWeek.GetWeekOfYear(proforma.Fecha),
-                    Mes = proforma.Fecha.Month,
-                    Año = proforma.Fecha.Year
+                    Semana =
+                        ISOWeek.GetWeekOfYear(
+                            proforma.Fecha
+                        ),
+
+                    Mes =
+                        proforma.Fecha.Month,
+
+                    Año =
+                        proforma.Fecha.Year
                 };
 
                 _context.Ventas.Add(venta);
 
                 await _context.SaveChangesAsync();
+
+                // 🔥 RECARGAR ID REAL
+                await _context.Entry(venta)
+                    .ReloadAsync();
             }
             else
             {
-                // 🔥 ACTUALIZAR
-                venta.Total = proforma.Total;
-                venta.NumeroCajas = proforma.NumeroCajas;
-                venta.AgenteVenta = proforma.AgenteVenta;
+                // ========================================
+                // ACTUALIZAR
+                // ========================================
 
-                // 🔥 LIMPIAR DETALLES
-                _context.VentaDetalles.RemoveRange(venta.Detalles);
+                venta.Total =
+                    proforma.Total;
+
+                venta.NumeroCajas =
+                    proforma.NumeroCajas;
+
+                venta.AgenteVenta =
+                    proforma.AgenteVenta;
+
+                venta.Semana =
+                    ISOWeek.GetWeekOfYear(
+                        proforma.Fecha
+                    );
+
+                venta.Mes =
+                    proforma.Fecha.Month;
+
+                venta.Año =
+                    proforma.Fecha.Year;
+
+                await _context.SaveChangesAsync();
+
+                // ========================================
+                // ELIMINAR DETALLES
+                // ========================================
+
+                var detallesViejos =
+                    await _context.VentaDetalles
+                        .Where(x =>
+                            x.VentaId == venta.Id)
+                        .ToListAsync();
+
+                _context.VentaDetalles
+                    .RemoveRange(detallesViejos);
 
                 await _context.SaveChangesAsync();
             }
 
-            // 🔥 AGREGAR DETALLES NUEVOS
+            // ========================================
+            // LIMPIAR TRACKER
+            // ========================================
+
+            _context.ChangeTracker.Clear();
+
+            // ========================================
+            // RECARGAR VENTA LIMPIA
+            // ========================================
+
+            venta = await _context.Ventas
+                .FirstOrDefaultAsync(v =>
+                    v.Id == venta.Id);
+
+            if (venta == null)
+                return;
+
+            // ========================================
+            // AGREGAR DETALLES
+            // ========================================
+
             foreach (var item in proforma.Detalles)
             {
-                var detalleVenta = new VentaDetalle
-                {
-                    VentaId = venta.Id,
+                var detalle =
+                    new VentaDetalle
+                    {
+                        VentaId =
+                            venta.Id,
 
-                    InventarioCodigo = item.InventarioCodigo,
-                    Color = item.Color,
-                    Talla = item.Talla,
+                        InventarioCodigo =
+                            item.InventarioCodigo,
 
-                    Cantidad = item.Cantidad,
-                    PrecioUnitario = item.PrecioUnitario,
-                    SubTotal = item.SubTotal
-                };
+                        Color =
+                            item.Color,
 
-                _context.VentaDetalles.Add(detalleVenta);
+                        Talla =
+                            item.Talla,
+
+                        Cantidad =
+                            item.Cantidad,
+
+                        PrecioUnitario =
+                            item.PrecioUnitario,
+
+                        SubTotal =
+                            item.SubTotal
+                    };
+
+                _context.VentaDetalles
+                    .Add(detalle);
             }
 
             await _context.SaveChangesAsync();
         }
+
+
 
         // ==========================
         // DETALLE
@@ -642,6 +836,157 @@ namespace FashionM.Controllers
 
             return Json(agentes);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GenerarVenta(int id)
+        {
+            try
+            {
+                var proforma = await _context.Proformas
+                    .Include(p => p.Detalles)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (proforma == null)
+                {
+                    TempData["Error"] =
+                        "No se encontró la proforma.";
+
+                    return RedirectToAction(
+                        nameof(Details),
+                        new { id });
+                }
+
+                // ========================================
+                // YA EXISTE
+                // ========================================
+
+                var ventaExistente =
+                    await _context.Ventas
+                        .FirstOrDefaultAsync(v =>
+
+                            v.DocumentoId == proforma.Id &&
+
+                            v.TipoDocumento == "PROFORMA"
+                        );
+
+                if (ventaExistente != null)
+                {
+                    TempData["Error"] =
+                        $"La venta ya existe (# {ventaExistente.Id}).";
+
+                    return RedirectToAction(
+                        nameof(Details),
+                        new { id });
+                }
+
+                // ========================================
+                // FECHA UTC
+                // ========================================
+
+                var fechaVenta =
+                    proforma.Fecha.Kind == DateTimeKind.Utc
+                        ? proforma.Fecha
+                        : DateTime.SpecifyKind(
+                            proforma.Fecha,
+                            DateTimeKind.Utc
+                        );
+
+                // ========================================
+                // CREAR VENTA
+                // ========================================
+
+                var venta = new Venta
+                {
+                    Fecha = fechaVenta,
+
+                    TipoDocumento = "PROFORMA",
+
+                    DocumentoId = proforma.Id,
+
+                    ClienteCedula = proforma.ClienteCedula,
+
+                    EmpresaId = proforma.EmpresaId,
+
+                    Total = proforma.Total,
+
+                    NumeroCajas = proforma.NumeroCajas,
+
+                    FacturadoPor = proforma.FacturadoPor,
+
+                    AgenteVenta = proforma.AgenteVenta,
+
+                    Estado = "ACTIVA",
+
+                    Semana =
+                        ISOWeek.GetWeekOfYear(
+                            fechaVenta
+                        ),
+
+                    Mes =
+                        fechaVenta.Month,
+
+                    Año =
+                        fechaVenta.Year
+                };
+
+                _context.Ventas.Add(venta);
+
+                await _context.SaveChangesAsync();
+
+                // ========================================
+                // DETALLES
+                // ========================================
+
+                foreach (var item in proforma.Detalles)
+                {
+                    _context.VentaDetalles.Add(
+                        new VentaDetalle
+                        {
+                            VentaId = venta.Id,
+
+                            InventarioCodigo =
+                                item.InventarioCodigo,
+
+                            Color =
+                                item.Color,
+
+                            Talla =
+                                item.Talla,
+
+                            Cantidad =
+                                item.Cantidad,
+
+                            PrecioUnitario =
+                                item.PrecioUnitario,
+
+                            SubTotal =
+                                item.SubTotal
+                        });
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] =
+                    $"Venta #{venta.Id} creada correctamente.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    ex.InnerException?.Message ??
+                    ex.Message;
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id });
+            }
+        }
     }
+    
     
 }

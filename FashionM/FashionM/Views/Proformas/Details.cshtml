@@ -205,6 +205,36 @@
         </div>
     </div>
 
+    <form asp-action="GenerarVenta"
+          asp-route-id="@Model.Id"
+          method="post"
+          style="display:inline;">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit"
+                class="btn btn-success">
+
+            💰 Generar Venta
+
+        </button>
+
+    </form>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
     <!-- ACCIONES -->
     <div class="action-bar">
         <a asp-action="Index" class="btn-back">

@@ -248,11 +248,12 @@ namespace FashionM.Data
             // VENTA -> CUENTA POR COBRAR
             // ========================================
 
-            modelBuilder.Entity<CuentaPorCobrar>()
-                .HasOne(c => c.Venta)
-                .WithOne(v => v.CuentaPorCobrar)
+            modelBuilder.Entity<Venta>()
+                .HasOne(v => v.CuentaPorCobrar)
+                .WithOne(c => c.Venta)
                 .HasForeignKey<CuentaPorCobrar>(
                     c => c.VentaId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

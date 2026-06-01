@@ -51,8 +51,11 @@
                     Total Ventas
                 </div>
 
-                <div class="stat-value" id="cardTotalVentas">
+                <div class="stat-value"
+                     id="cardTotalVentas">
+
                     @Model.Count()
+
                 </div>
 
             </div>
@@ -69,8 +72,11 @@
                     Total Vendido
                 </div>
 
-                <div class="stat-value" id="cardTotalVendido">
+                <div class="stat-value"
+                     id="cardTotalVendido">
+
                     ₡ @Model.Sum(x => x.Total).ToString("N2")
+
                 </div>
 
             </div>
@@ -87,8 +93,13 @@
                     Agentes Activos
                 </div>
 
-                <div class="stat-value" id="cardAgentes">
-                    @Model.Select(x => x.AgenteVenta).Distinct().Count()
+                <div class="stat-value"
+                     id="cardAgentes">
+
+                    @Model.Select(x => x.AgenteVenta)
+                    .Distinct()
+                    .Count()
+
                 </div>
 
             </div>
@@ -105,8 +116,13 @@
                     Empresas
                 </div>
 
-                <div class="stat-value" id="cardEmpresas">
-                    @Model.Select(x => x.EmpresaId).Distinct().Count()
+                <div class="stat-value"
+                     id="cardEmpresas">
+
+                    @Model.Select(x => x.EmpresaId)
+                    .Distinct()
+                    .Count()
+
                 </div>
 
             </div>
@@ -120,6 +136,7 @@
 
         <div class="filter-grid">
 
+            <!-- BUSCAR -->
             <div class="filter-group">
 
                 <label>
@@ -133,6 +150,7 @@
 
             </div>
 
+            <!-- EMPRESA -->
             <div class="filter-group">
 
                 <label>
@@ -151,7 +169,9 @@
                         foreach (var empresa in ViewBag.Empresas)
                         {
                             <option value="@empresa.Nombre.ToLower()">
+
                                 @empresa.Nombre
+
                             </option>
                         }
                     }
@@ -160,6 +180,7 @@
 
             </div>
 
+            <!-- TIPO -->
             <div class="filter-group">
 
                 <label>
@@ -185,6 +206,7 @@
 
             </div>
 
+            <!-- AGENTE -->
             <div class="filter-group">
 
                 <label>
@@ -198,6 +220,7 @@
 
             </div>
 
+            <!-- SEMANA -->
             <div class="filter-group">
 
                 <label>
@@ -211,6 +234,7 @@
 
             </div>
 
+            <!-- MES -->
             <div class="filter-group">
 
                 <label>
@@ -243,6 +267,7 @@
 
         </div>
 
+        <!-- BOTÓN LIMPIAR -->
         <div class="filter-actions">
 
             <button type="button"
@@ -301,7 +326,7 @@
                                 data-agente="@(item.AgenteVenta?.ToLower() ?? "")"
                                 data-empresa="@(item.Empresa?.Nombre?.ToLower() ?? "")"
                                 data-tipo="@(item.TipoDocumento?.ToLower() ?? "")"
-                                data-fecha="@item.Fecha.ToString("yyyy-MM-dd")"
+                                data-semana="@item.Semana"
                                 data-mes="@(CultureInfo
                                                                     .GetCultureInfo("es-CR")
                                                                     .DateTimeFormat
@@ -309,81 +334,112 @@
                                                                     .ToLower())"
                                 data-buscar="@($"{item.Cliente?.Nombre} {item.Cliente?.Apellidos} {item.Cliente?.Comercio}".ToLower())">
 
+                                <!-- ID -->
                                 <td>
+
                                     #@item.Id
+
                                 </td>
 
+                                <!-- FECHA -->
                                 <td>
+
                                     @item.Fecha.ToString("dd/MM/yyyy")
+
                                 </td>
 
+                                <!-- CLIENTE -->
                                 <td>
 
                                     <div class="client-info">
 
                                         <strong>
+
                                             @item.Cliente?.Nombre
                                             @item.Cliente?.Apellidos
+
                                         </strong>
 
                                         <small>
+
                                             @item.Cliente?.Comercio
+
                                         </small>
 
                                     </div>
 
                                 </td>
 
+                                <!-- EMPRESA -->
                                 <td>
+
                                     @item.Empresa?.Nombre
+
                                 </td>
 
+                                <!-- AGENTE -->
                                 <td>
 
                                     <span class="agent-badge">
+
                                         👤 @item.AgenteVenta
+
                                     </span>
 
                                 </td>
 
+                                <!-- TIPO -->
                                 <td>
 
                                     @if (item.TipoDocumento == "PROFORMA")
                                     {
                                         <span class="type-badge proforma">
+
                                             📄 PROFORMA
+
                                         </span>
                                     }
                                     else
                                     {
                                         <span class="type-badge factura">
+
                                             🧾 FACTURA
+
                                         </span>
                                     }
 
                                 </td>
 
+                                <!-- TOTAL -->
                                 <td class="fw-bold">
+
                                     ₡ @item.Total.ToString("N2")
+
                                 </td>
 
+                                <!-- ESTADO -->
                                 <td>
 
                                     @if (item.Estado == "ACTIVA")
                                     {
                                         <span class="status-badge active">
+
                                             ✅ ACTIVA
+
                                         </span>
                                     }
                                     else
                                     {
                                         <span class="status-badge canceled">
+
                                             ❌ @item.Estado
+
                                         </span>
                                     }
 
                                 </td>
 
+                                <!-- ACCIONES -->
                                 <td>
 
                                     <a asp-action="Details"
@@ -403,6 +459,7 @@
 
                 </table>
 
+                <!-- PAGINACIÓN -->
                 <div class="pagination-container">
 
                     <button id="prevPage"
@@ -453,396 +510,402 @@
 
 <script>
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener(
+        'DOMContentLoaded',
+        function ()
+        {
 
-        // ========================================
-        // INPUTS
-        // ========================================
+            // ========================================
+            // INPUTS
+            // ========================================
 
-        const buscarInput =
-            document.getElementById("buscarInput");
-
-        const empresaFilter =
-            document.getElementById("empresaFilter");
-
-        const tipoFilter =
-            document.getElementById("tipoFilter");
-
-        const agenteFilter =
-            document.getElementById("agenteFilter");
-
-        const semanaFilter =
-            document.getElementById("semanaFilter");
-
-        const mesFilter =
-            document.getElementById("mesFilter");
-
-        const filas =
-            Array.from(
-                document.querySelectorAll(".venta-row")
-            );
-
-        // ========================================
-        // CARDS
-        // ========================================
-
-        const cardTotalVentas =
-            document.getElementById("cardTotalVentas");
-
-        const cardTotalVendido =
-            document.getElementById("cardTotalVendido");
-
-        const cardAgentes =
-            document.getElementById("cardAgentes");
-
-        const cardEmpresas =
-            document.getElementById("cardEmpresas");
-
-        // ========================================
-        // PAGINACIÓN
-        // ========================================
-
-        const prevPage =
-            document.getElementById("prevPage");
-
-        const nextPage =
-            document.getElementById("nextPage");
-
-        const paginationInfo =
-            document.getElementById("paginationInfo");
-
-        let currentPage = 1;
-
-        const rowsPerPage = 15;
-
-        let filasFiltradas = [];
-
-        // ========================================
-        // FUNCIÓN SEMANA
-        // ========================================
-
-        function obtenerSemana(fecha) {
-
-            const primerDia =
-                new Date(fecha.getFullYear(), 0, 1);
-
-            const dias =
-                Math.floor(
-                    (fecha - primerDia) / 86400000
+            const buscarInput =
+                document.getElementById(
+                    "buscarInput"
                 );
 
-            return Math.ceil(
-                (dias + primerDia.getDay() + 1) / 7
-            );
-        }
+            const empresaFilter =
+                document.getElementById(
+                    "empresaFilter"
+                );
 
-        // ========================================
-        // FILTRAR
-        // ========================================
+            const tipoFilter =
+                document.getElementById(
+                    "tipoFilter"
+                );
 
-        function filtrarVentas() {
+            const agenteFilter =
+                document.getElementById(
+                    "agenteFilter"
+                );
 
-            const buscar =
-                buscarInput.value
-                    .trim()
-                    .toLowerCase();
+            const semanaFilter =
+                document.getElementById(
+                    "semanaFilter"
+                );
 
-            const empresa =
-                empresaFilter.value
-                    .trim()
-                    .toLowerCase();
+            const mesFilter =
+                document.getElementById(
+                    "mesFilter"
+                );
 
-            const tipo =
-                tipoFilter.value
-                    .trim()
-                    .toLowerCase();
+            const filas =
+                Array.from(
+                    document.querySelectorAll(
+                        ".venta-row"
+                    )
+                );
 
-            const agente =
-                agenteFilter.value
-                    .trim()
-                    .toLowerCase();
+            // ========================================
+            // CARDS
+            // ========================================
 
-            const semana =
-                semanaFilter.value
-                    .trim();
+            const cardTotalVentas =
+                document.getElementById(
+                    "cardTotalVentas"
+                );
 
-            const mes =
-                mesFilter.value
-                    .trim()
-                    .toLowerCase();
+            const cardTotalVendido =
+                document.getElementById(
+                    "cardTotalVendido"
+                );
 
-            let totalVendido = 0;
+            const cardAgentes =
+                document.getElementById(
+                    "cardAgentes"
+                );
 
-            let agentes = new Set();
+            const cardEmpresas =
+                document.getElementById(
+                    "cardEmpresas"
+                );
 
-            let empresas = new Set();
+            // ========================================
+            // PAGINACIÓN
+            // ========================================
 
-            filasFiltradas = [];
+            const prevPage =
+                document.getElementById(
+                    "prevPage"
+                );
 
-            filas.forEach(fila => {
+            const nextPage =
+                document.getElementById(
+                    "nextPage"
+                );
 
-                const textoBuscar =
-                    (fila.dataset.buscar || "")
+            const paginationInfo =
+                document.getElementById(
+                    "paginationInfo"
+                );
+
+            let currentPage = 1;
+
+            const rowsPerPage = 15;
+
+            let filasFiltradas = [];
+
+            // ========================================
+            // FILTRAR
+            // ========================================
+
+            function filtrarVentas()
+            {
+                const buscar =
+                    buscarInput.value
                         .trim()
                         .toLowerCase();
 
-                const textoEmpresa =
-                    (fila.dataset.empresa || "")
+                const empresa =
+                    empresaFilter.value
                         .trim()
                         .toLowerCase();
 
-                const textoTipo =
-                    (fila.dataset.tipo || "")
+                const tipo =
+                    tipoFilter.value
                         .trim()
                         .toLowerCase();
 
-                const textoAgente =
-                    (fila.dataset.agente || "")
+                const agente =
+                    agenteFilter.value
                         .trim()
                         .toLowerCase();
 
-                const textoMes =
-                    (fila.dataset.mes || "")
+                const semana =
+                    semanaFilter.value
+                        .trim();
+
+                const mes =
+                    mesFilter.value
                         .trim()
                         .toLowerCase();
 
-                const fechaTexto =
-                    fila.dataset.fecha;
+                let totalVendido = 0;
 
-                const fecha =
-                    new Date(fechaTexto);
+                let agentes = new Set();
 
-                const semanaFila =
-                    obtenerSemana(fecha);
+                let empresas = new Set();
 
-                // ========================================
-                // VALIDACIONES
-                // ========================================
+                filasFiltradas = [];
 
-                const coincideBuscar =
-                    !buscar ||
-                    textoBuscar.includes(buscar);
+                filas.forEach(fila =>
+                {
+                    const textoBuscar =
+                        (fila.dataset.buscar || "")
+                            .trim()
+                            .toLowerCase();
 
-                const coincideEmpresa =
-                    !empresa ||
-                    textoEmpresa === empresa;
+                    const textoEmpresa =
+                        (fila.dataset.empresa || "")
+                            .trim()
+                            .toLowerCase();
 
-                const coincideTipo =
-                    !tipo ||
-                    textoTipo === tipo;
+                    const textoTipo =
+                        (fila.dataset.tipo || "")
+                            .trim()
+                            .toLowerCase();
 
-                const coincideAgente =
-                    !agente ||
-                    textoAgente.includes(agente);
+                    const textoAgente =
+                        (fila.dataset.agente || "")
+                            .trim()
+                            .toLowerCase();
 
-                const coincideSemana =
-                    !semana ||
-                    semanaFila === Number(semana);
+                    const textoMes =
+                        (fila.dataset.mes || "")
+                            .trim()
+                            .toLowerCase();
 
-                const coincideMes =
-                    !mes ||
-                    textoMes === mes;
-
-                // ========================================
-                // RESULTADO
-                // ========================================
-
-                const mostrar =
-                    coincideBuscar &&
-                    coincideEmpresa &&
-                    coincideTipo &&
-                    coincideAgente &&
-                    coincideSemana &&
-                    coincideMes;
-
-                if (mostrar) {
-
-                    filasFiltradas.push(fila);
-
-                    totalVendido +=
-                        parseFloat(
-                            fila.dataset.total || 0
+                    const semanaFila =
+                        Number(
+                            fila.dataset.semana || 0
                         );
 
-                    if (textoAgente)
-                        agentes.add(textoAgente);
+                    // ========================================
+                    // VALIDACIONES
+                    // ========================================
 
-                    if (textoEmpresa)
-                        empresas.add(textoEmpresa);
+                    const coincideBuscar =
+                        !buscar ||
+                        textoBuscar.includes(buscar);
 
-                }
+                    const coincideEmpresa =
+                        !empresa ||
+                        textoEmpresa === empresa;
 
-            });
+                    const coincideTipo =
+                        !tipo ||
+                        textoTipo === tipo;
 
-            // ========================================
-            // ACTUALIZAR CARDS
-            // ========================================
+                    const coincideAgente =
+                        !agente ||
+                        textoAgente.includes(agente);
 
-            cardTotalVentas.innerText =
-                filasFiltradas.length;
+                    const coincideSemana =
+                        !semana ||
+                        semanaFila === Number(semana);
 
-            cardTotalVendido.innerText =
-                `₡ ${totalVendido.toLocaleString(
-                    "es-CR",
+                    const coincideMes =
+                        !mes ||
+                        textoMes === mes;
+
+                    // ========================================
+                    // RESULTADO
+                    // ========================================
+
+                    const mostrar =
+                        coincideBuscar &&
+                        coincideEmpresa &&
+                        coincideTipo &&
+                        coincideAgente &&
+                        coincideSemana &&
+                        coincideMes;
+
+                    if (mostrar)
                     {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
+                        filasFiltradas.push(fila);
+
+                        totalVendido +=
+                            parseFloat(
+                                fila.dataset.total || 0
+                            );
+
+                        if (textoAgente)
+                            agentes.add(textoAgente);
+
+                        if (textoEmpresa)
+                            empresas.add(textoEmpresa);
                     }
-                )}`;
-
-            cardAgentes.innerText =
-                agentes.size;
-
-            cardEmpresas.innerText =
-                empresas.size;
-
-            currentPage = 1;
-
-            renderPagination();
-
-        }
-
-        // ========================================
-        // PAGINACIÓN
-        // ========================================
-
-        function renderPagination() {
-
-            filas.forEach(fila => {
-
-                fila.style.display = "none";
-
-            });
-
-            const start =
-                (currentPage - 1) * rowsPerPage;
-
-            const end =
-                start + rowsPerPage;
-
-            const filasPagina =
-                filasFiltradas.slice(start, end);
-
-            filasPagina.forEach(fila => {
-
-                fila.style.display = "";
-
-            });
-
-            const totalPages =
-                Math.ceil(
-                    filasFiltradas.length / rowsPerPage
-                ) || 1;
-
-            paginationInfo.innerText =
-                `Página ${currentPage} de ${totalPages}`;
-
-            prevPage.disabled =
-                currentPage === 1;
-
-            nextPage.disabled =
-                currentPage === totalPages;
-
-        }
-
-        // ========================================
-        // EVENTOS
-        // ========================================
-
-        buscarInput.addEventListener(
-            "input",
-            filtrarVentas
-        );
-
-        empresaFilter.addEventListener(
-            "change",
-            filtrarVentas
-        );
-
-        tipoFilter.addEventListener(
-            "change",
-            filtrarVentas
-        );
-
-        agenteFilter.addEventListener(
-            "input",
-            filtrarVentas
-        );
-
-        semanaFilter.addEventListener(
-            "input",
-            filtrarVentas
-        );
-
-        mesFilter.addEventListener(
-            "change",
-            filtrarVentas
-        );
-
-        // ========================================
-        // LIMPIAR
-        // ========================================
-
-        document
-            .getElementById("btnLimpiar")
-            .addEventListener(
-                "click",
-                () => {
-
-                    buscarInput.value = "";
-                    empresaFilter.value = "";
-                    tipoFilter.value = "";
-                    agenteFilter.value = "";
-                    semanaFilter.value = "";
-                    mesFilter.value = "";
-
-                    filtrarVentas();
 
                 });
 
-        // ========================================
-        // PAGINACIÓN BOTONES
-        // ========================================
+                // ========================================
+                // CARDS
+                // ========================================
 
-        prevPage.addEventListener(
-            "click",
-            () => {
+                cardTotalVentas.innerText =
+                    filasFiltradas.length;
 
-                if (currentPage > 1) {
+                cardTotalVendido.innerText =
+                    `₡ ${totalVendido.toLocaleString(
+                        "es-CR",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}`;
 
-                    currentPage--;
+                cardAgentes.innerText =
+                    agentes.size;
 
-                    renderPagination();
+                cardEmpresas.innerText =
+                    empresas.size;
 
-                }
+                currentPage = 1;
 
-            });
+                renderPagination();
+            }
 
-        nextPage.addEventListener(
-            "click",
-            () => {
+            // ========================================
+            // PAGINACIÓN
+            // ========================================
+
+            function renderPagination()
+            {
+                filas.forEach(fila =>
+                {
+                    fila.style.display = "none";
+                });
+
+                const start =
+                    (currentPage - 1)
+                    * rowsPerPage;
+
+                const end =
+                    start + rowsPerPage;
+
+                const filasPagina =
+                    filasFiltradas.slice(
+                        start,
+                        end
+                    );
+
+                filasPagina.forEach(fila =>
+                {
+                    fila.style.display = "";
+                });
 
                 const totalPages =
                     Math.ceil(
-                        filasFiltradas.length / rowsPerPage
-                    );
+                        filasFiltradas.length
+                        / rowsPerPage
+                    ) || 1;
 
-                if (currentPage < totalPages) {
+                paginationInfo.innerText =
+                    `Página ${currentPage} de ${totalPages}`;
 
-                    currentPage++;
+                prevPage.disabled =
+                    currentPage === 1;
 
-                    renderPagination();
+                nextPage.disabled =
+                    currentPage === totalPages;
+            }
 
-                }
+            // ========================================
+            // EVENTOS
+            // ========================================
 
-            });
+            buscarInput.addEventListener(
+                "input",
+                filtrarVentas
+            );
 
-        // ========================================
-        // INIT
-        // ========================================
+            empresaFilter.addEventListener(
+                "change",
+                filtrarVentas
+            );
 
-        filtrarVentas();
+            tipoFilter.addEventListener(
+                "change",
+                filtrarVentas
+            );
 
-    });
+            agenteFilter.addEventListener(
+                "input",
+                filtrarVentas
+            );
+
+            semanaFilter.addEventListener(
+                "input",
+                filtrarVentas
+            );
+
+            mesFilter.addEventListener(
+                "change",
+                filtrarVentas
+            );
+
+            // ========================================
+            // LIMPIAR
+            // ========================================
+
+            document
+                .getElementById(
+                    "btnLimpiar"
+                )
+                .addEventListener(
+                    "click",
+                    () =>
+                    {
+                        buscarInput.value = "";
+                        empresaFilter.value = "";
+                        tipoFilter.value = "";
+                        agenteFilter.value = "";
+                        semanaFilter.value = "";
+                        mesFilter.value = "";
+
+                        filtrarVentas();
+                    });
+
+            // ========================================
+            // PAGINACIÓN BOTONES
+            // ========================================
+
+            prevPage.addEventListener(
+                "click",
+                () =>
+                {
+                    if (currentPage > 1)
+                    {
+                        currentPage--;
+
+                        renderPagination();
+                    }
+                });
+
+            nextPage.addEventListener(
+                "click",
+                () =>
+                {
+                    const totalPages =
+                        Math.ceil(
+                            filasFiltradas.length
+                            / rowsPerPage
+                        );
+
+                    if (currentPage < totalPages)
+                    {
+                        currentPage++;
+
+                        renderPagination();
+                    }
+                });
+
+            // ========================================
+            // INIT
+            // ========================================
+
+            filtrarVentas();
+
+        });
 
 </script>

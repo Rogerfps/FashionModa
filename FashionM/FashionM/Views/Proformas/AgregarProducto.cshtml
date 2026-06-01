@@ -4,131 +4,273 @@
     ViewData["Title"] = "Agregar Productos";
 }
 
-<link rel="stylesheet" href="~/css/Proforma/ProformaAgregar.css" />
+<link rel="stylesheet"
+      href="~/css/Proforma/ProformaAgregar.css" />
 
 <div class="container mt-4">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <div class="page-header">
+
         <h1 class="page-title">
-            <span>🛒</span> Agregar Productos a Proforma #@Model.Id
+
+            <span>🛒</span>
+
+            Agregar Productos a Proforma #@Model.Id
+
         </h1>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">
-            <span>←</span> Ver Detalle
+
+        <a asp-action="Details"
+           asp-route-id="@Model.Id"
+           class="back-link">
+
+            <span>←</span>
+
+            Ver Detalle
+
         </a>
+
     </div>
 
-    <!-- Información -->
+    <!-- INFO -->
     <div class="info-card">
+
         <div class="info-grid">
+
             <div class="info-item">
-                <div class="info-label">Empresa</div>
-                <div class="info-value">@Model.Empresa?.Nombre</div>
+
+                <div class="info-label">
+                    Empresa
+                </div>
+
+                <div class="info-value">
+                    @Model.Empresa?.Nombre
+                </div>
+
             </div>
+
             <div class="info-item">
-                <div class="info-label">Cliente</div>
-                <div class="info-value">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</div>
+
+                <div class="info-label">
+                    Cliente
+                </div>
+
+                <div class="info-value">
+                    @Model.Cliente?.Nombre
+                    @Model.Cliente?.Apellidos
+                </div>
+
             </div>
+
             <div class="info-item">
-                <div class="info-label">Fecha</div>
-                <div class="info-value">@Model.Fecha.ToString("dd/MM/yyyy")</div>
+
+                <div class="info-label">
+                    Fecha
+                </div>
+
+                <div class="info-value">
+                    @Model.Fecha.ToString("dd/MM/yyyy")
+                </div>
+
             </div>
+
         </div>
+
     </div>
 
     <!-- FORM -->
     <div class="form-card">
+
         <div class="section-title">
-            <span>➕</span> Agregar Nuevo Producto
+
+            <span>➕</span>
+
+            Agregar Nuevo Producto
+
         </div>
 
-        <form asp-action="CrearZapato" method="post" id="formProforma">
-            <input type="hidden" name="proformaId" value="@Model.Id" />
+        <form asp-action="CrearZapato"
+              method="post"
+              id="formProforma">
+
+            <input type="hidden"
+                   name="proformaId"
+                   value="@Model.Id" />
 
             <div class="row g-3">
 
                 <!-- PRODUCTO -->
                 <div class="col-md-4 position-relative">
-                    <label class="form-label">Producto</label>
 
-                    <input type="text" id="productoBuscar" class="form-control"
-                           placeholder="Buscar código o marca..." autocomplete="off" />
+                    <label class="form-label">
+                        Producto
+                    </label>
 
-                    <input type="hidden" name="codigo" id="codigoProducto" required />
+                    <input type="text"
+                           id="productoBuscar"
+                           class="form-control"
+                           placeholder="Buscar código o marca..."
+                           autocomplete="off" />
 
-                    <div id="listaProductos" class="list-group"></div>
+                    <input type="hidden"
+                           name="codigo"
+                           id="codigoProducto"
+                           required />
+
+                    <div id="listaProductos"
+                         class="list-group">
+                    </div>
+
                 </div>
 
                 <!-- COLOR -->
                 <div class="col-md-3">
-                    <label class="form-label">Color</label>
-                    <select name="color" id="colorSelect" class="form-select" required>
-                        <option value="">Seleccione</option>
+
+                    <label class="form-label">
+                        Color
+                    </label>
+
+                    <select name="color"
+                            id="colorSelect"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            Seleccione
+                        </option>
+
                     </select>
+
                 </div>
 
                 <!-- DETALLE -->
                 <div class="col-md-3">
-                    <label class="form-label">Detalle</label>
-                    <select name="detalle" id="detalleSelect" class="form-select">
-                        <option value="">(Sin detalle)</option>
+
+                    <label class="form-label">
+                        Detalle
+                    </label>
+
+                    <select name="detalle"
+                            id="detalleSelect"
+                            class="form-select">
+
+                        <option value="">
+                            (Sin detalle)
+                        </option>
+
                     </select>
+
                 </div>
 
+                <!-- BTN -->
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn-add">
+
+                    <button type="submit"
+                            class="btn-add">
+
                         ➕ Agregar
+
                     </button>
+
                 </div>
 
                 <!-- TABLA -->
                 <div class="col-12">
-                    <label class="form-label">Tallas y Cantidades</label>
+
+                    <label class="form-label">
+                        Tallas y Cantidades
+                    </label>
+
                     <div id="tablaTallas"></div>
+
                 </div>
 
             </div>
+
         </form>
+
     </div>
 
     <!-- TABLA ACTUAL -->
     <div class="table-wrapper">
+
         <div class="section-title">
-            <span>📋</span> Productos en la Proforma
+
+            <span>📋</span>
+
+            Productos en la Proforma
+
         </div>
 
         <div class="table-responsive">
+
             <table class="productos-table">
+
                 <thead>
+
                     <tr>
+
                         <th>Código</th>
                         <th>Color</th>
                         <th>Talla</th>
                         <th class="text-center">Cantidad</th>
                         <th class="text-right">Precio</th>
                         <th class="text-right">Subtotal</th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     @foreach (var item in Model.Detalles)
                     {
                         <tr>
-                            <td>@item.InventarioCodigo</td>
-                            <td>@item.Color</td>
-                            <td>@item.Talla</td>
-                            <td class="text-center">@item.Cantidad</td>
-                            <td class="text-right">₡ @item.PrecioUnitario.ToString("N2")</td>
-                            <td class="text-right fw-bold">₡ @item.SubTotal.ToString("N2")</td>
+
+                            <td>
+                                @item.InventarioCodigo
+                            </td>
+
+                            <td>
+                                @item.Color
+                            </td>
+
+                            <td>
+                                @item.Talla
+                            </td>
+
+                            <td class="text-center">
+                                @item.Cantidad
+                            </td>
+
+                            <td class="text-right">
+                                ₡ @item.PrecioUnitario.ToString("N2")
+                            </td>
+
+                            <td class="text-right fw-bold">
+                                ₡ @item.SubTotal.ToString("N2")
+                            </td>
+
                         </tr>
                     }
+
                 </tbody>
+
             </table>
+
         </div>
 
+        <!-- TOTAL -->
         <div class="total-footer">
+
             <span>Total:</span>
-            <span>₡ @Model.Total.ToString("N2")</span>
+
+            <span>
+                ₡ @Model.Total.ToString("N2")
+            </span>
+
         </div>
+
     </div>
 
 </div>
@@ -136,106 +278,192 @@
 @section Scripts {
 
     <script>
+
         let timeout = null;
 
-        const input = document.getElementById("productoBuscar");
-        const lista = document.getElementById("listaProductos");
-        const hidden = document.getElementById("codigoProducto");
+        const input =
+            document.getElementById(
+                "productoBuscar"
+            );
 
-        const color = document.getElementById("colorSelect");
-        const detalle = document.getElementById("detalleSelect");
+        const lista =
+            document.getElementById(
+                "listaProductos"
+            );
+
+        const hidden =
+            document.getElementById(
+                "codigoProducto"
+            );
+
+        const color =
+            document.getElementById(
+                "colorSelect"
+            );
+
+        const detalle =
+            document.getElementById(
+                "detalleSelect"
+            );
 
         let variantes = [];
 
+        // ========================================
         // BUSCAR PRODUCTO
-        input.addEventListener("keyup", function () {
-            clearTimeout(timeout);
+        // ========================================
 
-            let term = this.value;
+        input.addEventListener(
+            "keyup",
+            function ()
+            {
+                clearTimeout(timeout);
 
-            timeout = setTimeout(() => {
+                let term = this.value;
 
-                if (term.length < 1) {
-                    lista.innerHTML = "";
-                    return;
-                }
-
-                fetch(`/Proformas/BuscarProductos?term=${term}&proformaId=@Model.Id`)
-                    .then(r => r.json())
-                    .then(data => {
-
+                timeout = setTimeout(() =>
+                {
+                    if (term.length < 1)
+                    {
                         lista.innerHTML = "";
+                        return;
+                    }
 
-                        data.forEach(p => {
-                            let item = document.createElement("a");
-                            item.className = "list-group-item list-group-item-action";
-                            item.innerHTML = `<strong>${p.codigo}</strong> - ${p.marca}`;
+                    fetch(`/Proformas/BuscarProductos?term=${term}&proformaId=@Model.Id`)
+                        .then(r => r.json())
+                        .then(data =>
+                        {
+                            lista.innerHTML = "";
 
-                            item.onclick = () => {
-                                input.value = p.codigo;
-                                hidden.value = p.codigo;
-                                lista.innerHTML = "";
+                            data.forEach(p =>
+                            {
+                                let item =
+                                    document.createElement("a");
 
-                                cargarVariantes(p.codigo);
-                            };
+                                item.className =
+                                    "list-group-item list-group-item-action";
 
-                            lista.appendChild(item);
+                                item.innerHTML =
+                                    `<strong>${p.codigo}</strong> - ${p.marca}`;
+
+                                item.onclick = () =>
+                                {
+                                    input.value = p.codigo;
+
+                                    hidden.value = p.codigo;
+
+                                    lista.innerHTML = "";
+
+                                    cargarVariantes(p.codigo);
+                                };
+
+                                lista.appendChild(item);
+                            });
                         });
-                    });
 
-            }, 300);
-        });
+                }, 300);
+            });
 
-        function cargarVariantes(codigo) {
+        // ========================================
+        // CARGAR VARIANTES
+        // ========================================
+
+        function cargarVariantes(codigo)
+        {
             fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}&proformaId=@Model.Id`)
                 .then(r => r.json())
-                .then(data => {
+                .then(data =>
+                {
                     variantes = data;
 
-                    llenarSelect(color, [...new Set(data.map(x => x.color))], "Seleccione");
+                    llenarSelect(
+                        color,
+                        [...new Set(data.map(x => x.color))],
+                        "Seleccione"
+                    );
 
-                    detalle.innerHTML = `<option value="">(Sin detalle)</option>`;
-                    document.getElementById("tablaTallas").innerHTML = "";
+                    detalle.innerHTML =
+                        `<option value="">(Sin detalle)</option>`;
+
+                    document.getElementById(
+                        "tablaTallas"
+                    ).innerHTML = "";
                 });
         }
 
-        color.addEventListener("change", () => {
-            let c = color.value;
+        // ========================================
+        // COLOR CHANGE
+        // ========================================
 
-            let filtradasColor = variantes.filter(v => v.color === c);
+        color.addEventListener(
+            "change",
+            () =>
+            {
+                let c = color.value;
 
-            let detalles = filtradasColor.map(v => v.detalle || "");
-            let unicos = [...new Set(detalles)];
+                let filtradasColor =
+                    variantes.filter(v =>
+                        v.color === c
+                    );
 
-            llenarSelect(detalle, unicos, "(Sin detalle)");
+                let detalles =
+                    filtradasColor.map(v =>
+                        v.detalle || ""
+                    );
 
-            // 🔥 SI SOLO HAY UN DETALLE → AUTO
-            if (unicos.length === 1) {
-                detalle.value = unicos[0];
-                detalle.dispatchEvent(new Event("change"));
-            }
+                let unicos =
+                    [...new Set(detalles)];
 
-            // 🔥 SI NO HAY DETALLE → MOSTRAR DIRECTO
-            if (unicos.length === 0) {
-                renderTallas(filtradasColor);
-            }
-        });
+                llenarSelect(
+                    detalle,
+                    unicos,
+                    "(Sin detalle)"
+                );
 
-        detalle.addEventListener("change", () => {
+                if (unicos.length === 1)
+                {
+                    detalle.value = unicos[0];
 
-            let c = color.value;
-            let d = detalle.value;
+                    detalle.dispatchEvent(
+                        new Event("change")
+                    );
+                }
 
-            let filtradas = variantes.filter(v =>
-                v.color === c &&
-                (v.detalle || "").trim() === (d || "").trim()
-            );
+                if (unicos.length === 0)
+                {
+                    renderTallas(
+                        filtradasColor
+                    );
+                }
+            });
 
-            renderTallas(filtradas);
-        });
+        // ========================================
+        // DETALLE CHANGE
+        // ========================================
 
-        function renderTallas(data) {
+        detalle.addEventListener(
+            "change",
+            () =>
+            {
+                let c = color.value;
 
+                let d = detalle.value;
+
+                let filtradas =
+                    variantes.filter(v =>
+                        v.color === c &&
+                        (v.detalle || "").trim()
+                            === (d || "").trim()
+                    );
+
+                renderTallas(filtradas);
+            });
+
+        // ========================================
+        // RENDER TALLAS
+        // ========================================
+
+        function renderTallas(data)
+        {
             let html = `
                 <table class="productos-table">
                     <thead>
@@ -249,83 +477,201 @@
                     <tbody>
             `;
 
-            data.forEach((v, i) => {
+            data.forEach((v, i) =>
+            {
+                let precio =
+                    Number(v.precio || 0);
+
                 html += `
                     <tr>
+
                         <td>${v.talla}</td>
+
                         <td>${v.stock ?? '-'}</td>
-                        <td>₡ ${v.precio}</td>
+
                         <td>
-                            <input type="hidden" name="tallas[${i}]" value="${v.talla}" />
-                            <input type="hidden" name="preciosCosto[${i}]" value="${v.precio}" />
-                            <input type="hidden" name="preciosVenta[${i}]" value="${v.precio}" />
+                            ₡ ${precio.toFixed(2)}
+                        </td>
+
+                        <td>
+
+                            <input type="hidden"
+                                   name="tallas[${i}]"
+                                   value="${v.talla}" />
+
+                            <input type="hidden"
+                                   name="preciosCosto[${i}]"
+                                   value="${precio}" />
+
+                            <input type="hidden"
+                                   name="preciosVenta[${i}]"
+                                   value="${precio}" />
 
                             <input type="number"
                                    name="cantidades[${i}]"
                                    min="0"
                                    class="form-control" />
+
                         </td>
+
                     </tr>
                 `;
             });
 
-            html += `</tbody></table>`;
-            document.getElementById("tablaTallas").innerHTML = html;
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById(
+                "tablaTallas"
+            ).innerHTML = html;
         }
 
-        document.getElementById("formProforma").addEventListener("submit", function (e) {
+        // ========================================
+        // SUBMIT
+        // ========================================
 
-            let inputsCantidad = document.querySelectorAll("input[name^='cantidades']");
-            let inputsTalla = document.querySelectorAll("input[name^='tallas']");
-            let inputsCosto = document.querySelectorAll("input[name^='preciosCosto']");
-            let inputsVenta = document.querySelectorAll("input[name^='preciosVenta']");
+        document.getElementById(
+            "formProforma"
+        ).addEventListener(
+            "submit",
+            function (e)
+            {
+                let inputsCantidad =
+                    document.querySelectorAll(
+                        "input[name^='cantidades']"
+                    );
 
-            let nuevasTallas = [];
-            let nuevasCantidades = [];
-            let nuevosCostos = [];
-            let nuevosVentas = [];
+                let inputsTalla =
+                    document.querySelectorAll(
+                        "input[name^='tallas']"
+                    );
 
-            inputsCantidad.forEach((input, index) => {
-                let cantidad = parseInt(input.value);
+                let inputsCosto =
+                    document.querySelectorAll(
+                        "input[name^='preciosCosto']"
+                    );
 
-                if (!isNaN(cantidad) && cantidad > 0) {
-                    nuevasTallas.push(inputsTalla[index].value);
-                    nuevasCantidades.push(cantidad);
-                    nuevosCostos.push(inputsCosto[index].value);
-                    nuevosVentas.push(inputsVenta[index].value);
+                let inputsVenta =
+                    document.querySelectorAll(
+                        "input[name^='preciosVenta']"
+                    );
+
+                let nuevasTallas = [];
+
+                let nuevasCantidades = [];
+
+                let nuevosCostos = [];
+
+                let nuevosVentas = [];
+
+                inputsCantidad.forEach(
+                    (input, index) =>
+                    {
+                        let cantidad =
+                            parseInt(input.value);
+
+                        if (!isNaN(cantidad)
+                            && cantidad > 0)
+                        {
+                            nuevasTallas.push(
+                                inputsTalla[index].value
+                            );
+
+                            nuevasCantidades.push(
+                                cantidad
+                            );
+
+                            nuevosCostos.push(
+                                Number(
+                                    inputsCosto[index].value
+                                )
+                            );
+
+                            nuevosVentas.push(
+                                Number(
+                                    inputsVenta[index].value
+                                )
+                            );
+                        }
+                    });
+
+                if (nuevasCantidades.length === 0)
+                {
+                    e.preventDefault();
+
+                    alert(
+                        "Debe ingresar al menos una cantidad mayor a 0"
+                    );
+
+                    return;
                 }
+
+                // LIMPIAR INPUTS VIEJOS
+                inputsCantidad.forEach(i => i.remove());
+
+                inputsTalla.forEach(i => i.remove());
+
+                inputsCosto.forEach(i => i.remove());
+
+                inputsVenta.forEach(i => i.remove());
+
+                // CREAR NUEVOS
+                nuevasTallas.forEach((t, i) =>
+                {
+                    this.insertAdjacentHTML(
+                        "beforeend",
+                        `
+                        <input type="hidden"
+                               name="tallas[${i}]"
+                               value="${t}" />
+
+                        <input type="hidden"
+                               name="cantidades[${i}]"
+                               value="${nuevasCantidades[i]}" />
+
+                        <input type="hidden"
+                               name="preciosCosto[${i}]"
+                               value="${nuevosCostos[i]}" />
+
+                        <input type="hidden"
+                               name="preciosVenta[${i}]"
+                               value="${nuevosVentas[i]}" />
+                        `
+                    );
+                });
             });
 
-            if (nuevasCantidades.length === 0) {
-                e.preventDefault();
-                alert("Debe ingresar al menos una cantidad mayor a 0");
-                return;
-            }
+        // ========================================
+        // LLENAR SELECT
+        // ========================================
 
-            inputsCantidad.forEach(i => i.remove());
-            inputsTalla.forEach(i => i.remove());
-            inputsCosto.forEach(i => i.remove());
-            inputsVenta.forEach(i => i.remove());
+        function llenarSelect(
+            select,
+            items,
+            textoDefault
+        )
+        {
+            select.innerHTML =
+                `<option value="">${textoDefault}</option>`;
 
-            nuevasTallas.forEach((t, i) => {
-                this.insertAdjacentHTML("beforeend", `
-                    <input type="hidden" name="tallas[${i}]" value="${t}" />
-                    <input type="hidden" name="cantidades[${i}]" value="${nuevasCantidades[i]}" />
-                    <input type="hidden" name="preciosCosto[${i}]" value="${nuevosCostos[i]}" />
-                    <input type="hidden" name="preciosVenta[${i}]" value="${nuevosVentas[i]}" />
-                `);
-            });
-        });
+            items.forEach(i =>
+            {
+                let o =
+                    document.createElement(
+                        "option"
+                    );
 
-        function llenarSelect(select, items, textoDefault) {
-            select.innerHTML = `<option value="">${textoDefault}</option>`;
-
-            items.forEach(i => {
-                let o = document.createElement("option");
                 o.value = i;
-                o.text = i || "(Sin detalle)";
+
+                o.text =
+                    i || "(Sin detalle)";
+
                 select.appendChild(o);
             });
         }
+
     </script>
+
 }
