@@ -514,6 +514,35 @@ namespace FashionM.Controllers
             return Json(proveedores);
         }
 
+        //DELETE FOTO
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFoto(int id, string inventarioCodigo)
+        {
+            var foto = await _context.Fotos.FindAsync(id);
+
+            if (foto == null)
+                return NotFound();
+
+            // Eliminar archivo físico
+            if (!string.IsNullOrEmpty(foto.Ruta))
+            {
+                var rutaFisica = Path.Combine(
+                    _environment.WebRootPath,
+                    foto.Ruta.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString())
+                );
+
+                if (System.IO.File.Exists(rutaFisica))
+                {
+                    System.IO.File.Delete(rutaFisica);
+                }
+            }
+
+            _context.Fotos.Remove(foto);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = inventarioCodigo });
+        }
 
     }
 }
