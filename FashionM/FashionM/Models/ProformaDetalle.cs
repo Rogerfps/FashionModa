@@ -11,7 +11,9 @@ namespace FashionM.Models
 
         public Proforma? Proforma { get; set; }
 
-        public string InventarioCodigo { get; set; } = string.Empty;
+        public string? InventarioCodigo { get; set; }
+
+        public string CodigoProducto { get; set; } = string.Empty;
 
         public string Color { get; set; } = string.Empty;
 

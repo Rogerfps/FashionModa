@@ -162,7 +162,7 @@ namespace FashionM.Data
                 .WithMany()
                 .HasForeignKey(d => d.InventarioCodigo)
                 .HasPrincipalKey(i => i.Codigo)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             // ===============================
             // RELACIONES - PROVEEDORES CATÁLOGO

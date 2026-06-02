@@ -78,7 +78,6 @@ wwwroot\images\inventarios\7ba4e615-2434-4941-9767-8efbc963ae56.jpg
 wwwroot\images\inventarios\7efa3499-6ee9-4286-935b-49a3b2afe1a8.png
 wwwroot\images\inventarios\85887461-9eeb-4ce2-82ce-241e1e333b00.png
 wwwroot\images\inventarios\9b7b8cfd-6be2-4857-ba18-aea9ab6d6b08.png
-wwwroot\images\inventarios\9df07554-7ab0-4f66-bd5d-3e31ee4f206d.png
 wwwroot\images\inventarios\9ff305fc-430a-4e23-8b29-740f5612d703.jpg
 wwwroot\images\inventarios\a1f42ddc-f5f5-4a5f-b74d-a70dd2073a43.jpg
 wwwroot\images\inventarios\a43a42ad-a048-4459-bff5-da906d833812.jpg
@@ -166,6 +165,7 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\images\inventarios\9df07554-7ab0-4f66-bd5d-3e31ee4f206d.png
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Empresa\EmpresaDetails.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Historial\Detalle.css
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\wwwroot\css\Home\Home.css

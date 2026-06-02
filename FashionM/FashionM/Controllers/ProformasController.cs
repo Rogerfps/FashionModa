@@ -220,7 +220,12 @@ namespace FashionM.Controllers
                         ProformaId =
                             proformaId,
 
+                        // FK al inventario
                         InventarioCodigo =
+                            codigo,
+
+                        // Copia permanente del código
+                        CodigoProducto =
                             codigo,
 
                         Color =
@@ -282,7 +287,7 @@ namespace FashionM.Controllers
             // CREAR / ACTUALIZAR VENTA
             // ========================================
 
-            await CrearActualizarVenta(proformaId);
+            //await CrearActualizarVenta(proformaId);
 
             // ========================================
             // REDIRECT
