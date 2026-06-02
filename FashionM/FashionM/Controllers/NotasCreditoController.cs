@@ -434,9 +434,7 @@ namespace FashionM.Controllers
                 subtotalGeneral =
                     venta.Total;
 
-                totalDevueltoReal =
-                    venta.Total *
-                    (descuentoGlobal / 100);
+                totalDevueltoReal = 0;
             }
 
             // ========================================
