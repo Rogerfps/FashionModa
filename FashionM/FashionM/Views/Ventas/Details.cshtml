@@ -62,14 +62,15 @@
 
         @if (Model.CuentaPorCobrar != null)
         {
-            <a asp-controller="CuentasPorCobrar"
-               asp-action="Details"
-               asp-route-clienteCedula="@Model.ClienteCedula"
-               class="btn-cuenta-creada">
+        <a asp-controller="CuentasPorCobrar"
+           asp-action="Details"
+           asp-route-clienteCedula="@Model.ClienteCedula"
+           asp-route-empresaId="@Model.EmpresaId"
+           class="btn-cuenta-creada">
 
-                📄 Ver Cuenta por Cobrar
+            📄 Ver Cuenta por Cobrar
 
-            </a>
+        </a>
         }
 
     </div>

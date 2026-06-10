@@ -267,6 +267,12 @@ namespace FashionM.Data
                 .HasForeignKey(c => c.ClienteCedula)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<CuentaPorCobrar>()
+                .HasOne(c => c.Empresa)
+                .WithMany()
+                .HasForeignKey(c => c.EmpresaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // ========================================
             // CUENTA -> PAGOS

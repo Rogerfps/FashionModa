@@ -22,63 +22,99 @@ namespace FashionM.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var cuentas =
-                await _context.CuentasPorCobrar
+            var cuentas = await _context.CuentasPorCobrar
 
-                    .Include(c => c.Cliente)
+                .Include(c => c.Cliente)
 
-                    .Include(c => c.Venta)
+                .Include(c => c.Empresa)
 
+                .Include(c => c.Venta)
                     .ThenInclude(v => v!.NotasCredito)
 
-                    .Include(c => c.Pagos)
+                .Include(c => c.Pagos)
 
-                    .ToListAsync();
+                .ToListAsync();
 
-            var clientesAgrupados =
-                cuentas
+            var modelo = cuentas
 
                 .GroupBy(x => new
                 {
+                    x.EmpresaId,
+
+                    Empresa = x.Empresa!.Nombre,
+
                     x.ClienteCedula,
+
                     Nombre =
-                        x.Cliente!.Nombre
-                        + " "
-                        + x.Cliente.Apellidos
+                        x.Cliente!.Nombre + " " +
+                        x.Cliente.Apellidos,
+
+                    Comercio =
+                        x.Cliente.Comercio
                 })
 
                 .Select(g => new
                 {
+                    EmpresaId =
+                        g.Key.EmpresaId,
+
+                    Empresa =
+                        g.Key.Empresa,
+
                     ClienteCedula =
                         g.Key.ClienteCedula,
 
                     Nombre =
                         g.Key.Nombre,
 
+                    Comercio =
+                        g.Key.Comercio,
+
+                    CantidadFacturas =
+                        g.Count(),
+
                     Saldo =
                         g.Sum(c =>
                         {
                             decimal pagos =
-                                c.Pagos.Sum(x =>
-                                    x.Monto);
+                                c.Pagos.Sum(p =>
+                                    p.Monto);
 
                             decimal notas =
                                 c.Venta?.NotasCredito
-                                    .Sum(x =>
-                                        x.TotalDevuelto) ?? 0;
+                                    .Sum(n =>
+                                        n.TotalDevuelto) ?? 0;
 
-                            return c.MontoOriginal
+                            decimal saldo =
+                                c.MontoOriginal
                                 - pagos
                                 - notas;
+
+                            // ========================================
+                            // TODO SALDO MENOR A ₡1
+                            // SE CONSIDERA PAGADO
+                            // ========================================
+
+                            return saldo < 1
+                                ? 0
+                                : saldo;
                         })
                 })
 
-                .OrderByDescending(x =>
-                    x.Saldo)
+                .OrderBy(x => x.Empresa)
+
+                .ThenByDescending(x => x.Saldo)
 
                 .ToList();
 
-            return View(clientesAgrupados);
+            ViewBag.Empresas =
+                await _context.Empresas
+
+                    .OrderBy(x => x.Nombre)
+
+                    .ToListAsync();
+
+            return View(modelo);
         }
 
         // ========================================
@@ -86,25 +122,33 @@ namespace FashionM.Controllers
         // ========================================
 
         public async Task<IActionResult> Details(
-            int clienteCedula)
+            int clienteCedula,
+            int empresaId)
         {
             var cuentas =
                 await _context.CuentasPorCobrar
 
                     .Include(c => c.Cliente)
 
+                    .Include(c => c.Empresa)
+
                     .Include(c => c.Venta)
 
-                    .ThenInclude(v => v!.NotasCredito)
+                        .ThenInclude(v => v!.NotasCredito)
 
                     .Include(c => c.Pagos)
 
                     .Where(c =>
-                        c.ClienteCedula ==
-                        clienteCedula)
 
-                    .OrderByDescending(c =>
-                        c.Fecha)
+                        c.ClienteCedula == clienteCedula
+
+                        &&
+
+                        c.EmpresaId == empresaId
+
+                    )
+
+                    .OrderByDescending(c => c.Fecha)
 
                     .ToListAsync();
 
@@ -147,8 +191,8 @@ namespace FashionM.Controllers
                     nameof(Details),
                     new
                     {
-                        clienteCedula =
-                            venta.ClienteCedula
+                        clienteCedula = venta.ClienteCedula,
+                        empresaId = venta.EmpresaId
                     });
             }
 
@@ -176,6 +220,9 @@ namespace FashionM.Controllers
 
                     ClienteCedula =
                         venta.ClienteCedula,
+
+                    EmpresaId =
+                        venta.EmpresaId,
 
                     MontoOriginal =
                         montoOriginal,
@@ -218,12 +265,11 @@ namespace FashionM.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            RegistrarPago(
-                int cuentaId,
-                decimal monto,
-                string metodoPago,
-                string observacion)
+        public async Task<IActionResult> RegistrarPago(
+            int cuentaId,
+            decimal monto,
+            string metodoPago,
+            string observacion)
         {
             var cuenta =
                 await _context.CuentasPorCobrar
@@ -232,10 +278,9 @@ namespace FashionM.Controllers
 
                     .Include(c => c.Venta)
 
-                    .ThenInclude(v => v!.NotasCredito)
+                        .ThenInclude(v => v!.NotasCredito)
 
-                    .FirstOrDefaultAsync(c =>
-                        c.Id == cuentaId);
+                    .FirstOrDefaultAsync(c => c.Id == cuentaId);
 
             if (cuenta == null)
                 return NotFound();
@@ -245,13 +290,10 @@ namespace FashionM.Controllers
             // ========================================
 
             decimal totalPagado =
-                cuenta.Pagos.Sum(x =>
-                    x.Monto);
+                cuenta.Pagos.Sum(x => x.Monto);
 
             decimal totalNotas =
-                cuenta.Venta!.NotasCredito
-                    .Sum(x =>
-                        x.TotalDevuelto);
+                cuenta.Venta!.NotasCredito.Sum(x => x.TotalDevuelto);
 
             decimal saldo =
                 cuenta.MontoOriginal
@@ -259,7 +301,25 @@ namespace FashionM.Controllers
                 - totalNotas;
 
             // ========================================
-            // VALIDAR
+            // YA PAGADA
+            // ========================================
+
+            if (saldo < 1)
+            {
+                TempData["Success"] =
+                    "La cuenta ya se considera pagada.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        clienteCedula = cuenta.ClienteCedula,
+                        empresaId = cuenta.EmpresaId
+                    });
+            }
+
+            // ========================================
+            // VALIDAR MONTO
             // ========================================
 
             if (monto <= 0)
@@ -271,8 +331,8 @@ namespace FashionM.Controllers
                     nameof(Details),
                     new
                     {
-                        clienteCedula =
-                            cuenta.ClienteCedula
+                        clienteCedula = cuenta.ClienteCedula,
+                        empresaId = cuenta.EmpresaId
                     });
             }
 
@@ -285,8 +345,8 @@ namespace FashionM.Controllers
                     nameof(Details),
                     new
                     {
-                        clienteCedula =
-                            cuenta.ClienteCedula
+                        clienteCedula = cuenta.ClienteCedula,
+                        empresaId = cuenta.EmpresaId
                     });
             }
 
@@ -294,27 +354,20 @@ namespace FashionM.Controllers
             // CREAR PAGO
             // ========================================
 
-            var pago =
-                new CuentaPorCobrarPago
-                {
-                    CuentaPorCobrarId =
-                        cuenta.Id,
+            var pago = new CuentaPorCobrarPago
+            {
+                CuentaPorCobrarId = cuenta.Id,
 
-                    Monto =
-                        monto,
+                Monto = monto,
 
-                    Fecha =
-                        DateTime.UtcNow,
+                Fecha = DateTime.UtcNow,
 
-                    MetodoPago =
-                        metodoPago,
+                MetodoPago = metodoPago,
 
-                    Observacion =
-                        observacion ?? string.Empty
-                };
+                Observacion = observacion ?? string.Empty
+            };
 
-            _context.CuentasPorCobrarPagos
-                .Add(pago);
+            _context.CuentasPorCobrarPagos.Add(pago);
 
             await _context.SaveChangesAsync();
 
@@ -325,32 +378,28 @@ namespace FashionM.Controllers
                 nameof(Details),
                 new
                 {
-                    clienteCedula =
-                        cuenta.ClienteCedula
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
                 });
-
         }
 
         // ========================================
         // CREATE
         // ========================================
 
-        public async Task<IActionResult>
-            Create(int ventaId)
+        public async Task<IActionResult> Create(int ventaId)
         {
-            var venta =
-                await _context.Ventas
+            var venta = await _context.Ventas
 
-                    .Include(v => v.Cliente)
+                .Include(v => v.Cliente)
 
-                    .Include(v => v.Empresa)
+                .Include(v => v.Empresa)
 
-                    .Include(v => v.NotasCredito)
+                .Include(v => v.NotasCredito)
 
-                    .Include(v => v.CuentaPorCobrar)
+                .Include(v => v.CuentaPorCobrar)
 
-                    .FirstOrDefaultAsync(v =>
-                        v.Id == ventaId);
+                .FirstOrDefaultAsync(v => v.Id == ventaId);
 
             if (venta == null)
                 return NotFound();
@@ -368,8 +417,8 @@ namespace FashionM.Controllers
                     nameof(Details),
                     new
                     {
-                        clienteCedula =
-                            venta.ClienteCedula
+                        clienteCedula = venta.ClienteCedula,
+                        empresaId = venta.EmpresaId
                     });
             }
 
@@ -378,9 +427,7 @@ namespace FashionM.Controllers
             // ========================================
 
             decimal totalNotas =
-                venta.NotasCredito
-                    .Sum(x =>
-                        x.TotalDevuelto);
+                venta.NotasCredito.Sum(x => x.TotalDevuelto);
 
             // ========================================
             // SALDO REAL
@@ -388,10 +435,6 @@ namespace FashionM.Controllers
 
             decimal saldoReal =
                 venta.Total - totalNotas;
-
-            // ========================================
-            // VALIDAR
-            // ========================================
 
             if (saldoReal <= 0)
             {
@@ -411,39 +454,31 @@ namespace FashionM.Controllers
             // MODELO
             // ========================================
 
-            var cuenta =
-                new CuentaPorCobrar
-                {
-                    VentaId =
-                        venta.Id,
+            var cuenta = new CuentaPorCobrar
+            {
+                VentaId = venta.Id,
 
-                    ClienteCedula =
-                        venta.ClienteCedula,
+                ClienteCedula = venta.ClienteCedula,
 
-                    // SIEMPRE TOTAL ORIGINAL
-                    MontoOriginal =
-                        venta.Total,
+                EmpresaId = venta.EmpresaId,
 
-                    Fecha =
-                        DateTime.UtcNow,
+                Empresa = venta.Empresa,
 
-                    DiasCredito =
-                        30,
+                MontoOriginal = venta.Total,
 
-                    FechaVencimiento =
-                        DateTime.UtcNow
-                            .AddDays(30),
+                Fecha = DateTime.UtcNow,
 
-                    Estado =
-                        "PENDIENTE",
+                DiasCredito = 30,
 
-                    Observaciones =
-                        $"Cuenta creada desde venta #{venta.Id}"
-                };
+                FechaVencimiento = DateTime.UtcNow.AddDays(30),
+
+                Estado = "PENDIENTE",
+
+                Observaciones = $"Cuenta creada desde venta #{venta.Id}"
+            };
 
             return View(cuenta);
         }
-
 
         // ========================================
         // CREATE POST
@@ -451,22 +486,15 @@ namespace FashionM.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            Create(CuentaPorCobrar cuenta)
+        public async Task<IActionResult> Create(CuentaPorCobrar cuenta)
         {
-            // ========================================
-            // VALIDAR
-            // ========================================
+            var venta = await _context.Ventas
 
-            var venta =
-                await _context.Ventas
+                .Include(v => v.CuentaPorCobrar)
 
-                    .Include(v => v.CuentaPorCobrar)
+                .Include(v => v.NotasCredito)
 
-                    .Include(v => v.NotasCredito)
-
-                    .FirstOrDefaultAsync(v =>
-                        v.Id == cuenta.VentaId);
+                .FirstOrDefaultAsync(v => v.Id == cuenta.VentaId);
 
             if (venta == null)
                 return NotFound();
@@ -481,11 +509,11 @@ namespace FashionM.Controllers
                     "La venta ya tiene una cuenta por cobrar.";
 
                 return RedirectToAction(
-                    "Details",
-                    "Ventas",
+                    nameof(Details),
                     new
                     {
-                        id = venta.Id
+                        clienteCedula = venta.ClienteCedula,
+                        empresaId = venta.EmpresaId
                     });
             }
 
@@ -494,9 +522,7 @@ namespace FashionM.Controllers
             // ========================================
 
             decimal totalNotas =
-                venta.NotasCredito
-                    .Sum(x =>
-                        x.TotalDevuelto);
+                venta.NotasCredito.Sum(x => x.TotalDevuelto);
 
             // ========================================
             // SALDO REAL
@@ -504,10 +530,6 @@ namespace FashionM.Controllers
 
             decimal saldoReal =
                 venta.Total - totalNotas;
-
-            // ========================================
-            // VALIDAR SALDO
-            // ========================================
 
             if (saldoReal <= 0)
             {
@@ -524,30 +546,20 @@ namespace FashionM.Controllers
             }
 
             // ========================================
-            // FECHA
+            // DATOS
             // ========================================
 
             cuenta.Fecha =
                 DateTime.UtcNow;
 
-            // ========================================
-            // FECHA VENCIMIENTO
-            // ========================================
-
             cuenta.FechaVencimiento =
-                cuenta.Fecha
-                    .AddDays(cuenta.DiasCredito);
-
-            // ========================================
-            // MONTO ORIGINAL
-            // ========================================
+                cuenta.Fecha.AddDays(cuenta.DiasCredito);
 
             cuenta.MontoOriginal =
                 venta.Total;
 
-            // ========================================
-            // ESTADO
-            // ========================================
+            cuenta.EmpresaId =
+                venta.EmpresaId;
 
             cuenta.Estado =
                 "PENDIENTE";
@@ -556,8 +568,7 @@ namespace FashionM.Controllers
             // SAVE
             // ========================================
 
-            _context.CuentasPorCobrar
-                .Add(cuenta);
+            _context.CuentasPorCobrar.Add(cuenta);
 
             await _context.SaveChangesAsync();
 
@@ -568,8 +579,8 @@ namespace FashionM.Controllers
                 nameof(Details),
                 new
                 {
-                    clienteCedula =
-                        cuenta.ClienteCedula
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
                 });
         }
 

@@ -4,6 +4,8 @@ using FashionM.Models;
 using Microsoft.AspNetCore.Identity;
 using FashionM.Controllers;
 using QuestPDF.Infrastructure;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 
 
@@ -32,7 +34,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";
 });
 
+
 var app = builder.Build();
+
+var culture = new CultureInfo("es-CR");
+
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(culture),
+    SupportedCultures = new[] { culture },
+    SupportedUICultures = new[] { culture }
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 using (var scope = app.Services.CreateScope())
 {

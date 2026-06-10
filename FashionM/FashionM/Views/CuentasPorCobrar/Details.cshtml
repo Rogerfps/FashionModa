@@ -4,13 +4,17 @@
     ViewData["Title"] = "Detalle Cuenta por Cobrar";
 
     var cliente = Model.FirstOrDefault()?.Cliente;
+    var empresa = Model.FirstOrDefault()?.Empresa;
 
     decimal totalGeneral = Model.Sum(item =>
-    {
-        decimal pagado = item.Pagos.Sum(x => x.Monto);
-        decimal notas = item.Venta?.NotasCredito.Sum(x => x.TotalDevuelto) ?? 0;
-        return item.MontoOriginal - pagado - notas;
-    });
+{
+    decimal pagado = item.Pagos.Sum(x => x.Monto);
+    decimal notas = item.Venta?.NotasCredito.Sum(x => x.TotalDevuelto) ?? 0;
+
+    decimal saldo = item.MontoOriginal - pagado - notas;
+
+    return saldo < 1 ? 0 : saldo;
+});
 }
 
 <style>
@@ -468,7 +472,13 @@
             </h1>
 
             <p class="page-subtitle">
+
                 @(cliente?.Nombre) @(cliente?.Apellidos)
+
+                |
+
+                🏢 @(empresa?.Nombre)
+
             </p>
         </div>
 
@@ -525,6 +535,22 @@
             </div>
         </div>
 
+        <div class="summary-card">
+
+            <div class="summary-label">
+
+                Empresa
+
+            </div>
+
+            <div class="summary-value">
+
+                @(empresa?.Nombre)
+
+            </div>
+
+        </div>
+
     </div>
 
     <!-- TABLA -->
@@ -563,6 +589,11 @@
 
                         decimal saldo =
                             item.MontoOriginal - totalPagado - totalNotas;
+
+                        if (saldo < 1)
+                        {
+                            saldo = 0;
+                        }
 
                         bool pagada = saldo <= 0;
 

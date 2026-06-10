@@ -8,18 +8,10 @@ namespace FashionM.Models
         [Key]
         public int Id { get; set; }
 
-        // ========================================
-        // RELACIÓN VENTA
-        // ========================================
-
         [Required]
         public int VentaId { get; set; }
 
         public Venta? Venta { get; set; }
-
-        // ========================================
-        // RELACIÓN CLIENTE
-        // ========================================
 
         [Required]
         public int ClienteCedula { get; set; }
@@ -27,9 +19,12 @@ namespace FashionM.Models
         [ForeignKey(nameof(ClienteCedula))]
         public Clientes? Cliente { get; set; }
 
-        // ========================================
-        // DATOS
-        // ========================================
+        [Required]
+        public int EmpresaId { get; set; }
+
+        [ForeignKey(nameof(EmpresaId))]
+        public Empresa? Empresa { get; set; }
+
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal MontoOriginal { get; set; }
@@ -46,10 +41,6 @@ namespace FashionM.Models
         [StringLength(500)]
         public string Observaciones { get; set; }
             = string.Empty;
-
-        // ========================================
-        // PAGOS
-        // ========================================
 
         public ICollection<CuentaPorCobrarPago> Pagos
         { get; set; }

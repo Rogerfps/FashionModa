@@ -297,6 +297,19 @@
         }
     }
 
+    .filters-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+    }
+
+    @@media(max-width:768px) {
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 </style>
 
 <div class="cxc-container">
@@ -348,16 +361,52 @@
 
         <div class="filter-group">
 
-            <label>
+            <div class="filters-grid">
 
-                🔍 Buscar Cliente
+                <div class="filter-group">
 
-            </label>
+                    <label>
 
-            <input type="text"
-                   id="searchInput"
-                   class="form-control"
-                   placeholder="Buscar por nombre o cédula..." />
+                        🔍 Buscar Cliente o Venta
+
+                    </label>
+
+                    <input type="text"
+                           id="searchInput"
+                           class="form-control"
+                           placeholder="Cliente, comercio, cédula o venta..." />
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>
+
+                        🏢 Empresa
+
+                    </label>
+
+                    <select id="empresaFilter"
+                            class="form-control">
+
+                        <option value="">
+                            Todas
+                        </option>
+
+                        @foreach (var empresa in ViewBag.Empresas)
+                        {
+                            <option value="@empresa.Nombre.ToLower()">
+
+                                @empresa.Nombre
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -376,6 +425,8 @@
                     <tr>
 
                         <th>Cliente</th>
+
+                        <th>Empresa</th>
 
                         <th>Cédula</th>
 
@@ -405,6 +456,12 @@
                             <td class="cliente-nombre">
 
                                 @item.Nombre
+
+                            </td>
+
+                            <td class="empresa">
+
+                                @item.Empresa
 
                             </td>
 
@@ -452,6 +509,7 @@
 
                                     <a asp-action="Details"
                                        asp-route-clienteCedula="@item.ClienteCedula"
+                                       asp-route-empresaId="@item.EmpresaId"
                                        class="btn-action btn-details">
 
                                         📄 Details
@@ -477,51 +535,109 @@
 
 <script>
 
-    const searchInput =
-        document.getElementById(
-            'searchInput'
-        );
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const rows =
-        document.querySelectorAll(
-            '#clientesTable tbody tr'
-        );
+        const searchInput =
+            document.getElementById("searchInput");
 
-    if (searchInput)
-    {
-        searchInput.addEventListener(
-            'input',
-            function ()
-            {
-                const value =
-                    this.value
+        const empresaFilter =
+            document.getElementById("empresaFilter");
+
+        const rows =
+            document.querySelectorAll(
+                "#clientesTable tbody tr"
+            );
+
+        function filtrar() {
+
+            const textoBuscar =
+                searchInput
+                    ? searchInput.value
+                        .trim()
                         .toLowerCase()
-                        .trim();
+                    : "";
 
-                rows.forEach(row =>
-                {
-                    const nombre =
-                        row.querySelector(
-                            '.cliente-nombre'
-                        )?.innerText
-                            .toLowerCase() || '';
+            const empresa =
+                empresaFilter
+                    ? empresaFilter.value
+                        .trim()
+                        .toLowerCase()
+                    : "";
 
-                    const cedula =
-                        row.querySelector(
-                            '.cliente-cedula'
-                        )?.innerText
-                            .toLowerCase() || '';
+            rows.forEach(row => {
 
-                    const visible =
-                        nombre.includes(value)
-                        || cedula.includes(value);
+                const nombre =
+                    row.querySelector(".cliente-nombre")
+                        ?.textContent
+                        .trim()
+                        .toLowerCase() || "";
 
-                    row.style.display =
-                        visible
-                            ? ''
-                            : 'none';
-                });
+                const cedula =
+                    row.querySelector(".cliente-cedula")
+                        ?.textContent
+                        .trim()
+                        .toLowerCase() || "";
+
+                const comercio =
+                    row.querySelector(".cliente-comercio")
+                        ?.textContent
+                        .trim()
+                        .toLowerCase() || "";
+
+                const empresaFila =
+                    row.querySelector(".empresa")
+                        ?.textContent
+                        .trim()
+                        .toLowerCase() || "";
+
+                const venta =
+                    row.querySelector(".venta")
+                        ?.textContent
+                        .trim()
+                        .toLowerCase() || "";
+
+                const coincideBusqueda =
+
+                    textoBuscar === "" ||
+
+                    nombre.includes(textoBuscar) ||
+
+                    cedula.includes(textoBuscar) ||
+
+                    comercio.includes(textoBuscar) ||
+
+                    venta.includes(textoBuscar);
+
+                const coincideEmpresa =
+
+                    empresa === "" ||
+
+                    empresaFila.includes(empresa);
+
+                row.style.display =
+
+                    (coincideBusqueda && coincideEmpresa)
+
+                        ? ""
+
+                        : "none";
+
             });
-    }
+
+        }
+
+        searchInput?.addEventListener(
+            "input",
+            filtrar
+        );
+
+        empresaFilter?.addEventListener(
+            "change",
+            filtrar
+        );
+
+        filtrar();
+
+    });
 
 </script>

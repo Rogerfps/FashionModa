@@ -57,6 +57,9 @@
                asp-for="ClienteCedula" />
 
         <input type="hidden"
+               asp-for="EmpresaId" />
+
+        <input type="hidden"
                asp-for="MontoOriginal" />
 
         <!-- INFO -->
@@ -87,6 +90,22 @@
                 <div class="summary-value">
 
                     #@Model.VentaId
+
+                </div>
+
+            </div>
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+
+                    Empresa
+
+                </div>
+
+                <div class="summary-value">
+
+                    @Model.Empresa?.Nombre
 
                 </div>
 
