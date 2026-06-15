@@ -29,6 +29,13 @@ namespace FashionM.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal MontoOriginal { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DescuentoAplicado { get; set; }
+
+        public bool DescuentoOtorgado { get; set; }
+
+        public DateTime? FechaDescuento { get; set; }
+
         public DateTime Fecha { get; set; }
 
         public DateTime? FechaVencimiento { get; set; }

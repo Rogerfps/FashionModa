@@ -88,7 +88,8 @@ namespace FashionM.Controllers
                             decimal saldo =
                                 c.MontoOriginal
                                 - pagos
-                                - notas;
+                                - notas
+                                - c.DescuentoAplicado;
 
                             // ========================================
                             // TODO SALDO MENOR A ₡1
@@ -277,7 +278,6 @@ namespace FashionM.Controllers
                     .Include(c => c.Pagos)
 
                     .Include(c => c.Venta)
-
                         .ThenInclude(v => v!.NotasCredito)
 
                     .FirstOrDefaultAsync(c => c.Id == cuentaId);
@@ -286,23 +286,67 @@ namespace FashionM.Controllers
                 return NotFound();
 
             // ========================================
-            // SALDO ACTUAL
+            // TOTAL PAGADO
             // ========================================
 
             decimal totalPagado =
                 cuenta.Pagos.Sum(x => x.Monto);
 
+            // ========================================
+            // TOTAL NOTAS
+            // ========================================
+
             decimal totalNotas =
                 cuenta.Venta!.NotasCredito.Sum(x => x.TotalDevuelto);
+
+            // ========================================
+            // SALDO
+            // ========================================
 
             decimal saldo =
                 cuenta.MontoOriginal
                 - totalPagado
-                - totalNotas;
+                - totalNotas
+                - cuenta.DescuentoAplicado;
 
             // ========================================
-            // YA PAGADA
+            // DESCUENTO AUTOMÁTICO
             // ========================================
+
+            bool puedeAplicarDescuento =
+
+                !cuenta.DescuentoOtorgado
+
+                &&
+
+                DateTime.UtcNow <=
+                    cuenta.Fecha.AddDays(60);
+
+            // Se redondea a colones enteros
+            decimal montoDescuento =
+
+                Math.Round(
+                    cuenta.MontoOriginal * 0.10m,
+                    0,
+                    MidpointRounding.AwayFromZero);
+
+            // Total que el cliente debe pagar
+            // para ganar el descuento
+            decimal montoConDescuento =
+
+                cuenta.MontoOriginal
+                - montoDescuento;
+
+            // Total pagado después de este pago
+            decimal totalPagadoConEstePago =
+
+                totalPagado + monto;
+
+            // ¿Obtiene el descuento?
+            bool aplicarDescuento =
+                puedeAplicarDescuento
+                &&
+                totalPagadoConEstePago == montoConDescuento;
 
             if (saldo < 1)
             {
@@ -317,6 +361,7 @@ namespace FashionM.Controllers
                         empresaId = cuenta.EmpresaId
                     });
             }
+
 
             // ========================================
             // VALIDAR MONTO
@@ -336,6 +381,8 @@ namespace FashionM.Controllers
                     });
             }
 
+            
+
             if (monto > saldo)
             {
                 TempData["Error"] =
@@ -351,7 +398,7 @@ namespace FashionM.Controllers
             }
 
             // ========================================
-            // CREAR PAGO
+            // REGISTRAR PAGO
             // ========================================
 
             var pago = new CuentaPorCobrarPago
@@ -367,12 +414,36 @@ namespace FashionM.Controllers
                 Observacion = observacion ?? string.Empty
             };
 
+            // ========================================
+            // APLICAR DESCUENTO
+            // ========================================
+
+            if (aplicarDescuento)
+            {
+                cuenta.DescuentoAplicado =
+                    montoDescuento;
+
+                cuenta.DescuentoOtorgado =
+                    true;
+
+                cuenta.FechaDescuento =
+                    DateTime.UtcNow;
+            }
+
             _context.CuentasPorCobrarPagos.Add(pago);
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Pago registrado correctamente.";
+            if (aplicarDescuento)
+            {
+                TempData["Success"] =
+                    $"Pago registrado. Se aplicó automáticamente un descuento de ₡{montoDescuento:N0}.";
+            }
+            else
+            {
+                TempData["Success"] =
+                    "Pago registrado correctamente.";
+            }
 
             return RedirectToAction(
                 nameof(Details),
@@ -583,6 +654,9 @@ namespace FashionM.Controllers
                     empresaId = cuenta.EmpresaId
                 });
         }
+
+
+      
 
     }
 }
