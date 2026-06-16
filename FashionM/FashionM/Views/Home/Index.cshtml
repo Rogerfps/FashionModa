@@ -8,6 +8,36 @@
 
 <div class="hero-section">
     <div class="hero-card">
+
+        <div class="d-flex justify-content-end mb-3">
+
+            <div class="dropdown">
+
+                <button class="btn btn-outline-primary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown">
+
+                    🏢 @Context.Session.GetString("EmpresaNombre")
+
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+
+                    <li>
+                        <a class="dropdown-item"
+                           asp-controller="Home"
+                           asp-action="SeleccionarEmpresa">
+
+                            🔄 Cambiar empresa
+
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
         <!-- Logo centrado -->
         <div class="logo-container">
             <img src="~/images/LogoDavid.png" alt="El David" class="logo-img" />

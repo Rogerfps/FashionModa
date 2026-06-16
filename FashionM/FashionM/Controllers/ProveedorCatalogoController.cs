@@ -91,6 +91,17 @@ public class ProveedorCatalogoController : Controller
     {
         int pageSize = 75;
 
+        // Primera vez que entra al módulo
+        if (!Request.Query.ContainsKey("empresa"))
+        {
+            empresa = HttpContext.Session.GetString("EmpresaNombre");
+
+            if (string.IsNullOrWhiteSpace(empresa))
+            {
+                return RedirectToAction("SeleccionarEmpresa", "Home");
+            }
+        }
+
         var proveedor = await _context.ProveedoresCatalogo
             .FirstOrDefaultAsync(p => p.Id == id);
 

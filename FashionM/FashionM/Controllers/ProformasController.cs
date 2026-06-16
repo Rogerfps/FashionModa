@@ -30,6 +30,18 @@ namespace FashionM.Controllers
         // ==========================
         public async Task<IActionResult> Index(string buscar, int? empresaId)
         {
+
+            // Si no viene el parámetro empresa, usar la empresa seleccionada
+            if (!Request.Query.ContainsKey("empresaId"))
+            {
+                empresaId = HttpContext.Session.GetInt32("EmpresaId");
+
+                if (!empresaId.HasValue)
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
             var query = _context.Proformas
                 .Include(p => p.Empresa)
                 .Include(p => p.Cliente)
@@ -47,7 +59,7 @@ namespace FashionM.Controllers
                 );
             }
 
-            if (empresaId.HasValue)
+            if (empresaId.HasValue && empresaId.Value != 0)
             {
                 query = query.Where(p => p.EmpresaId == empresaId.Value);
             }

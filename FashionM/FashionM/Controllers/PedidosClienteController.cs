@@ -26,6 +26,17 @@ namespace FashionM.Controllers
         {
             int pageSize = 10;
 
+            
+            if (!Request.Query.ContainsKey("empresa"))
+            {
+                empresa = HttpContext.Session.GetString("EmpresaNombre");
+
+                if (string.IsNullOrWhiteSpace(empresa))
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
             var pedidos = _context.PedidosCliente
                 .Include(p => p.Cliente)
                 .AsQueryable();
@@ -113,7 +124,10 @@ namespace FashionM.Controllers
                 .OrderBy(e => e)
                 .ToList();
 
+            ViewBag.Empresa = empresa;
+
             return View(lista);
+
         }
 
         // =====================================================

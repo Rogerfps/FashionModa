@@ -25,6 +25,16 @@ namespace FashionM.Controllers
         {
             int pageSize = 25;
 
+            if (string.IsNullOrWhiteSpace(empresa))
+            {
+                empresa = HttpContext.Session.GetString("EmpresaNombre");
+            }
+
+            if (string.IsNullOrWhiteSpace(empresa))
+            {
+                return RedirectToAction("SeleccionarEmpresa", "Home");
+            }
+
             var query = _context.Inventarios
                 .Include(i => i.Tallas)
                 .Include(i => i.Fotos)

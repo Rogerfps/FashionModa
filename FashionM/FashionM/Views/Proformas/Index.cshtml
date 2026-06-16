@@ -30,7 +30,7 @@
 
             <div class="col-md-4">
                 <select name="empresaId" class="filter-input">
-                    <option value="">-- Todas las empresas --</option>
+                    <option value="0">-- Todas las empresas --</option>
                     @foreach (var emp in ViewBag.Empresas)
                     {
                         <option value="@emp.Id"

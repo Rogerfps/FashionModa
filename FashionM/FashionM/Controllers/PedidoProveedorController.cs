@@ -28,6 +28,17 @@ namespace FashionM.Controllers
         {
             int pageSize = 25;
 
+            // Si no viene el parámetro empresa, usar la empresa seleccionada
+            if (!Request.Query.ContainsKey("empresa"))
+            {
+                empresa = HttpContext.Session.GetString("EmpresaNombre");
+
+                if (string.IsNullOrWhiteSpace(empresa))
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
             var query = _context.PedidosProveedor
                 .Include(p => p.Proveedor)
                 .Include(p => p.Detalles)
@@ -51,12 +62,13 @@ namespace FashionM.Controllers
                 .ToListAsync();
 
             ViewBag.Empresas = new List<string>
-        {
-            "Cocalza Plus S.A",
-            "Fashion Shoes S.A",
-            "LSG Moda S.A",
-            "Maxi Plus 23 S.A"
-        };
+    {
+        "Cocalza Plus S.A",
+        "Fashion Shoes S.A",
+        "LSG Moda S.A",
+        "Maxi Plus 23 S.A",
+        "KYROZ"
+    };
 
             ViewBag.Page = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);

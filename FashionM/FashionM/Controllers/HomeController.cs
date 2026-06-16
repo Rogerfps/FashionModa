@@ -1,6 +1,5 @@
 using FashionM.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace FashionM.Controllers
 {
@@ -8,7 +7,27 @@ namespace FashionM.Controllers
     {
         public IActionResult Index()
         {
+            var empresa = HttpContext.Session.GetInt32("EmpresaId");
+
+            if (empresa == null)
+            {
+                return RedirectToAction(nameof(SeleccionarEmpresa));
+            }
+
             return View();
+        }
+
+        public IActionResult SeleccionarEmpresa()
+        {
+            return View();
+        }
+
+        public IActionResult CambiarEmpresa(int id, string nombre)
+        {
+            HttpContext.Session.SetInt32("EmpresaId", id);
+            HttpContext.Session.SetString("EmpresaNombre", nombre);
+
+            return RedirectToAction("Index");
         }
     }
 }

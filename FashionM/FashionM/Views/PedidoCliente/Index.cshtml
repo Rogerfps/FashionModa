@@ -34,17 +34,23 @@
         <!-- EMPRESA -->
         <div class="col-md-3">
             <div class="filter-label">Empresa</div>
+
             <select id="empresaInput" name="empresa" class="filter-input">
-                <option value="">Todas</option>
+
+                <option value="" selected="@(string.IsNullOrEmpty(ViewBag.Empresa) ? "selected" : null)">
+                    Todas
+                </option>
+
                 @if (ViewBag.Empresas != null)
                 {
-                    foreach (var e in ViewBag.Empresas as List<string>)
+                    foreach (var e in (List<string>)ViewBag.Empresas)
                     {
-                        <option value="@e" selected="@(Context.Request.Query["empresa"] == e ? "selected" : null)">
+                        <option value="@e" selected="@(ViewBag.Empresa == e ? "selected" : null)">
                             @e
                         </option>
                     }
                 }
+
             </select>
         </div>
 

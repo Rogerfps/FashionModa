@@ -16,6 +16,13 @@ QuestPDF.Settings.License = LicenseType.Community;
 // MVC
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // DbContext + PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
@@ -70,6 +77,8 @@ app.UseRouting();
 
 app.UseAuthentication();   // 👈 necesario para login
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
