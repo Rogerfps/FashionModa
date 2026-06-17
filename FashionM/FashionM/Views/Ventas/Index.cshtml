@@ -106,27 +106,9 @@
 
         </div>
 
-        <div class="stat-card">
-
-            <div class="stat-icon">🏢</div>
-
-            <div>
-
-                <div class="stat-label">
-                    Empresas
-                </div>
-
-                <div class="stat-value"
-                     id="cardEmpresas">
-
-                    @Model.Select(x => x.EmpresaId)
-                    .Distinct()
-                    .Count()
-
-                </div>
-
-            </div>
-
+        <div class="alert alert-info mb-3">
+            <strong>🏢 Empresa:</strong>
+            @Context.Session.GetString("EmpresaNombre")
         </div>
 
     </div>
@@ -150,35 +132,7 @@
 
             </div>
 
-            <!-- EMPRESA -->
-            <div class="filter-group">
-
-                <label>
-                    🏢 Empresa
-                </label>
-
-                <select id="empresaFilter"
-                        class="form-select">
-
-                    <option value="">
-                        Todas
-                    </option>
-
-                    @if (ViewBag.Empresas != null)
-                    {
-                        foreach (var empresa in ViewBag.Empresas)
-                        {
-                            <option value="@empresa.Nombre.ToLower()">
-
-                                @empresa.Nombre
-
-                            </option>
-                        }
-                    }
-
-                </select>
-
-            </div>
+            
 
             <!-- TIPO -->
             <div class="filter-group">
@@ -510,402 +464,211 @@
 
 <script>
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        function ()
-        {
+    document.addEventListener("DOMContentLoaded", function () {
 
-            // ========================================
-            // INPUTS
-            // ========================================
+        // ===========================
+        // INPUTS
+        // ===========================
 
-            const buscarInput =
-                document.getElementById(
-                    "buscarInput"
-                );
+        const buscarInput = document.getElementById("buscarInput");
+        const tipoFilter = document.getElementById("tipoFilter");
+        const agenteFilter = document.getElementById("agenteFilter");
+        const semanaFilter = document.getElementById("semanaFilter");
+        const mesFilter = document.getElementById("mesFilter");
 
-            const empresaFilter =
-                document.getElementById(
-                    "empresaFilter"
-                );
+        // ===========================
+        // TABLA
+        // ===========================
 
-            const tipoFilter =
-                document.getElementById(
-                    "tipoFilter"
-                );
+        const filas = Array.from(document.querySelectorAll(".venta-row"));
 
-            const agenteFilter =
-                document.getElementById(
-                    "agenteFilter"
-                );
+        // ===========================
+        // CARDS
+        // ===========================
 
-            const semanaFilter =
-                document.getElementById(
-                    "semanaFilter"
-                );
+        const cardTotalVentas = document.getElementById("cardTotalVentas");
+        const cardTotalVendido = document.getElementById("cardTotalVendido");
+        const cardAgentes = document.getElementById("cardAgentes");
 
-            const mesFilter =
-                document.getElementById(
-                    "mesFilter"
-                );
+        // ===========================
+        // PAGINACIÓN
+        // ===========================
 
-            const filas =
-                Array.from(
-                    document.querySelectorAll(
-                        ".venta-row"
-                    )
-                );
+        const prevPage = document.getElementById("prevPage");
+        const nextPage = document.getElementById("nextPage");
+        const paginationInfo = document.getElementById("paginationInfo");
 
-            // ========================================
-            // CARDS
-            // ========================================
+        let currentPage = 1;
+        const rowsPerPage = 15;
+        let filasFiltradas = [];
 
-            const cardTotalVentas =
-                document.getElementById(
-                    "cardTotalVentas"
-                );
+        // ===========================
+        // FILTRAR
+        // ===========================
 
-            const cardTotalVendido =
-                document.getElementById(
-                    "cardTotalVendido"
-                );
+        function filtrarVentas() {
 
-            const cardAgentes =
-                document.getElementById(
-                    "cardAgentes"
-                );
+            const buscar = buscarInput.value.trim().toLowerCase();
+            const tipo = tipoFilter.value.trim().toLowerCase();
+            const agente = agenteFilter.value.trim().toLowerCase();
+            const semana = semanaFilter.value.trim();
+            const mes = mesFilter.value.trim().toLowerCase();
 
-            const cardEmpresas =
-                document.getElementById(
-                    "cardEmpresas"
-                );
+            let totalVendido = 0;
+            let agentes = new Set();
 
-            // ========================================
-            // PAGINACIÓN
-            // ========================================
+            filasFiltradas = [];
 
-            const prevPage =
-                document.getElementById(
-                    "prevPage"
-                );
+            filas.forEach(fila => {
 
-            const nextPage =
-                document.getElementById(
-                    "nextPage"
-                );
+                const textoBuscar = (fila.dataset.buscar || "").toLowerCase();
+                const textoTipo = (fila.dataset.tipo || "").toLowerCase();
+                const textoAgente = (fila.dataset.agente || "").toLowerCase();
+                const textoMes = (fila.dataset.mes || "").toLowerCase();
+                const semanaFila = parseInt(fila.dataset.semana || "0");
 
-            const paginationInfo =
-                document.getElementById(
-                    "paginationInfo"
-                );
+                const coincideBuscar =
+                    buscar === "" || textoBuscar.includes(buscar);
 
-            let currentPage = 1;
+                const coincideTipo =
+                    tipo === "" || textoTipo === tipo;
 
-            const rowsPerPage = 15;
+                const coincideAgente =
+                    agente === "" || textoAgente.includes(agente);
 
-            let filasFiltradas = [];
+                const coincideSemana =
+                    semana === "" || semanaFila === parseInt(semana);
 
-            // ========================================
-            // FILTRAR
-            // ========================================
+                const coincideMes =
+                    mes === "" || textoMes === mes;
 
-            function filtrarVentas()
-            {
-                const buscar =
-                    buscarInput.value
-                        .trim()
-                        .toLowerCase();
+                const mostrar =
+                    coincideBuscar &&
+                    coincideTipo &&
+                    coincideAgente &&
+                    coincideSemana &&
+                    coincideMes;
 
-                const empresa =
-                    empresaFilter.value
-                        .trim()
-                        .toLowerCase();
+                if (mostrar) {
 
-                const tipo =
-                    tipoFilter.value
-                        .trim()
-                        .toLowerCase();
+                    filasFiltradas.push(fila);
 
-                const agente =
-                    agenteFilter.value
-                        .trim()
-                        .toLowerCase();
+                    totalVendido += parseFloat(fila.dataset.total || "0");
 
-                const semana =
-                    semanaFilter.value
-                        .trim();
+                    if (textoAgente !== "")
+                        agentes.add(textoAgente);
+                }
 
-                const mes =
-                    mesFilter.value
-                        .trim()
-                        .toLowerCase();
+            });
 
-                let totalVendido = 0;
+            // ===========================
+            // ACTUALIZAR CARDS
+            // ===========================
 
-                let agentes = new Set();
+            cardTotalVentas.textContent = filasFiltradas.length;
 
-                let empresas = new Set();
-
-                filasFiltradas = [];
-
-                filas.forEach(fila =>
-                {
-                    const textoBuscar =
-                        (fila.dataset.buscar || "")
-                            .trim()
-                            .toLowerCase();
-
-                    const textoEmpresa =
-                        (fila.dataset.empresa || "")
-                            .trim()
-                            .toLowerCase();
-
-                    const textoTipo =
-                        (fila.dataset.tipo || "")
-                            .trim()
-                            .toLowerCase();
-
-                    const textoAgente =
-                        (fila.dataset.agente || "")
-                            .trim()
-                            .toLowerCase();
-
-                    const textoMes =
-                        (fila.dataset.mes || "")
-                            .trim()
-                            .toLowerCase();
-
-                    const semanaFila =
-                        Number(
-                            fila.dataset.semana || 0
-                        );
-
-                    // ========================================
-                    // VALIDACIONES
-                    // ========================================
-
-                    const coincideBuscar =
-                        !buscar ||
-                        textoBuscar.includes(buscar);
-
-                    const coincideEmpresa =
-                        !empresa ||
-                        textoEmpresa === empresa;
-
-                    const coincideTipo =
-                        !tipo ||
-                        textoTipo === tipo;
-
-                    const coincideAgente =
-                        !agente ||
-                        textoAgente.includes(agente);
-
-                    const coincideSemana =
-                        !semana ||
-                        semanaFila === Number(semana);
-
-                    const coincideMes =
-                        !mes ||
-                        textoMes === mes;
-
-                    // ========================================
-                    // RESULTADO
-                    // ========================================
-
-                    const mostrar =
-                        coincideBuscar &&
-                        coincideEmpresa &&
-                        coincideTipo &&
-                        coincideAgente &&
-                        coincideSemana &&
-                        coincideMes;
-
-                    if (mostrar)
-                    {
-                        filasFiltradas.push(fila);
-
-                        totalVendido +=
-                            parseFloat(
-                                fila.dataset.total || 0
-                            );
-
-                        if (textoAgente)
-                            agentes.add(textoAgente);
-
-                        if (textoEmpresa)
-                            empresas.add(textoEmpresa);
-                    }
-
+            cardTotalVendido.textContent =
+                "₡ " + totalVendido.toLocaleString("es-CR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 });
 
-                // ========================================
-                // CARDS
-                // ========================================
+            cardAgentes.textContent = agentes.size;
 
-                cardTotalVentas.innerText =
-                    filasFiltradas.length;
+            currentPage = 1;
 
-                cardTotalVendido.innerText =
-                    `₡ ${totalVendido.toLocaleString(
-                        "es-CR",
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}`;
+            renderPagination();
+        }
 
-                cardAgentes.innerText =
-                    agentes.size;
+        // ===========================
+        // PAGINACIÓN
+        // ===========================
 
-                cardEmpresas.innerText =
-                    empresas.size;
+        function renderPagination() {
 
-                currentPage = 1;
+            filas.forEach(f => f.style.display = "none");
 
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            filasFiltradas
+                .slice(start, end)
+                .forEach(f => f.style.display = "");
+
+            const totalPages = Math.max(
+                1,
+                Math.ceil(filasFiltradas.length / rowsPerPage)
+            );
+
+            paginationInfo.textContent =
+                `Página ${currentPage} de ${totalPages}`;
+
+            prevPage.disabled = currentPage === 1;
+            nextPage.disabled = currentPage === totalPages;
+        }
+
+        // ===========================
+        // EVENTOS
+        // ===========================
+
+        buscarInput.addEventListener("input", filtrarVentas);
+        tipoFilter.addEventListener("change", filtrarVentas);
+        agenteFilter.addEventListener("input", filtrarVentas);
+        semanaFilter.addEventListener("input", filtrarVentas);
+        mesFilter.addEventListener("change", filtrarVentas);
+
+        // ===========================
+        // LIMPIAR
+        // ===========================
+
+        document
+            .getElementById("btnLimpiar")
+            .addEventListener("click", () => {
+
+                buscarInput.value = "";
+                tipoFilter.value = "";
+                agenteFilter.value = "";
+                semanaFilter.value = "";
+                mesFilter.value = "";
+
+                filtrarVentas();
+
+            });
+
+        // ===========================
+        // PAGINACIÓN
+        // ===========================
+
+        prevPage.addEventListener("click", () => {
+
+            if (currentPage > 1) {
+                currentPage--;
                 renderPagination();
             }
 
-            // ========================================
-            // PAGINACIÓN
-            // ========================================
+        });
 
-            function renderPagination()
-            {
-                filas.forEach(fila =>
-                {
-                    fila.style.display = "none";
-                });
+        nextPage.addEventListener("click", () => {
 
-                const start =
-                    (currentPage - 1)
-                    * rowsPerPage;
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(filasFiltradas.length / rowsPerPage)
+                );
 
-                const end =
-                    start + rowsPerPage;
-
-                const filasPagina =
-                    filasFiltradas.slice(
-                        start,
-                        end
-                    );
-
-                filasPagina.forEach(fila =>
-                {
-                    fila.style.display = "";
-                });
-
-                const totalPages =
-                    Math.ceil(
-                        filasFiltradas.length
-                        / rowsPerPage
-                    ) || 1;
-
-                paginationInfo.innerText =
-                    `Página ${currentPage} de ${totalPages}`;
-
-                prevPage.disabled =
-                    currentPage === 1;
-
-                nextPage.disabled =
-                    currentPage === totalPages;
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPagination();
             }
 
-            // ========================================
-            // EVENTOS
-            // ========================================
-
-            buscarInput.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-            empresaFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-            tipoFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-            agenteFilter.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-            semanaFilter.addEventListener(
-                "input",
-                filtrarVentas
-            );
-
-            mesFilter.addEventListener(
-                "change",
-                filtrarVentas
-            );
-
-            // ========================================
-            // LIMPIAR
-            // ========================================
-
-            document
-                .getElementById(
-                    "btnLimpiar"
-                )
-                .addEventListener(
-                    "click",
-                    () =>
-                    {
-                        buscarInput.value = "";
-                        empresaFilter.value = "";
-                        tipoFilter.value = "";
-                        agenteFilter.value = "";
-                        semanaFilter.value = "";
-                        mesFilter.value = "";
-
-                        filtrarVentas();
-                    });
-
-            // ========================================
-            // PAGINACIÓN BOTONES
-            // ========================================
-
-            prevPage.addEventListener(
-                "click",
-                () =>
-                {
-                    if (currentPage > 1)
-                    {
-                        currentPage--;
-
-                        renderPagination();
-                    }
-                });
-
-            nextPage.addEventListener(
-                "click",
-                () =>
-                {
-                    const totalPages =
-                        Math.ceil(
-                            filasFiltradas.length
-                            / rowsPerPage
-                        );
-
-                    if (currentPage < totalPages)
-                    {
-                        currentPage++;
-
-                        renderPagination();
-                    }
-                });
-
-            // ========================================
-            // INIT
-            // ========================================
-
-            filtrarVentas();
-
         });
+
+        // ===========================
+        // INICIO
+        // ===========================
+
+        filtrarVentas();
+
+    });
 
 </script>

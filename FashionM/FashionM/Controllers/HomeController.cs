@@ -1,10 +1,18 @@
 using FashionM.Models;
 using Microsoft.AspNetCore.Mvc;
+using FashionM.Data;
 
 namespace FashionM.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly AppDbContext _context;
+
+        public HomeController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             var empresa = HttpContext.Session.GetInt32("EmpresaId");
@@ -24,10 +32,18 @@ namespace FashionM.Controllers
 
         public IActionResult CambiarEmpresa(int id, string nombre)
         {
-            HttpContext.Session.SetInt32("EmpresaId", id);
-            HttpContext.Session.SetString("EmpresaNombre", nombre);
+            var empresa = _context.Empresas
+                .FirstOrDefault(e => e.Nombre == nombre);
 
-            return RedirectToAction("Index");
+            if (empresa == null)
+            {
+                return RedirectToAction(nameof(SeleccionarEmpresa));
+            }
+
+            HttpContext.Session.SetInt32("EmpresaId", empresa.Id);
+            HttpContext.Session.SetString("EmpresaNombre", empresa.Nombre);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -359,56 +359,90 @@
     <!-- FILTROS -->
     <div class="filters-card">
 
-        <div class="filter-group">
+        <form method="get" class="filters-grid">
 
-            <div class="filters-grid">
+            <div class="filter-group">
 
-                <div class="filter-group">
+                <label>🔍 Buscar</label>
 
-                    <label>
-
-                        🔍 Buscar Cliente o Venta
-
-                    </label>
-
-                    <input type="text"
-                           id="searchInput"
-                           class="form-control"
-                           placeholder="Cliente, comercio, cédula o venta..." />
-
-                </div>
-
-                <div class="filter-group">
-
-                    <label>
-
-                        🏢 Empresa
-
-                    </label>
-
-                    <select id="empresaFilter"
-                            class="form-control">
-
-                        <option value="">
-                            Todas
-                        </option>
-
-                        @foreach (var empresa in ViewBag.Empresas)
-                        {
-                            <option value="@empresa.Nombre.ToLower()">
-
-                                @empresa.Nombre
-
-                            </option>
-                        }
-
-                    </select>
-
-                </div>
+                <input type="text"
+                       name="buscar"
+                       value="@ViewBag.Buscar"
+                       class="form-control"
+                       placeholder="Cliente, comercio..."
+                       oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.submit(), 2000);" />
 
             </div>
 
-        </div>
+            <div class="filter-group">
+
+                <label>🏢 Empresa</label>
+
+                <select name="empresaId"
+                        class="form-control"
+                        onchange="this.form.submit()">
+
+                    <option value="0"
+                            selected="@(ViewBag.EmpresaId != null && (int)ViewBag.EmpresaId == 0)">
+                        Todas las empresas
+                    </option>
+
+                    @foreach (var empresa in ViewBag.Empresas)
+                    {
+                        <option value="@empresa.Id"
+                                selected="@(ViewBag.EmpresaId != null && (int)ViewBag.EmpresaId == empresa.Id)">
+                            @empresa.Nombre
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+            <div class="filter-group">
+
+                <label>Estado</label>
+
+                <select name="estado"
+                        class="form-control"
+                        onchange="this.form.submit()">
+
+                    <option value=""
+                            selected="@(string.IsNullOrEmpty(ViewBag.Estado))">
+                        Todos
+                    </option>
+
+                    <option value="Pendiente"
+                            selected="@(ViewBag.Estado == "Pendiente")">
+                        Pendientes
+                    </option>
+
+                    <option value="Pagada"
+                            selected="@(ViewBag.Estado == "Pagada")">
+                        Pagadas
+                    </option>
+
+                </select>
+
+
+            </div>
+
+
+            <div class="filter-group d-flex align-items-end">
+
+                <button type="submit" class="btn btn-primary me-2">
+                    🔍 Buscar
+                </button>
+
+                <a asp-action="Index"
+                   asp-route-empresaId="0"
+                   class="btn btn-secondary">
+                    ✖ Limpiar
+                </a>
+
+            </div>
+
+        </form>
 
     </div>
 
@@ -533,111 +567,3 @@
 
 </div>
 
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const searchInput =
-            document.getElementById("searchInput");
-
-        const empresaFilter =
-            document.getElementById("empresaFilter");
-
-        const rows =
-            document.querySelectorAll(
-                "#clientesTable tbody tr"
-            );
-
-        function filtrar() {
-
-            const textoBuscar =
-                searchInput
-                    ? searchInput.value
-                        .trim()
-                        .toLowerCase()
-                    : "";
-
-            const empresa =
-                empresaFilter
-                    ? empresaFilter.value
-                        .trim()
-                        .toLowerCase()
-                    : "";
-
-            rows.forEach(row => {
-
-                const nombre =
-                    row.querySelector(".cliente-nombre")
-                        ?.textContent
-                        .trim()
-                        .toLowerCase() || "";
-
-                const cedula =
-                    row.querySelector(".cliente-cedula")
-                        ?.textContent
-                        .trim()
-                        .toLowerCase() || "";
-
-                const comercio =
-                    row.querySelector(".cliente-comercio")
-                        ?.textContent
-                        .trim()
-                        .toLowerCase() || "";
-
-                const empresaFila =
-                    row.querySelector(".empresa")
-                        ?.textContent
-                        .trim()
-                        .toLowerCase() || "";
-
-                const venta =
-                    row.querySelector(".venta")
-                        ?.textContent
-                        .trim()
-                        .toLowerCase() || "";
-
-                const coincideBusqueda =
-
-                    textoBuscar === "" ||
-
-                    nombre.includes(textoBuscar) ||
-
-                    cedula.includes(textoBuscar) ||
-
-                    comercio.includes(textoBuscar) ||
-
-                    venta.includes(textoBuscar);
-
-                const coincideEmpresa =
-
-                    empresa === "" ||
-
-                    empresaFila.includes(empresa);
-
-                row.style.display =
-
-                    (coincideBusqueda && coincideEmpresa)
-
-                        ? ""
-
-                        : "none";
-
-            });
-
-        }
-
-        searchInput?.addEventListener(
-            "input",
-            filtrar
-        );
-
-        empresaFilter?.addEventListener(
-            "change",
-            filtrar
-        );
-
-        filtrar();
-
-    });
-
-</script>

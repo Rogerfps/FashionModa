@@ -20,100 +20,111 @@ namespace FashionM.Controllers
         // INDEX
         // ========================================
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string buscar, int? empresaId, string estado)
         {
-            var cuentas = await _context.CuentasPorCobrar
+            if (!Request.Query.ContainsKey("empresaId"))
+            {
+                empresaId = HttpContext.Session.GetInt32("EmpresaId");
 
+                if (!empresaId.HasValue)
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
+            var query = _context.CuentasPorCobrar
                 .Include(c => c.Cliente)
-
                 .Include(c => c.Empresa)
-
                 .Include(c => c.Venta)
                     .ThenInclude(v => v!.NotasCredito)
-
                 .Include(c => c.Pagos)
+                .AsQueryable();
 
-                .ToListAsync();
+            if (empresaId.HasValue && empresaId.Value != 0)
+            {
+                query = query.Where(c => c.EmpresaId == empresaId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                buscar = buscar.Trim().ToLower();
+
+                query = query.Where(c =>
+                    c.Cliente.Nombre.ToLower().Contains(buscar) ||
+                    c.Cliente.Apellidos.ToLower().Contains(buscar) ||
+                    c.Cliente.Cedula.ToString().Contains(buscar) ||
+                    c.Cliente.Comercio.ToLower().Contains(buscar) ||
+                    c.VentaId.ToString().Contains(buscar));
+            }
+
+            
+
+            var cuentas = await query.ToListAsync();
 
             var modelo = cuentas
-
                 .GroupBy(x => new
                 {
                     x.EmpresaId,
-
                     Empresa = x.Empresa!.Nombre,
-
                     x.ClienteCedula,
-
-                    Nombre =
-                        x.Cliente!.Nombre + " " +
-                        x.Cliente.Apellidos,
-
-                    Comercio =
-                        x.Cliente.Comercio
+                    Nombre = x.Cliente!.Nombre + " " + x.Cliente.Apellidos,
+                    Comercio = x.Cliente.Comercio
                 })
-
                 .Select(g => new
                 {
-                    EmpresaId =
-                        g.Key.EmpresaId,
+                    EmpresaId = g.Key.EmpresaId,
+                    Empresa = g.Key.Empresa,
+                    ClienteCedula = g.Key.ClienteCedula,
+                    Nombre = g.Key.Nombre,
+                    Comercio = g.Key.Comercio,
+                    CantidadFacturas = g.Count(),
+                    Saldo = g.Sum(c =>
+                    {
+                        decimal pagos = c.Pagos.Sum(p => p.Monto);
 
-                    Empresa =
-                        g.Key.Empresa,
+                        decimal notas =
+                            c.Venta?.NotasCredito.Sum(n => n.TotalDevuelto) ?? 0;
 
-                    ClienteCedula =
-                        g.Key.ClienteCedula,
+                        decimal saldo =
+                            c.MontoOriginal
+                            - pagos
+                            - notas
+                            - c.DescuentoAplicado;
 
-                    Nombre =
-                        g.Key.Nombre,
-
-                    Comercio =
-                        g.Key.Comercio,
-
-                    CantidadFacturas =
-                        g.Count(),
-
-                    Saldo =
-                        g.Sum(c =>
-                        {
-                            decimal pagos =
-                                c.Pagos.Sum(p =>
-                                    p.Monto);
-
-                            decimal notas =
-                                c.Venta?.NotasCredito
-                                    .Sum(n =>
-                                        n.TotalDevuelto) ?? 0;
-
-                            decimal saldo =
-                                c.MontoOriginal
-                                - pagos
-                                - notas
-                                - c.DescuentoAplicado;
-
-                            // ========================================
-                            // TODO SALDO MENOR A ₡1
-                            // SE CONSIDERA PAGADO
-                            // ========================================
-
-                            return saldo < 1
-                                ? 0
-                                : saldo;
-                        })
+                        return saldo < 1 ? 0 : saldo;
+                    })
                 })
-
-                .OrderBy(x => x.Empresa)
-
-                .ThenByDescending(x => x.Saldo)
 
                 .ToList();
 
-            ViewBag.Empresas =
-                await _context.Empresas
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                if (estado == "Pendiente")
+                {
+                    modelo = modelo
+                        .Where(x => x.Saldo > 0)
+                        .ToList();
+                }
+                else if (estado == "Pagada")
+                {
+                    modelo = modelo
+                        .Where(x => x.Saldo <= 0)
+                        .ToList();
+                }
+            }
 
-                    .OrderBy(x => x.Nombre)
+            modelo = modelo
+                .OrderBy(x => x.Empresa)
+                .ThenByDescending(x => x.Saldo)
+                .ToList();
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(x => x.Nombre)
+                .ToListAsync();
 
-                    .ToListAsync();
+
+            ViewBag.Estado = estado;
+            ViewBag.Buscar = buscar;
+            ViewBag.EmpresaId = empresaId;
 
             return View(modelo);
         }

@@ -25,14 +25,15 @@ namespace FashionM.Controllers
         {
             int pageSize = 25;
 
-            if (string.IsNullOrWhiteSpace(empresa))
+            // Solo usar la empresa de la sesión la primera vez que entra
+            if (!Request.Query.ContainsKey("empresa"))
             {
                 empresa = HttpContext.Session.GetString("EmpresaNombre");
-            }
 
-            if (string.IsNullOrWhiteSpace(empresa))
-            {
-                return RedirectToAction("SeleccionarEmpresa", "Home");
+                if (string.IsNullOrWhiteSpace(empresa))
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
             }
 
             var query = _context.Inventarios

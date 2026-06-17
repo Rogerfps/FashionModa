@@ -343,13 +343,16 @@
                            name="buscar"
                            value="@Context.Request.Query["buscar"]"
                            class="filter-input w-100"
-                           placeholder="Código, nombre, agente, cédula o teléfono" />
+                           placeholder="Código, nombre, agente, cédula o teléfono"
+                           oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.submit(), 1500);" />
                 </div>
 
                 <!-- ESTADO -->
                 <div class="col-lg-2">
                     <div class="filter-label">Estado</div>
-                    <select name="estado" class="filter-input w-100">
+                    <select name="estado" class="filter-input w-100"
+                            onchange="this.form.submit()">
+
                         <option value="">Todos</option>
                         <option value="true" selected="@(Context.Request.Query["estado"] == "true")">Activos</option>
                         <option value="false" selected="@(Context.Request.Query["estado"] == "false")">Inactivos</option>
@@ -359,7 +362,9 @@
                 <!-- ZONA -->
                 <div class="col-lg-2">
                     <div class="filter-label">Zona</div>
-                    <select name="zona" class="filter-input w-100">
+                    <select name="zona" class="filter-input w-100"
+                            onchange="this.form.submit()">
+                        
                         <option value="">Todas</option>
                         @if (ViewBag.Zonas != null)
                         {

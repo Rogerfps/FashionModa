@@ -77,6 +77,7 @@ wwwroot\images\inventarios\2b46e2a3-7bd1-4201-8038-a220ee0928e3.jpg
 wwwroot\images\inventarios\2d2e1fe8-78fa-488a-b35e-0f88fc84ce9a.png
 wwwroot\images\inventarios\3a1a0781-5556-4e09-b46d-bb559789fc96.png
 wwwroot\images\inventarios\3d15fce9-c848-4cae-a2c0-43c94ae1241a.jpg
+wwwroot\images\inventarios\4729d647-ef82-496b-8e7d-0e517025d2a5.png
 wwwroot\images\inventarios\5_f8a8a581-42de-472d-8d4c-4b42c8dbfd2c.jpg
 wwwroot\images\inventarios\62af4443-6563-4196-b495-5885293a062d.png
 wwwroot\images\inventarios\6b1b5629-a209-4b62-a357-a5ac701809b2.png
@@ -86,6 +87,7 @@ wwwroot\images\inventarios\7abfe274-4f59-46a1-9076-bba3f5645b69.webp
 wwwroot\images\inventarios\7ba4e615-2434-4941-9767-8efbc963ae56.jpg
 wwwroot\images\inventarios\7efa3499-6ee9-4286-935b-49a3b2afe1a8.png
 wwwroot\images\inventarios\85887461-9eeb-4ce2-82ce-241e1e333b00.png
+wwwroot\images\inventarios\8d3fc38b-d91a-4425-abf8-7ec98be88493.png
 wwwroot\images\inventarios\91d7e93e-62b4-4ffc-819d-491c654cc21d.jpeg
 wwwroot\images\inventarios\9b7b8cfd-6be2-4857-ba18-aea9ab6d6b08.png
 wwwroot\images\inventarios\9df07554-7ab0-4f66-bd5d-3e31ee4f206d.png

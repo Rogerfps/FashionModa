@@ -45,7 +45,9 @@
                 <button type="submit" class="btn-primary">
                     🔍 Buscar
                 </button>
-                <a asp-action="Index" class="btn-secondary">
+                <a asp-action="Index"
+                   asp-route-empresaId="0"
+                   class="btn-secondary">
                     ✖ Limpiar
                 </a>
             </div>

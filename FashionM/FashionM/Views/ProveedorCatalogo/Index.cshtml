@@ -27,12 +27,14 @@
                        name="busqueda"
                        value="@Context.Request.Query["busqueda"]"
                        class="filter-input"
-                       placeholder="Buscar por código o nombre..." />
+                       placeholder="Buscar por código o nombre..."/>
             </div>
 
             <div class="col-md-3">
                 <div class="filter-label">⚡ Estado</div>
-                <select name="activo" class="filter-input">
+                <select name="activo" class="filter-input"
+                        onchange="this.form.submit()">
+                    
                     <option value="">Todos</option>
                     <option value="true" selected="@(Context.Request.Query["activo"] == "true")">Activos</option>
                     <option value="false" selected="@(Context.Request.Query["activo"] == "false")">Inactivos</option>
@@ -151,6 +153,6 @@
             const activo = document.querySelector('[name="activo"]').value;
             const url = `/ProveedorCatalogo?busqueda=${encodeURIComponent(busqueda)}&activo=${activo}`;
             window.location.href = url;
-        }, 400);
+        }, 1500);
     });
 </script>

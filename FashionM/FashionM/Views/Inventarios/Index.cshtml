@@ -35,9 +35,12 @@
                name="search"
                value="@ViewBag.Search"
                class="filter-input flex-grow-1"
-               placeholder="Buscar por código, marca, SKU...">
+               placeholder="Buscar por código, marca, SKU..."
+               oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.submit(), 2000);" />
 
-        <select name="empresa" class="filter-input">
+        <select name="empresa" class="filter-input"
+                onchange="this.form.submit()">
+            
             <option value="">Todas las empresas</option>
             @foreach (var e in ViewBag.Empresas)
             {
@@ -51,7 +54,12 @@
 
         @if (!string.IsNullOrEmpty(ViewBag.Search) || !string.IsNullOrEmpty(ViewBag.Empresa))
         {
-            <a asp-action="Index" class="btn-filter" style="background:#ef4444;">✖</a>
+            <a asp-action="Index"
+               asp-route-empresa=""
+               class="btn-filter"
+               style="background:#ef4444;">
+                ✖
+            </a>
         }
 
     </form>

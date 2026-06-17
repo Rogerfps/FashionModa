@@ -93,7 +93,8 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Empresa</label>
-                    <select name="empresa" class="form-control">
+                    <select name="empresa" class="form-control"
+                            onchange="this.form.submit()">
                         <option value="">Todas</option>
                         @foreach (var e in ViewBag.Empresas)
                         {

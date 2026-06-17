@@ -211,36 +211,29 @@
     </ul>
 }
 
-<!-- 🔥 SCRIPT FILTROS AUTOMÁTICOS -->
+<!-- SCRIPT FILTROS AUTOMÁTICOS -->
 <script>
-let timeout = null;
+    let timeout = null;
 
-function aplicarFiltros() {
+    function aplicarFiltros() {
 
-    clearTimeout(timeout);
+        clearTimeout(timeout);
 
-    timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
 
-        const buscar = document.getElementById("buscarInput").value;
-        const empresa = document.getElementById("empresaInput").value;
-        const semana = document.getElementById("semanaInput").value;
+            document.querySelector("form").submit();
 
-        const url = `/PedidoCliente/Index?buscar=${buscar}&empresa=${empresa}&semana=${semana}`;
+        }, 2000); // 2 segundos
 
-        window.location.href = url;
+    }
 
-    }, 400);
-}
+    document.getElementById("buscarInput")
+        .addEventListener("input", aplicarFiltros);
 
-document.querySelectorAll('#buscarInput, #empresaInput, #semanaInput')
-    .forEach(el => {
-        el.addEventListener('change', () => {
-            el.closest('form').submit();
-        });
-    });
+    document.getElementById("empresaInput")
+        .addEventListener("change", aplicarFiltros);
 
-// eventos
-document.getElementById("buscarInput").addEventListener("keyup", aplicarFiltros);
-document.getElementById("empresaInput").addEventListener("change", aplicarFiltros);
-document.getElementById("semanaInput").addEventListener("keyup", aplicarFiltros);
+    document.getElementById("semanaInput")
+        .addEventListener("input", aplicarFiltros);
+
 </script>

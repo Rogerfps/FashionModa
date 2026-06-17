@@ -17,17 +17,37 @@ namespace FashionM.Controllers
         }
 
         // LISTADO
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? empresaId)
         {
-            var ventas = await _context.Ventas
+            if (!Request.Query.ContainsKey("empresaId"))
+            {
+                empresaId = HttpContext.Session.GetInt32("EmpresaId");
+
+                if (!empresaId.HasValue)
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
+            var query = _context.Ventas
                 .Include(v => v.Cliente)
                 .Include(v => v.Empresa)
+                .AsQueryable();
+
+            if (empresaId.HasValue && empresaId.Value != 0)
+            {
+                query = query.Where(v => v.EmpresaId == empresaId.Value);
+            }
+
+            var ventas = await query
                 .OrderByDescending(v => v.Fecha)
                 .ToListAsync();
 
             ViewBag.Empresas = await _context.Empresas
                 .OrderBy(x => x.Nombre)
                 .ToListAsync();
+
+            ViewBag.EmpresaId = empresaId;
 
             return View(ventas);
         }
