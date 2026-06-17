@@ -9,6 +9,7 @@
     --warning: #f59e0b;
     --info: #3b82f6;
     --text-gray: #64748b;
+    --border-light: #e2e8f0;
 }
 
 body {
@@ -22,6 +23,8 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .page-title {
@@ -36,30 +39,38 @@ body {
     gap: 8px;
 }
 
-.back-link {
-    color: var(--deep-blue);
-    text-decoration: none;
-    font-size: 0.9rem;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
+.btn-back {
     background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    transition: all 0.2s;
 }
 
+    .btn-back:hover {
+        background: var(--deep-blue);
+        color: white;
+        transform: translateY(-2px);
+    }
+
 /* Cards */
-.detail-card {
+.info-card {
     background: var(--pure-white);
-    border-radius: 24px;
-    padding: 1.8rem;
-    box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
-    margin-bottom: 2rem;
-    border: 1px solid rgba(11, 36, 71, 0.05);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
 
 .section-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--deep-blue);
     margin-bottom: 1.2rem;
@@ -70,124 +81,40 @@ body {
     gap: 8px;
 }
 
-    .section-title span {
-        font-size: 1.4rem;
-    }
-
 /* Grid de información */
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
 }
 
-.info-box {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1.2rem;
-    border: 1px solid #e2e8f0;
-}
-
-.info-box-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--deep-blue);
-    margin-bottom: 1rem;
-    padding-bottom: 0.3rem;
-    border-bottom: 1px solid #e2e8f0;
+.info-item {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    gap: 0.2rem;
 }
-
-.info-row {
-    display: flex;
-    padding: 0.4rem 0;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-    .info-row:last-child {
-        border-bottom: none;
-    }
 
 .info-label {
-    width: 100px;
-    font-size: 0.8rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
     font-weight: 600;
     color: var(--text-gray);
+    letter-spacing: 0.3px;
 }
 
 .info-value {
-    flex: 1;
     font-size: 0.9rem;
+    font-weight: 500;
     color: var(--deep-blue);
 }
 
-/* Tabla de detalles */
-.table-wrapper {
-    background: var(--pure-white);
-    border-radius: 20px;
-    padding: 1.2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    margin: 1rem 0;
-    overflow-x: auto;
-}
-
-.detalle-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-    min-width: 1000px;
-}
-
-    .detalle-table th {
-        background: var(--deep-blue);
-        color: white;
-        font-weight: 500;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        padding: 0.8rem 0.5rem;
-        white-space: nowrap;
+    .info-value.credit {
+        color: var(--success);
+        font-weight: 700;
     }
 
-        .detalle-table th:first-child {
-            border-radius: 12px 0 0 12px;
-        }
-
-        .detalle-table th:last-child {
-            border-radius: 0 12px 12px 0;
-        }
-
-    .detalle-table td {
-        padding: 0.8rem 0.5rem;
-        border-bottom: 1px solid #edf2f7;
-        vertical-align: middle;
-    }
-
-    .detalle-table tbody tr:hover {
-        background: rgba(87, 108, 188, 0.02);
-    }
-
-/* Imagen del producto */
-.producto-img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.no-image {
-    width: 50px;
-    height: 50px;
-    background: #f1f5f9;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    color: var(--text-gray);
-    border: 1px dashed #cbd5e1;
+.full-width {
+    grid-column: span 3;
 }
 
 /* Badges de estado */
@@ -195,9 +122,10 @@ body {
     display: inline-block;
     padding: 0.4rem 1rem;
     border-radius: 30px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
     .status-badge.success {
@@ -224,186 +152,198 @@ body {
         border: 1px solid rgba(100, 116, 139, 0.2);
     }
 
-/* Total zapatos */
-.total-zapatos {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1rem;
+.status-group {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 1rem 0;
-}
-
-.total-zapatos-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--deep-blue);
-    text-transform: uppercase;
-}
-
-.total-zapatos-value {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--deep-blue);
-    background: white;
-    padding: 0.3rem 1.5rem;
-    border-radius: 30px;
-    border: 1px solid #e2e8f0;
-}
-
-/* Totales y estados */
-.totales-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin: 1rem 0;
-}
-
-.total-box {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1.2rem;
-    text-align: center;
-    border: 1px solid #e2e8f0;
-}
-
-.total-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: var(--text-gray);
-    margin-bottom: 0.3rem;
-}
-
-.total-monto {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--deep-blue);
-}
-
-.estados-box {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1.2rem;
-}
-
-.estado-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-    .estado-item:last-child {
-        border-bottom: none;
-    }
-
-/* Botones de acción */
-.action-buttons {
-    display: flex;
-    gap: 0.8rem;
     flex-wrap: wrap;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #eef2f6;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
 }
 
-.btn-action {
-    padding: 0.6rem 1.5rem;
-    border-radius: 30px;
+/* Tabla de productos */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
+    min-width: 800px;
 }
 
-.btn-secondary {
-    background: #f1f5f9;
-    color: var(--deep-blue);
-}
-
-    .btn-secondary:hover {
+    .product-table th {
         background: var(--deep-blue);
         color: white;
+        font-weight: 500;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        padding: 0.8rem 0.5rem;
+        white-space: nowrap;
     }
 
-.btn-info {
-    background: #e6f0fa;
-    color: var(--info);
+        .product-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .product-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+    .product-table td {
+        padding: 0.8rem 0.5rem;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+    }
+
+    .product-table tbody tr:hover {
+        background: rgba(87, 108, 188, 0.02);
+    }
+
+    .product-table .entregado-row {
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+/* Checkbox personalizado */
+.checkbox-delivery {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--success);
 }
 
-    .btn-info:hover {
-        background: var(--info);
-        color: white;
-    }
-
-.btn-success {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-}
-
-    .btn-success:hover {
-        background: var(--success);
-        color: white;
-    }
-
-.btn-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-}
-
-    .btn-danger:hover {
-        background: var(--danger);
-        color: white;
-    }
-
-.btn-warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-    .btn-warning:hover {
-        background: var(--warning);
-        color: white;
-    }
-
-.btn-primary {
-    background: var(--deep-blue);
+/* Total */
+.total-card {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    border-radius: 20px;
+    padding: 1.2rem 2rem;
+    text-align: right;
     color: white;
 }
 
-    .btn-primary:hover {
-        background: var(--electric-blue);
-    }
+.total-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.2rem;
+}
+
+.total-value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    color: var(--text-gray);
+}
 
 /* Responsive */
 @@media (max-width: 768px) {
     .info-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
     }
 
-    .totales-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-
-    .btn-action {
-        width: 100%;
-        justify-content: center;
+    .full-width {
+        grid-column: span 1;
     }
 
     .page-title {
         font-size: 1.5rem;
     }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .total-card {
+        text-align: center;
+    }
+
+    .status-group {
+        justify-content: center;
+    }
+}
+
+/* ========================= */
+/* ESTADOS NUEVOS */
+/* ========================= */
+
+/* GRID */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+/* CARD */
+.status-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .status-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+    }
+
+    /* ACTIVO */
+    .status-card.active {
+        background: rgba(16,185,129,0.08);
+        border: 1px solid rgba(16,185,129,0.3);
+    }
+
+/* ICON */
+.status-icon {
+    font-size: 1.5rem;
+}
+
+/* TEXTO */
+.status-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-gray);
+}
+
+.status-desc {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+}
+
+/* SELECT */
+.status-select {
+    margin-left: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    padding: 4px 8px;
+}
+
+/* COLORES CRÉDITO */
+.status-card.credit.Aprobado {
+    background: rgba(16,185,129,0.08);
+}
+
+.status-card.credit.Rechazado {
+    background: rgba(239,68,68,0.08);
+}
+
+.status-card.credit.Pendiente {
+    background: rgba(245,158,11,0.08);
+}
+
+/* ENTREGA */
+.status-card.delivery.active {
+    background: rgba(59,130,246,0.08);
 }
