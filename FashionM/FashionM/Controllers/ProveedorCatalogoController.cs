@@ -1,9 +1,12 @@
 ﻿using FashionM.Data;
 using FashionM.Models.Provedor;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+
+[Authorize(Roles = "Admin,Secretaria")]
 public class ProveedorCatalogoController : Controller
 {
     private readonly AppDbContext _context;
