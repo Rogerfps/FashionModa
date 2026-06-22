@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using FashionM.Services;
 
 namespace FashionM.Controllers
 {
@@ -77,6 +78,58 @@ namespace FashionM.Controllers
                 .ToList();
 
             return View(inventarios);
+        }
+
+
+        [HttpGet]
+        public IActionResult ExportarExcel(string? search, string? empresa)
+        {
+            // Si no viene empresa en la URL, usar la de la sesión
+            if (!Request.Query.ContainsKey("empresa"))
+            {
+                empresa = HttpContext.Session.GetString("EmpresaNombre");
+
+                if (string.IsNullOrWhiteSpace(empresa))
+                {
+                    return RedirectToAction("SeleccionarEmpresa", "Home");
+                }
+            }
+
+            var query = _context.Inventarios
+                .Include(i => i.Tallas)
+                .Include(i => i.Fotos)
+                .AsQueryable();
+
+            // Buscar
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(i =>
+                    i.Codigo.Contains(search) ||
+                    i.Marca.Contains(search) ||
+                    i.SKU.Contains(search) ||
+                    i.Tallas.Any(t => t.Color.Contains(search)) ||
+                    i.Tallas.Any(t => t.Detalle.Contains(search))
+                );
+            }
+
+            // Empresa
+            if (!string.IsNullOrWhiteSpace(empresa))
+            {
+                query = query.Where(i => i.Empresa == empresa);
+            }
+
+            var inventarios = query
+                .OrderBy(i => i.Codigo)
+                .ToList();
+
+            var excel = new ExcelInventarioService(_environment);
+
+            byte[] archivo = excel.Generar(inventarios);
+
+            return File(
+                archivo,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Inventario_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
         }
 
         // CREATE GET
@@ -554,6 +607,8 @@ namespace FashionM.Controllers
 
             return RedirectToAction(nameof(Details), new { id = inventarioCodigo });
         }
+
+
 
     }
 }
