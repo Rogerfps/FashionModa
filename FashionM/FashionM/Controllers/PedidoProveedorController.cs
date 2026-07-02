@@ -62,13 +62,13 @@ namespace FashionM.Controllers
                 .ToListAsync();
 
             ViewBag.Empresas = new List<string>
-    {
-        "Cocalza Plus S.A",
-        "Fashion Shoes S.A",
-        "LSG Moda S.A",
-        "Maxi Plus 23 S.A",
-        "KYROZ"
-    };
+                {
+                    "Cocalza Plus S.A",
+                    "Fashion Shoes S.A",
+                    "LSG Moda S.A",
+                    "Maxi Plus 23 S.A",
+                    "KYROZ"
+                };
 
             ViewBag.Page = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
@@ -84,13 +84,15 @@ namespace FashionM.Controllers
         // GENERAR PEDIDOS
         // =====================================================
         [HttpPost]
-        public async Task<IActionResult> GenerarPedidos(int semana)
+        public async Task<IActionResult> GenerarPedidos(int semana, string empresa)
         {
             // =========================
             // 🔥 LIMPIAR SI YA EXISTE (REGENERAR)
             // =========================
             var existentes = await _context.PedidosProveedor
-                .Where(p => p.Semana == semana)
+                .Where(p =>
+                    p.Semana == semana &&
+                    p.Empresa == empresa)
                 .ToListAsync();
 
             if (existentes.Any())
@@ -100,8 +102,17 @@ namespace FashionM.Controllers
                 var main = await _context.PedidosMain
                     .FirstOrDefaultAsync(p => p.Semana == semana);
 
-                if (main != null)
-                    _context.PedidosMain.Remove(main);
+                if (main == null)
+                {
+                    main = new PedidoMain
+                    {
+                        Semana = semana,
+                        FechaGenerado = DateTime.UtcNow
+                    };
+
+                    _context.PedidosMain.Add(main);
+                    await _context.SaveChangesAsync();
+                }
 
                 await _context.SaveChangesAsync();
             }
@@ -113,6 +124,7 @@ namespace FashionM.Controllers
                 .Include(p => p.Detalles)
                 .Where(p =>
                     p.Semana == semana &&
+                    p.Empresa == empresa &&
                     p.EstadoCredito == EstadoCredito.Aprobado &&
                     p.AprobadoSecretaria
                 )
@@ -138,14 +150,20 @@ namespace FashionM.Controllers
             // =========================
             // 🔥 CREAR MAIN
             // =========================
-            var pedidoMain = new PedidoMain
-            {
-                Semana = semana,
-                FechaGenerado = DateTime.UtcNow
-            };
+            var pedidoMain = await _context.PedidosMain
+                .FirstOrDefaultAsync(p => p.Semana == semana);
 
-            _context.PedidosMain.Add(pedidoMain);
-            await _context.SaveChangesAsync();
+            if (pedidoMain == null)
+            {
+                pedidoMain = new PedidoMain
+                {
+                    Semana = semana,
+                    FechaGenerado = DateTime.UtcNow
+                };
+
+                _context.PedidosMain.Add(pedidoMain);
+                await _context.SaveChangesAsync();
+            }
 
             // =========================
             // 🔥 AGRUPAR DETALLES

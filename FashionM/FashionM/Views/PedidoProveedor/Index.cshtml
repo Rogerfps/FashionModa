@@ -38,7 +38,8 @@
         <div class="buttons-row">
             <form asp-action="GenerarPedidos" method="post" style="flex: 1;">
                 <div class="row g-2">
-                    <div class="col-md-6">
+
+                    <div class="col-md-4">
                         <input type="number"
                                name="semana"
                                class="form-control"
@@ -47,11 +48,24 @@
                                max="53"
                                required />
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-4">
+                        <select name="empresa" class="form-control" required>
+                            <option value="">Seleccione empresa</option>
+
+                            @foreach (var e in ViewBag.Empresas)
+                            {
+                                <option value="@e">@e</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
                         <button type="submit" class="btn-generar w-100">
                             ➕ Generar pedidos
                         </button>
                     </div>
+
                 </div>
             </form>
 

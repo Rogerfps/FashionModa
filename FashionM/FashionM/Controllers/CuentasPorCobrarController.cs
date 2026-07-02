@@ -312,6 +312,8 @@ namespace FashionM.Controllers
             decimal totalNotas =
                 cuenta.Venta!.NotasCredito.Sum(x => x.TotalDevuelto);
 
+
+
             // ========================================
             // SALDO
             // ========================================
@@ -334,20 +336,35 @@ namespace FashionM.Controllers
 
                 DateTime.UtcNow <=
                     cuenta.Fecha.AddDays(60);
+            // ========================================
+            // MONTO BASE PARA DESCUENTO
+            // (YA CON NOTAS DE CRÉDITO)
+            // ========================================
 
-            // Se redondea a colones enteros
+            decimal montoBase =
+
+                cuenta.MontoOriginal
+                - totalNotas;
+
+            // ========================================
+            // DESCUENTO (10%)
+            // ========================================
+
             decimal montoDescuento =
 
                 Math.Round(
-                    cuenta.MontoOriginal * 0.10m,
+                    montoBase * 0.10m,
                     0,
                     MidpointRounding.AwayFromZero);
 
-            // Total que el cliente debe pagar
-            // para ganar el descuento
+            // ========================================
+            // TOTAL NECESARIO PARA
+            // OBTENER EL DESCUENTO
+            // ========================================
+
             decimal montoConDescuento =
 
-                cuenta.MontoOriginal
+                montoBase
                 - montoDescuento;
 
             // Total pagado después de este pago

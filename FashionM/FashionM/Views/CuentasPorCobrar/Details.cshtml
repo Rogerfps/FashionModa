@@ -197,7 +197,41 @@
                                 ₡ @saldo.ToString("N2")
                             </td>
 
-                            <td> @if (item.DescuentoOtorgado)
+                            <td>
+
+                                @{
+                                    decimal montoBase =
+                                        item.MontoOriginal
+                                        - totalNotas;
+
+                                    decimal descuento = 0;
+
+                                    decimal montoConDescuento = 0;
+
+                                    decimal falta = 0;
+
+                                    if (montoBase > 0)
+                                    {
+                                        descuento =
+                                            Math.Round(
+                                                montoBase * 0.10m,
+                                                0,
+                                                MidpointRounding.AwayFromZero);
+
+                                        montoConDescuento =
+                                            montoBase - descuento;
+
+                                        falta =
+                                            montoConDescuento - totalPagado;
+
+                                        if (falta < 0)
+                                        {
+                                            falta = 0;
+                                        }
+                                    }
+                                }
+
+                                @if (item.DescuentoOtorgado)
                                 {
                                     <span class="badge-success">
 
@@ -213,45 +247,50 @@
 
                                     </small>
                                 }
-                                else
+                                else if (montoBase <= 0)
                                 {
-                                    decimal descuento = Math.Round(
-                                        item.MontoOriginal * 0.10m,
-                                        0,
-                                        MidpointRounding.AwayFromZero);
+                                    <span class="badge-success">
 
-                                    decimal montoConDescuento =
-                                        item.MontoOriginal - descuento;
+                                        ✅ Cuenta cancelada
 
-                                    decimal falta =
-                                        montoConDescuento - totalPagado;
+                                    </span>
+                                }
+                                else if (DateTime.UtcNow <= item.Fecha.AddDays(60))
+                                {
+                                    <span class="badge-warning">
 
-                                    if (DateTime.UtcNow <= item.Fecha.AddDays(60))
-                                    {
-                                        if (falta < 0)
-                                        {
-                                            falta = 0;
-                                        }
+                                        🎁 Le faltan
 
-                                        <span class="badge-warning">
+                                        <br />
 
-                                            🎁 Faltan
+                                        <strong>
 
                                             ₡ @falta.ToString("N0")
 
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge-danger">
+                                        </strong>
 
-                                            ⌛ Vencido
+                                        <br />
 
-                                        </span>
-                                    }
+                                        <small>
+
+                                            para obtener el descuento
+
+                                        </small>
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-danger">
+
+                                        ⌛ Descuento vencido
+
+                                    </span>
                                 }
 
                             </td>
+
+                            
 
                             <td>
 

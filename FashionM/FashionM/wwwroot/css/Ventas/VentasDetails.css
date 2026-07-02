@@ -385,6 +385,58 @@ body {
     box-shadow: 0 6px 18px rgba(220,38,38,0.15);
 }
 
+/* ========================================
+   BTN CUENTA POR COBRAR
+======================================== */
+
+.btn-cuenta-cobrar {
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0.9rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(11, 36, 71, 0.18);
+}
+
+    .btn-cuenta-cobrar:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(11, 36, 71, 0.28);
+    }
+
+/* ========================================
+   BTN VER CUENTA
+======================================== */
+
+.btn-cuenta-creada {
+    background: linear-gradient(135deg, #059669, #10B981);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0.9rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.18);
+}
+
+    .btn-cuenta-creada:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(5, 150, 105, 0.28);
+    }
+
     .btn-nota-credito:hover {
         color: white;
         transform: translateY(-2px);

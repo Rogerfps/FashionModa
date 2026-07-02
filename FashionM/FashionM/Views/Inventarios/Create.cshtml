@@ -131,56 +131,150 @@
 
             </div>
 
-            <!-- TALLAS -->
-            <div class="section-title">📏 Variantes</div>
+            <!-- ========================================= -->
+            <!-- GENERADOR DE VARIANTES -->
+            <!-- ========================================= -->
+
+            <div class="section-title">⚙️ Generador de Variantes</div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Tipo de Zapato</label>
+
+                    <select id="tipoZapato" class="form-control">
+                        <option value="">Seleccione...</option>
+                        <option value="adulto">Adulto (34 - 44)</option>
+                        <option value="nino">Niño (15 - 36)</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+
+                <div class="form-group rangoPersonalizado d-none">
+                    <label>Desde</label>
+                    <input type="number"
+                           id="tallaInicio"
+                           class="form-control"
+                           value="34" />
+                </div>
+
+                <div class="form-group rangoPersonalizado d-none">
+                    <label>Hasta</label>
+                    <input type="number"
+                           id="tallaFin"
+                           class="form-control"
+                           value="44" />
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- ========================================= -->
+            <!-- COLORES -->
+            <!-- ========================================= -->
+
+            <div class="section-title">🎨 Colores</div>
+
+            <div id="coloresContainer">
+
+                <div class="d-flex gap-2 mb-2 color-row">
+
+                    <input type="text"
+                           class="form-control color-input"
+                           placeholder="Ej: Negro" />
+
+                    <button type="button"
+                            class="btn-remove"
+                            onclick="eliminarColor(this)">
+                        ✕
+                    </button>
+
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="btn-add"
+                    onclick="agregarColor()">
+                ➕ Agregar Color
+            </button>
+
+            <hr />
+
+            <!-- ========================================= -->
+            <!-- DETALLES -->
+            <!-- ========================================= -->
+
+            <div class="section-title">📝 Detalles</div>
+
+            <div id="detallesContainer">
+
+                <div class="d-flex gap-2 mb-2 detalle-row">
+
+                    <input type="text"
+                           class="form-control detalle-input"
+                           placeholder="Ej: Charol (Opcional)" />
+
+                    <button type="button"
+                            class="btn-remove"
+                            onclick="eliminarDetalle(this)">
+                        ✕
+                    </button>
+
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="btn-add"
+                    onclick="agregarDetalle()">
+                ➕ Agregar Detalle
+            </button>
+
+            <hr />
+
+            <div class="text-center mb-4">
+
+                <button type="button"
+                        class="btn-primary"
+                        onclick="generarVariantes()">
+
+                    ⚡ Generar Variantes
+
+                </button>
+
+            </div>
+
+            <!-- ========================================= -->
+            <!-- TABLA DE VARIANTES -->
+            <!-- ========================================= -->
+
+            <div class="section-title">📏 Variantes Generadas</div>
 
             <table class="tallas-table" id="tablaTallas">
 
                 <thead>
+
                     <tr>
+
                         <th>Color</th>
+
                         <th>Detalle</th>
+
                         <th>Talla</th>
+
                         <th>Cantidad</th>
+
+                        <th>Precio</th>
+
                         <th></th>
+
                     </tr>
+
                 </thead>
 
                 <tbody>
-
-                    <tr>
-
-                        <td>
-                            <input type="text"
-                                   name="Tallas[0].Color"
-                                   placeholder="Negro"
-                                   required />
-                        </td>
-
-                        <td>
-                            <input type="text"
-                                   name="Tallas[0].Detalle"
-                                   placeholder="Cuero" />
-                        </td>
-
-                        <td>
-                            <input type="text"
-                                   name="Tallas[0].Numero"
-                                   placeholder="38"
-                                   required />
-                        </td>
-
-                        <td>
-                            <input type="number"
-                                   name="Tallas[0].Cantidad"
-                                   value="0"
-                                   required />
-                        </td>
-
-                        <td></td>
-
-                    </tr>
-
                 </tbody>
 
             </table>
@@ -188,7 +282,7 @@
             <button type="button"
                     class="btn-add"
                     onclick="agregarTalla()">
-                ➕ Agregar
+                ➕ Agregar Variante
             </button>
 
             <!-- FOTOS -->
@@ -217,105 +311,468 @@
     </div>
 </div>
 
-@section Scripts {
+@section Scripts{
 
-    <partial name="_ValidationScriptsPartial" />
+<partial name="_ValidationScriptsPartial" />
 
-    <script>
+<script>
 
-        // =========================
-        // 🔥 TALLAS
-        // =========================
+    //==========================================
+    // VARIABLES
+    //==========================================
 
-        let idx = 1;
+    let idx = 0;
 
-        function agregarTalla() {
+    //==========================================
+    // TIPO DE ZAPATO
+    //==========================================
 
-            const tabla = document.querySelector("#tablaTallas tbody");
+    document.getElementById("tipoZapato")
+        .addEventListener("change", function () {
 
-            tabla.insertAdjacentHTML("beforeend", `
-                <tr>
+            const personalizado =
+                this.value === "personalizado";
 
-                    <td>
-                        <input type="text"
-                               name="Tallas[${idx}].Color"
-                               placeholder="Negro"
-                               required />
-                    </td>
+            document
+                .querySelectorAll(".rangoPersonalizado")
+                .forEach(x => {
 
-                    <td>
-                        <input type="text"
-                               name="Tallas[${idx}].Detalle"
-                               placeholder="Cuero" />
-                    </td>
+                    x.classList.toggle("d-none", !personalizado);
 
-                    <td>
-                        <input type="text"
-                               name="Tallas[${idx}].Numero"
-                               placeholder="38"
-                               required />
-                    </td>
+                });
 
-                    <td>
-                        <input type="number"
-                               name="Tallas[${idx}].Cantidad"
-                               value="0"
-                               required />
-                    </td>
+        });
 
-                    <td>
-                        <button type="button"
-                                class="btn-remove"
-                                onclick="eliminarFila(this)">
-                            ✕
-                        </button>
-                    </td>
+    //==========================================
+    // COLORES
+    //==========================================
 
-                </tr>
-            `);
+    function agregarColor() {
 
-            idx++;
+        const container =
+            document.getElementById("coloresContainer");
+
+        container.insertAdjacentHTML("beforeend", `
+
+            <div class="d-flex gap-2 mb-2 color-row">
+
+                <input type="text"
+                       class="form-control color-input"
+                       placeholder="Ej: Negro" />
+
+                <button type="button"
+                        class="btn-remove"
+                        onclick="eliminarColor(this)">
+                    ✕
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+    function eliminarColor(btn) {
+
+        const filas =
+            document.querySelectorAll(".color-row");
+
+        if (filas.length == 1) {
+
+            btn.parentElement
+                .querySelector("input")
+                .value = "";
+
+            return;
+
         }
 
-        function eliminarFila(btn) {
+        btn.parentElement.remove();
 
-            btn.closest("tr").remove();
+    }
 
-            reindexar();
+    //==========================================
+    // DETALLES
+    //==========================================
+
+    function agregarDetalle() {
+
+        const container =
+            document.getElementById("detallesContainer");
+
+        container.insertAdjacentHTML("beforeend", `
+
+            <div class="d-flex gap-2 mb-2 detalle-row">
+
+                <input type="text"
+                       class="form-control detalle-input"
+                       placeholder="Ej: Charol" />
+
+                <button type="button"
+                        class="btn-remove"
+                        onclick="eliminarDetalle(this)">
+                    ✕
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+    function eliminarDetalle(btn) {
+
+        const filas =
+            document.querySelectorAll(".detalle-row");
+
+        if (filas.length == 1) {
+
+            btn.parentElement
+                .querySelector("input")
+                .value = "";
+
+            return;
+
         }
 
-        function reindexar() {
+        btn.parentElement.remove();
 
-            const filas = document.querySelectorAll("#tablaTallas tbody tr");
+    }
 
-            filas.forEach((fila, i) => {
+    //==========================================
+    // OBTENER RANGO DE TALLAS
+    //==========================================
 
-                fila.querySelectorAll("input")[0]
-                    .setAttribute("name", `Tallas[${i}].Color`);
+    function obtenerTallas() {
 
-                fila.querySelectorAll("input")[1]
-                    .setAttribute("name", `Tallas[${i}].Detalle`);
+        const tipo =
+            document.getElementById("tipoZapato").value;
 
-                fila.querySelectorAll("input")[2]
-                    .setAttribute("name", `Tallas[${i}].Numero`);
+        let inicio = 34;
+        let fin = 44;
 
-                fila.querySelectorAll("input")[3]
-                    .setAttribute("name", `Tallas[${i}].Cantidad`);
+        if (tipo === "nino") {
+
+            inicio = 15;
+            fin = 36;
+
+        }
+
+        if (tipo === "personalizado") {
+
+            inicio = parseInt(
+                document.getElementById("tallaInicio").value);
+
+            fin = parseInt(
+                document.getElementById("tallaFin").value);
+
+        }
+
+        const tallas = [];
+
+        for (let i = inicio; i <= fin; i++) {
+
+            tallas.push(i.toString());
+
+        }
+
+        return tallas;
+
+    }
+
+    //==========================================
+    // OBTENER COLORES
+    //==========================================
+
+    function obtenerColores() {
+
+        let colores = [];
+
+        document
+            .querySelectorAll(".color-input")
+            .forEach(x => {
+
+                const valor = x.value.trim();
+
+                if (valor != "")
+                    colores.push(valor);
 
             });
 
-            idx = filas.length;
+        return [...new Set(colores)];
+
+    }
+
+    //==========================================
+    // OBTENER DETALLES
+    //==========================================
+
+    function obtenerDetalles() {
+
+        let detalles = [];
+
+        document
+            .querySelectorAll(".detalle-input")
+            .forEach(x => {
+
+                const valor = x.value.trim();
+
+                if (valor != "")
+                    detalles.push(valor);
+
+            });
+
+        if (detalles.length == 0)
+            detalles.push("");
+
+        return [...new Set(detalles)];
+
+    }
+
+                //==========================================
+            // GENERAR VARIANTES
+            //==========================================
+
+            function generarVariantes() {
+
+                const tabla = document.querySelector("#tablaTallas tbody");
+
+                    if (tabla.children.length > 0) {
+
+                        if (!confirm("Ya existen variantes.\n\nSe perderán las variantes agregadas manualmente.\n\n¿Desea continuar?"))
+                            return;
+
         }
 
-        // =========================
-        // 🔥 AUTOCOMPLETE PROVEEDOR NUEVO
-        // =========================
+                tabla.innerHTML = "";
+
+                idx = 0;
+
+                const precio = document.getElementById("PrecioVenta").value;
+
+                if (precio == "") {
+
+                    alert("Debe indicar el Precio de Venta.");
+
+                    return;
+
+                }
+
+                const tipo =
+                    document.getElementById("tipoZapato").value;
+
+                if (tipo == "") {
+
+                    alert("Seleccione el tipo de zapato.");
+
+                    return;
+
+                }
+
+                const colores = obtenerColores();
+
+                if (colores.length == 0) {
+
+                    alert("Debe agregar al menos un color.");
+
+                    return;
+
+                }
+
+                const detalles = obtenerDetalles();
+
+                const tallas = obtenerTallas();
+
+                colores.forEach(color => {
+
+                    detalles.forEach(detalle => {
+
+                        tallas.forEach(talla => {
+
+                            crearFila(
+                                color,
+                                detalle,
+                                talla,
+                                precio
+                            );
+
+                        });
+
+                    });
+
+                });
+
+            }
+
+            //==========================================
+            // CREAR FILA
+            //==========================================
+
+            function crearFila(
+                color,
+                detalle,
+                talla,
+                precio) {
+
+                const tabla =
+                    document.querySelector("#tablaTallas tbody");
+
+                tabla.insertAdjacentHTML("beforeend", `
+
+        <tr>
+
+        <td>
+
+        <input type="text"
+               class="form-control"
+               name="Tallas[${idx}].Color"
+               value="${color}"
+               readonly />
+
+        </td>
+
+        <td>
+
+            <input type="text"
+           class="form-control"
+           name="Tallas[${idx}].Detalle"
+           value="${detalle}" />
+
+        </td>
+
+        <td>
+
+        <input type="text"
+               class="form-control"
+               name="Tallas[${idx}].Numero"
+               value="${talla}"
+               readonly />
+
+        </td>
+
+        <td>
+
+        <input type="number"
+               class="form-control"
+               name="Tallas[${idx}].Cantidad"
+               value="0" />
+
+        </td>
+
+        <td>
+
+        <input type="number"
+               class="form-control precio-variante"
+               step="0.01"
+               name="Tallas[${idx}].Precio"
+               value="${precio}" />
+
+        </td>
+
+        <td>
+
+        <button type="button"
+                class="btn-remove"
+                onclick="eliminarFila(this)">
+
+        ✕
+
+        </button>
+
+        </td>
+
+        </tr>
+
+                `);
+
+                idx++;
+
+            }
+
+            //==========================================
+            // ELIMINAR FILA
+            //==========================================
+
+            function eliminarFila(btn) {
+
+                btn.closest("tr").remove();
+
+                reindexar();
+
+            }
+
+            //==========================================
+            // REINDEXAR MVC
+            //==========================================
+
+            function reindexar() {
+
+                const filas =
+                    document.querySelectorAll("#tablaTallas tbody tr");
+
+                idx = 0;
+
+                filas.forEach(fila => {
+
+                    fila.querySelector('[name$=".Color"]')
+                        .name = `Tallas[${idx}].Color`;
+
+                    fila.querySelector('[name$=".Detalle"]')
+                        .name = `Tallas[${idx}].Detalle`;
+
+                    fila.querySelector('[name$=".Numero"]')
+                        .name = `Tallas[${idx}].Numero`;
+
+                    fila.querySelector('[name$=".Cantidad"]')
+                        .name = `Tallas[${idx}].Cantidad`;
+
+                    fila.querySelector('[name$=".Precio"]')
+                        .name = `Tallas[${idx}].Precio`;
+
+                    idx++;
+
+                });
+
+            }
+
+            //==========================================
+            // ACTUALIZAR PRECIOS
+            //==========================================
+
+            document.getElementById("PrecioVenta")
+                .addEventListener("change", function () {
+
+                    const cajas =
+                        document.querySelectorAll(".precio-variante");
+
+                    if (cajas.length == 0)
+                        return;
+
+                    if (!confirm("¿Actualizar el precio de todas las variantes?"))
+                        return;
+
+                    cajas.forEach(x => {
+
+                        x.value = document.getElementById("PrecioVenta").value;
+
+                    });
+
+                });
+
+                    //==========================================
+        // BUSCAR PROVEEDOR
+        //==========================================
 
         let timeoutProveedor = null;
 
-        const inputProveedor = document.getElementById("proveedorBuscar");
-        const listaProveedores = document.getElementById("listaProveedores");
-        const proveedorId = document.getElementById("proveedorId");
+        const inputProveedor =
+            document.getElementById("proveedorBuscar");
+
+        const listaProveedores =
+            document.getElementById("listaProveedores");
+
+        const proveedorId =
+            document.getElementById("proveedorId");
 
         if (inputProveedor) {
 
@@ -336,14 +793,17 @@
                     }
 
                     fetch(`/Inventarios/BuscarProveedores?term=${term}`)
+
                         .then(r => r.json())
+
                         .then(data => {
 
                             listaProveedores.innerHTML = "";
 
                             data.forEach(p => {
 
-                                let item = document.createElement("a");
+                                let item =
+                                    document.createElement("a");
 
                                 item.className =
                                     "list-group-item list-group-item-action";
@@ -355,12 +815,14 @@
 
                                 item.onclick = () => {
 
-                                    inputProveedor.value = p.nombre;
+                                    inputProveedor.value =
+                                        p.nombre;
 
-                                    // 🔥 NUEVO ID
-                                    proveedorId.value = p.id;
+                                    proveedorId.value =
+                                        p.id;
 
                                     listaProveedores.innerHTML = "";
+
                                 };
 
                                 listaProveedores.appendChild(item);
@@ -373,15 +835,82 @@
 
             });
 
-            // cerrar lista
             document.addEventListener("click", function (e) {
 
                 if (!inputProveedor.contains(e.target)) {
 
                     listaProveedores.innerHTML = "";
+
                 }
+
             });
+
+        }
+
+                //==========================================
+        // AGREGAR VARIANTE MANUAL
+        //==========================================
+
+        function agregarTalla() {
+
+            const precio =
+                document.getElementById("PrecioVenta").value || 0;
+
+            const tabla =
+                document.querySelector("#tablaTallas tbody");
+
+            tabla.insertAdjacentHTML("beforeend", `
+
+        <tr>
+
+            <td>
+                <input type="text"
+                       class="form-control"
+                       name="Tallas[${idx}].Color" />
+            </td>
+
+            <td>
+                <input type="text"
+                       class="form-control"
+                       name="Tallas[${idx}].Detalle" />
+            </td>
+
+            <td>
+                <input type="text"
+                       class="form-control"
+                       name="Tallas[${idx}].Numero" />
+            </td>
+
+            <td>
+                <input type="number"
+                       class="form-control"
+                       name="Tallas[${idx}].Cantidad"
+                       value="0" />
+            </td>
+
+            <td>
+                <input type="number"
+                       step="0.01"
+                       class="form-control precio-variante"
+                       name="Tallas[${idx}].Precio"
+                       value="${precio}" />
+            </td>
+
+            <td>
+                <button type="button"
+                        class="btn-remove"
+                        onclick="eliminarFila(this)">
+                    ✕
+                </button>
+            </td>
+
+        </tr>
+
+            `);
+
+            idx++;
         }
 
     </script>
+
 }
