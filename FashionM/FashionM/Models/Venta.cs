@@ -30,6 +30,7 @@ namespace FashionM.Models
         public decimal Total { get; set; }
 
         public int NumeroCajas { get; set; }
+        public int CantidadZapatos { get; set; }
 
         public string FacturadoPor { get; set; } = string.Empty;
 

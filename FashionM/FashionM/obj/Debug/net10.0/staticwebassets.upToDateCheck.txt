@@ -46,6 +46,7 @@ wwwroot\css\Ventas\VentasDetails.css
 wwwroot\css\Ventas\VentasGraficos.css
 wwwroot\css\Ventas\VentasIndex.css
 wwwroot\favicon.ico
+wwwroot\imagenes\ZapatosProveedor\09326a2a-8d0b-4f21-b7ea-74ff20ae7168.png
 wwwroot\imagenes\ZapatosProveedor\22a7b974-5970-4456-9805-2d527ea46f29.png
 wwwroot\imagenes\ZapatosProveedor\3b7439f4-fa87-4774-982c-ca3948bba896.png
 wwwroot\imagenes\ZapatosProveedor\712b157a-4019-40fc-adc7-8771b89b276f.png

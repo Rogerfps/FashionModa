@@ -357,6 +357,8 @@ namespace FashionM.Controllers
             // ========================================
             // CREAR
             // ========================================
+            int cantidadZapatos = proforma.Detalles.Sum(x => x.Cantidad);
+
 
             if (venta == null)
             {
@@ -375,6 +377,8 @@ namespace FashionM.Controllers
                     Total = proforma.Total,
 
                     NumeroCajas = proforma.NumeroCajas,
+
+                    CantidadZapatos = cantidadZapatos,
 
                     FacturadoPor = proforma.FacturadoPor,
 
@@ -413,6 +417,8 @@ namespace FashionM.Controllers
 
                 venta.NumeroCajas =
                     proforma.NumeroCajas;
+
+                venta.CantidadZapatos = proforma.Detalles.Sum(x => x.Cantidad);
 
                 venta.AgenteVenta =
                     proforma.AgenteVenta;
@@ -898,6 +904,8 @@ namespace FashionM.Controllers
                         new { id });
                 }
 
+                int cantidadZapatos = proforma.Detalles.Sum(x => x.Cantidad);
+
                 // ========================================
                 // FECHA UTC
                 // ========================================
@@ -929,6 +937,8 @@ namespace FashionM.Controllers
                     Total = proforma.Total,
 
                     NumeroCajas = proforma.NumeroCajas,
+
+                    CantidadZapatos = cantidadZapatos,
 
                     FacturadoPor = proforma.FacturadoPor,
 
