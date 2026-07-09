@@ -192,6 +192,7 @@
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Subtotal</th>
+                            <th>Stock</th>
                             <th>Entregado</th>
                         </tr>
                     </thead>
@@ -208,6 +209,12 @@
                                 <td>₡ @d.PrecioUnitario.ToString("N2")</td>
                                 <td class="fw-bold" style="color: var(--deep-blue);">
                                     ₡ @((d.Cantidad * d.PrecioUnitario).ToString("N2"))
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox"
+                                           class="checkbox-stock"
+                                    @(d.EsStock ? "checked" : "")
+                                           onchange="toggleStockDetalle(@d.Id, this.checked)" />
                                 </td>
                                 <td class="text-center">
                                     <input type="checkbox"
@@ -251,6 +258,21 @@
                 })
             })
             .then(() => location.reload()) // opcional
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleStockDetalle(detalleId, estado) {
+            fetch('/PedidoCliente/ToggleStockDetalle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: detalleId,
+                    stock: estado
+                })
+            })
+            .then(() => location.reload())
             .catch(error => console.error('Error:', error));
         }
 

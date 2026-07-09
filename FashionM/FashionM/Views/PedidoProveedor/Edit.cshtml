@@ -1,0 +1,275 @@
+﻿@model PedidoProveedor
+
+@{
+    ViewData["Title"] = "Editar Pedido";
+
+    var detalles = Model.Detalles.ToList();
+}
+
+<link rel="stylesheet" href="~/css/PedidoProveedor/Edit.css" />
+
+<div class="container mt-4">
+
+    <div class="page-header">
+        <h2>✏️ Editar Pedido Proveedor</h2>
+
+        <a asp-action="Details"
+           asp-route-id="@Model.Id"
+           class="btn btn-secondary">
+            ← Volver
+        </a>
+    </div>
+
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <form asp-action="Edit" method="post">
+
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="PedidoMainId" type="hidden" />
+        <input asp-for="ProveedorCatalogoId" type="hidden" />
+        <input asp-for="Empresa" type="hidden" />
+        <input asp-for="Semana" type="hidden" />
+        <input asp-for="FechaPedido" type="hidden" />
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <label class="fw-bold">Proveedor</label>
+                        <input class="form-control"
+                               value="@Model.Proveedor.Nombre"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="fw-bold">Empresa</label>
+                        <input class="form-control"
+                               value="@Model.Empresa"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="fw-bold">Semana</label>
+                        <input class="form-control"
+                               value="@Model.Semana"
+                               readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="fw-bold">Fecha</label>
+                        <input class="form-control"
+                               value="@Model.FechaPedido.ToString("dd/MM/yyyy")"
+                               readonly />
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">
+                    Productos
+                </h5>
+
+                <button type="button"
+                        class="btn btn-success"
+                        onclick="agregarFila()">
+                    + Agregar Producto
+                </button>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle mb-0" id="tablaProductos">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Código</th>
+                            <th>Color</th>
+                            <th>Detalle</th>
+                            <th>Talla</th>
+                            <th width="120">Cantidad</th>
+                            <th width="80"></th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @for (int i = 0; i < detalles.Count; i++)
+                        {
+                            <tr>
+
+                                <td>
+                                    <input type="hidden"
+                                           name="Detalles[@i].Id"
+                                           value="@detalles[i].Id" />
+
+                                    <input class="form-control"
+                                           name="Detalles[@i].CodigoProducto"
+                                           value="@detalles[i].CodigoProducto" />
+                                </td>
+
+                                <td>
+                                    <input class="form-control"
+                                           name="Detalles[@i].Color"
+                                           value="@detalles[i].Color" />
+                                </td>
+
+                                <td>
+                                    <input class="form-control"
+                                           name="Detalles[@i].Detalle"
+                                           value="@detalles[i].Detalle" />
+                                </td>
+
+                                <td>
+                                    <input class="form-control"
+                                           name="Detalles[@i].Talla"
+                                           value="@detalles[i].Talla" />
+                                </td>
+
+                                <td>
+                                    <input class="form-control"
+                                           type="number"
+                                           min="1"
+                                           name="Detalles[@i].Cantidad"
+                                           value="@detalles[i].Cantidad" />
+                                </td>
+
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-danger"
+                                            onclick="eliminarFila(this)">
+                                        🗑
+                                    </button>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <div class="mt-4 text-end">
+
+            <button class="btn btn-primary btn-lg">
+                💾 Guardar Cambios
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        function eliminarFila(btn){
+
+            btn.closest("tr").remove();
+
+            actualizarIndices();
+
+        }
+
+        function agregarFila(){
+
+            let tbody=document.querySelector("#tablaProductos tbody");
+
+            let index=tbody.rows.length;
+
+            tbody.insertAdjacentHTML("beforeend",`
+
+        <tr>
+
+        <td>
+
+        <input type="hidden" name="Detalles[${index}].Id" value="0"/>
+
+        <input class="form-control"
+        name="Detalles[${index}].CodigoProducto"/>
+
+        </td>
+
+        <td>
+
+        <input class="form-control"
+        name="Detalles[${index}].Color"/>
+
+        </td>
+
+        <td>
+
+        <input class="form-control"
+        name="Detalles[${index}].Detalle"/>
+
+        </td>
+
+        <td>
+
+        <input class="form-control"
+        name="Detalles[${index}].Talla"/>
+
+        </td>
+
+        <td>
+
+        <input class="form-control"
+        type="number"
+        min="1"
+        value="1"
+        name="Detalles[${index}].Cantidad"/>
+
+        </td>
+
+        <td class="text-center">
+
+        <button
+        type="button"
+        class="btn btn-danger"
+        onclick="eliminarFila(this)">
+        🗑
+        </button>
+
+        </td>
+
+        </tr>
+
+        `);
+
+        }
+
+        function actualizarIndices(){
+
+            let filas=document.querySelectorAll("#tablaProductos tbody tr");
+
+            filas.forEach((fila,index)=>{
+
+                fila.querySelectorAll("input").forEach(input=>{
+
+                    input.name=input.name.replace(/Detalles\[\d+\]/,`Detalles[${index}]`);
+
+                });
+
+            });
+
+        }
+
+    </script>
+
+}

@@ -141,6 +141,7 @@ namespace FashionM.Controllers
             // =========================
             if (pedidosClientes
                 .SelectMany(p => p.Detalles)
+                .Where(d => !d.EsStock)
                 .Any(d => d.ProveedorCatalogoId == null))
             {
                 TempData["Error"] = "Hay productos sin proveedor asignado";
@@ -169,7 +170,7 @@ namespace FashionM.Controllers
             // 🔥 AGRUPAR DETALLES
             // =========================
             var detallesAgrupados = pedidosClientes
-                .SelectMany(p => p.Detalles, (pedido, detalle) => new
+                .SelectMany(p => p.Detalles.Where(d => !d.EsStock),(pedido, detalle) => new
                 {
                     pedido.Empresa,
                     ProveedorCatalogoId = detalle.ProveedorCatalogoId.Value,
@@ -199,6 +200,16 @@ namespace FashionM.Controllers
                     Cantidad = g.Sum(x => x.Cantidad)
                 })
                 .ToList();
+
+            var cantidadProduccion = pedidosClientes
+                .SelectMany(p => p.Detalles)
+                .Count(d => !d.EsStock);
+
+            if (cantidadProduccion == 0)
+            {
+                TempData["Error"] = "Todos los productos del pedido están marcados como stock. No hay productos para enviar a producción.";
+                return RedirectToAction("Index");
+            }
 
             // =========================
             // 🔥 AGRUPAR POR PROVEEDOR
@@ -374,6 +385,93 @@ namespace FashionM.Controllers
                 .ToList();
 
             return View(resultado);
+        }
+
+        // =====================================================
+        // EDIT GET
+        // =====================================================
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var pedido = await _context.PedidosProveedor
+                .Include(p => p.Proveedor)
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            return View(pedido);
+        }
+
+        // =====================================================
+        // EDIT POST
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(PedidoProveedor model)
+        {
+            // Estas propiedades no vienen del formulario
+            ModelState.Remove(nameof(PedidoProveedor.Proveedor));
+
+            if (!ModelState.IsValid)
+            {
+                // Recargar proveedor para volver a mostrar la vista
+                model.Proveedor = await _context.ProveedoresCatalogo
+                    .FirstOrDefaultAsync(p => p.Id == model.ProveedorCatalogoId);
+
+                if (model.Detalles == null)
+                    model.Detalles = new List<PedidoProveedorDetalle>();
+
+                // Mostrar los errores en la vista
+                foreach (var estado in ModelState)
+                {
+                    foreach (var error in estado.Value.Errors)
+                    {
+                        ModelState.AddModelError("", $"{estado.Key}: {error.ErrorMessage}");
+                    }
+                }
+
+                return View(model);
+            }
+
+            var pedidoDb = await _context.PedidosProveedor
+                .Include(p => p.Proveedor)
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == model.Id);
+
+            if (pedidoDb == null)
+                return NotFound();
+
+            // ===========================
+            // ELIMINAR DETALLES
+            // ===========================
+            _context.PedidosProveedorDetalle.RemoveRange(pedidoDb.Detalles);
+            pedidoDb.Detalles.Clear();
+
+            // ===========================
+            // AGREGAR DETALLES NUEVOS
+            // ===========================
+            if (model.Detalles != null)
+            {
+                foreach (var d in model.Detalles)
+                {
+                    pedidoDb.Detalles.Add(new PedidoProveedorDetalle
+                    {
+                        CodigoProducto = d.CodigoProducto,
+                        Color = d.Color,
+                        Detalle = d.Detalle,
+                        Talla = d.Talla,
+                        Cantidad = d.Cantidad
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Pedido actualizado correctamente.";
+
+            return RedirectToAction(nameof(Details), new { id = pedidoDb.Id });
         }
 
         // =====================================================

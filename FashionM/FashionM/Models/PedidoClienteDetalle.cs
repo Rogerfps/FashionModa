@@ -33,6 +33,7 @@ namespace FashionM.Models
         [NotMapped]
         public decimal SubTotal => Cantidad * PrecioUnitario;
         public bool Entregado { get; set; } = false;
+        public bool EsStock { get; set; } = false;
 
         // 🔥 NUEVO PROVEEDOR
         public int? ProveedorCatalogoId { get; set; }

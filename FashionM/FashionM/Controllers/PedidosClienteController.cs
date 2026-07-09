@@ -329,7 +329,8 @@ namespace FashionM.Controllers
                         Talla = d.Talla,
                         Detalle = d.Detalle,
                         Cantidad = d.Cantidad,
-                        PrecioUnitario = d.PrecioUnitario
+                        PrecioUnitario = d.PrecioUnitario,
+                        EsStock = d.EsStock,
                     };
 
                     total += d.Cantidad * d.PrecioUnitario;
@@ -421,6 +422,24 @@ namespace FashionM.Controllers
                 return NotFound();
 
             detalle.Entregado = entregado;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult ToggleStockDetalle([FromBody] JsonElement data)
+        {
+            int id = data.GetProperty("id").GetInt32();
+            bool stock = data.GetProperty("stock").GetBoolean();
+
+            var detalle = _context.PedidoClienteDetalles.Find(id);
+
+            if (detalle == null)
+                return NotFound();
+
+            detalle.EsStock = stock;
 
             _context.SaveChanges();
 

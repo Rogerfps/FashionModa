@@ -186,10 +186,23 @@
                                                 <a asp-action="Details" asp-route-id="@p.Id" class="btn-view" title="Ver detalles">
                                                     👁
                                                 </a>
-                                                <form asp-action="Delete" asp-route-id="@p.Id" method="post"
+
+                                                <a asp-action="Edit"
+                                                   asp-route-id="@p.Id"
+                                                   class="btn-edit"
+                                                   title="Editar">
+                                                    ✏️
+                                                </a>
+
+                                                <form asp-action="Delete"
+                                                      asp-route-id="@p.Id"
+                                                      method="post"
                                                       onsubmit="return confirm('¿Eliminar este pedido?')">
                                                     @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn-delete" title="Eliminar">
+
+                                                    <button type="submit"
+                                                            class="btn-delete"
+                                                            title="Eliminar">
                                                         🗑
                                                     </button>
                                                 </form>
