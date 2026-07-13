@@ -25,15 +25,58 @@
         </a>
     </div>
 
-    <!-- FILTRO MES -->
-    <div class="dashboard-filters">
-        <form method="get">
-            <div class="filter-group">
-                <label>📅 Filtrar por Mes</label>
+    <!-- FILTROS -->
+<div class="dashboard-filters">
+    <form method="get" class="d-flex gap-3 align-items-end">
+
+        <div class="filter-group">
+            <label>📅 Año</label>
+            <select name="anio" class="form-select" onchange="this.form.submit()">
+                @foreach (int anio in ViewBag.Anios)
+                {
+                    if (ViewBag.AnioSeleccionado == anio)
+                    {
+                        <option value="@anio" selected="selected">@anio</option>
+                    }
+                    else
+                    {
+                        <option value="@anio">@anio</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>📅 Mes</label>
                 <select name="mes" class="form-select" onchange="this.form.submit()">
-                    <option value="0">--- Todos ---</option>
+
+                    @if (ViewBag.MesSeleccionado == 0)
+                    {
+                        <option value="0" selected="selected">Todos</option>
+                    }
+                    else
+                    {
+                        <option value="0">Todos</option>
+                    }
+
                     @{
-                        string[] mesesFiltro = { "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+                        string[] mesesFiltro =
+                        {
+            "",
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre"
+        };
+
                         for (int i = 1; i <= 12; i++)
                         {
                             if (ViewBag.MesSeleccionado == i)
@@ -46,17 +89,19 @@
                             }
                         }
                     }
+
                 </select>
-            </div>
-        </form>
-    </div>
+        </div>
+
+    </form>
+</div>
 
     <!-- GRID DE GRÁFICOS -->
     <div class="charts-grid">
 
         <!-- VENTAS POR SEMANA -->
         <div class="chart-card large">
-            <div class="chart-header">📅 Ventas por Semana</div>
+            <div class="chart-header">📅 Pares por Semana</div>
             <div class="chart-body">
                 <canvas id="ventasSemanaChart"></canvas>
             </div>
@@ -64,7 +109,7 @@
 
         <!-- VENTAS POR MES Y EMPRESA -->
         <div class="chart-card large">
-            <div class="chart-header">📆 Ventas por Mes y Empresa</div>
+            <div class="chart-header">📆 Pares por Mes y Empresa</div>
             <div class="chart-body">
                 <canvas id="ventasMesChart"></canvas>
             </div>
@@ -73,7 +118,7 @@
         <!-- VENTAS POR AGENTE -->
         <div class="chart-card">
             <div class="chart-header">
-                👤 Ventas por Agente
+                👤 Pares por Agente
                 <small>(@ViewBag.MesActual)</small>
             </div>
             <div class="chart-body">
@@ -84,7 +129,7 @@
         <!-- VENTAS POR EMPRESA -->
         <div class="chart-card">
             <div class="chart-header">
-                🏢 Ventas por Empresa
+                🏢 Pares por Empresa
                 <small>(@ViewBag.MesActual)</small>
             </div>
             <div class="chart-body">
@@ -133,112 +178,271 @@
     // ========================================
     const coloresEmpresas = {
     "Cocalza Plus S.A": "#DC2626",
-    "LSG MODA S.A": "#16A34A",
+    "KYROZ": "#7F1D1D",
+    "LSG Moda S.A": "#16A34A",
     "Fashion Shoes S.A": "#EC4899",
-    "Maxi Plus 23 S.A": "#EAB308",
-    "KAYROS": "#111827"
+    "Maxi Plus 23 S.A": "#EAB308"
     };
 
     // ========================================
-    // 📅 VENTAS POR SEMANA
+    // 📅 PARES POR SEMANA
     // ========================================
     const semanas = @Html.Raw(Json.Serialize(ViewBag.Semanas));
+    const semanaPares = @Html.Raw(Json.Serialize(ViewBag.SemanaPares));
     const semanaTotales = @Html.Raw(Json.Serialize(ViewBag.SemanaTotales));
 
     if (semanas && semanas.length > 0) {
+
     new Chart(document.getElementById('ventasSemanaChart'), {
+
     type: 'line',
+
     data: {
+
     labels: semanas,
+
     datasets: [{
-    label: 'Ventas',
-    data: semanaTotales,
+
+    label: 'Pares',
+
+    data: semanaPares,
+
     borderWidth: 3,
+
     tension: 0.4,
+
     fill: true,
+
     borderColor: "#2563EB",
+
     backgroundColor: "rgba(37,99,235,0.15)"
+
     }]
     },
+
     options: {
+
     responsive: true,
+
     maintainAspectRatio: true,
-    plugins: { legend: { display: false } }
+
+    plugins: {
+
+    legend: {
+    display: false
+    },
+
+    tooltip: {
+
+    callbacks: {
+
+    label: function (context) {
+
+    const indice = context.dataIndex;
+
+    const pares = semanaPares[indice] ?? 0;
+
+    const monto = semanaTotales[indice] ?? 0;
+
+    return [
+    `Pares: ${pares}`,
+    `Monto: ₡ ${monto.toLocaleString()}`
+    ];
+
     }
+
+    }
+
+    }
+
+    }
+
+    }
+
     });
+
     }
 
     // ========================================
-    // 📆 VENTAS POR MES Y EMPRESA
+    // 📆 PARES POR MES Y EMPRESA
     // ========================================
     const empresasVentasMes = @Html.Raw(Json.Serialize(ViewBag.EmpresasVentasMes));
-    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    console.log("EmpresasVentasMes:", empresasVentasMes);
+    console.log(empresasVentasMes);
+
+    const meses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+    ];
+
     const empresas = [...new Set(empresasVentasMes.map(x => x.empresa))];
 
     const datasets = empresas.map(empresa => ({
+
     label: empresa,
-    backgroundColor: coloresEmpresas[empresa] || "#3B82F6",
-    borderColor: coloresEmpresas[empresa] || "#3B82F6",
+
+    backgroundColor: coloresEmpresas[empresa] ?? "#3B82F6",
+
+    borderColor: coloresEmpresas[empresa] ?? "#3B82F6",
+
     data: meses.map(mes => {
-    const venta = empresasVentasMes.find(x => x.empresa === empresa && x.mes === mes);
-    return venta ? venta.total : 0;
+
+    const venta = empresasVentasMes.find(x =>
+    x.empresa === empresa &&
+    x.mes === mes);
+
+    return venta ? venta.pares : 0;
+
     }),
+
     borderWidth: 1,
+
     borderRadius: 8
+
     }));
 
     new Chart(document.getElementById('ventasMesChart'), {
+
     type: 'bar',
+
     plugins: [ChartDataLabels],
-    data: { labels: meses, datasets: datasets },
+
+    data: {
+    labels: meses,
+    datasets: datasets
+    },
+
     options: {
+
     responsive: true,
+
     maintainAspectRatio: true,
+
     plugins: {
+
+    legend: {
+    position: 'bottom'
+    },
+
     datalabels: {
+
     color: '#111827',
+
     anchor: 'end',
+
     align: 'top',
-    font: { weight: 'bold', size: 10 },
-    formatter: value => value > 0 ? `₡ ${value.toLocaleString()}` : ''
+
+    font: {
+    weight: 'bold',
+    size: 10
+    },
+
+    formatter: value => value > 0 ? value + " pares" : ""
+
+    },
+
+    tooltip: {
+
+    callbacks: {
+
+    label: function (context) {
+
+    const empresa = context.dataset.label;
+
+    const mes = context.label;
+
+    const venta = empresasVentasMes.find(x =>
+    x.empresa === empresa &&
+    x.mes === mes);
+
+    if (!venta)
+    return "";
+
+    return [
+    `Pares: ${venta.pares}`,
+    `Monto: ₡ ${venta.total.toLocaleString()}`
+    ];
     }
     }
     }
+    }
+    }
+    
+    
+
     });
 
     // ========================================
-    // 👤 AGENTES
+    // 👤 PARES POR AGENTE
     // ========================================
     const agentes = @Html.Raw(Json.Serialize(ViewBag.Agentes));
+    const agentePares = @Html.Raw(Json.Serialize(ViewBag.AgentePares));
     const agenteTotales = @Html.Raw(Json.Serialize(ViewBag.AgenteTotales));
 
     if (agentes && agentes.length > 0) {
     new Chart(document.getElementById('agentesChart'), {
     type: 'doughnut',
     plugins: [ChartDataLabels],
-    data: { labels: agentes, datasets: [{ data: agenteTotales }] },
+    data: {
+    labels: agentes,
+    datasets: [{
+    data: agentePares
+    }]
+    },
     options: {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
+    legend: {
+    position: 'bottom'
+    },
     datalabels: {
     color: '#fff',
-    font: { weight: 'bold', size: 14 },
+    font: {
+    weight: 'bold',
+    size: 14
+    },
     formatter: (value, context) => {
     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-    return ((value / total) * 100).toFixed(1) + "%";
+    return total > 0
+    ? ((value / total) * 100).toFixed(1) + "%"
+    : "";
     }
     },
-    legend: { position: 'bottom' }
+    tooltip: {
+    callbacks: {
+    title: function (context) {
+    return context[0].label;
+    },
+    label: function (context) {
+    const indice = context.dataIndex;
+    return [
+    `Pares: ${agentePares[indice]}`,
+    `Monto: ₡ ${agenteTotales[indice].toLocaleString()}`
+    ];
+    }
+    }
+    }
     }
     }
     });
     }
 
     // ========================================
-    // 🏢 EMPRESAS
+    // 🏢 PARES POR EMPRESA
     // ========================================
     const empresasLabels = @Html.Raw(Json.Serialize(ViewBag.Empresas));
+    const empresaPares = @Html.Raw(Json.Serialize(ViewBag.EmpresaPares));
     const empresaTotales = @Html.Raw(Json.Serialize(ViewBag.EmpresaTotales));
 
     if (empresasLabels && empresasLabels.length > 0) {
@@ -248,23 +452,46 @@
     data: {
     labels: empresasLabels,
     datasets: [{
-    backgroundColor: ["#DC2626", "#16A34A", "#EC4899", "#EAB308", "#111827"],
-    data: empresaTotales
+    data: empresaPares,
+    backgroundColor: empresasLabels.map(e =>
+    coloresEmpresas[e] || "#3B82F6"
+    )
     }]
     },
     options: {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
+    legend: {
+    position: 'bottom'
+    },
     datalabels: {
     color: '#fff',
-    font: { weight: 'bold', size: 14 },
+    font: {
+    weight: 'bold',
+    size: 14
+    },
     formatter: (value, context) => {
     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-    return ((value / total) * 100).toFixed(1) + "%";
+    return total > 0
+    ? ((value / total) * 100).toFixed(1) + "%"
+    : "";
     }
     },
-    legend: { position: 'bottom' }
+    tooltip: {
+    callbacks: {
+    title: function (context) {
+    return context[0].label;
+    },
+    label: function (context) {
+    const indice = context.dataIndex;
+    return [
+    `Pares: ${empresaPares[indice]}`,
+    `Monto: ₡ ${empresaTotales[indice].toLocaleString()}`
+    ];
+    }
+    }
+    }
     }
     }
     });
@@ -344,20 +571,23 @@
     }
 
     // ========================================
-    // 🛍 CLIENTES TOP
+    // 🛍 TOP CLIENTES
     // ========================================
     const clientes = @Html.Raw(Json.Serialize(ViewBag.Clientes));
+    const clientesPares = @Html.Raw(Json.Serialize(ViewBag.ClientesPares));
     const clientesTotales = @Html.Raw(Json.Serialize(ViewBag.ClientesTotales));
 
     if (clientes && clientes.length > 0) {
+
     new Chart(document.getElementById('clientesChart'), {
+
     type: 'bar',
     plugins: [ChartDataLabels],
     data: {
     labels: clientes,
     datasets: [{
-    label: 'Monto Comprado',
-    data: clientesTotales,
+    label: 'Pares Comprados',
+    data: clientesPares,
     borderWidth: 1,
     backgroundColor: "#7C3AED",
     borderRadius: 8
@@ -372,10 +602,28 @@
     anchor: 'end',
     align: 'end',
     color: '#111827',
-    font: { weight: 'bold' },
-    formatter: value => `₡ ${value.toLocaleString()}`
+    font: {
+    weight: 'bold'
     },
-    legend: { display: false }
+    formatter: value => value + " pares"
+    },
+    tooltip: {
+    callbacks: {
+    title: function (context) {
+    return context[0].label;
+    },
+    label: function (context) {
+    const indice = context.dataIndex;
+    return [
+    `Pares: ${clientesPares[indice]}`,
+    `Monto: ₡ ${clientesTotales[indice].toLocaleString()}`
+    ];
+    }
+    }
+    },
+    legend: {
+    display: false
+    }
     }
     }
     });

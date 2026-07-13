@@ -84,6 +84,7 @@ wwwroot\images\inventarios\0bcf5543-9bac-4204-8996-cf113ccc69fd.jpg
 wwwroot\images\inventarios\0e2aec2b-b614-495a-a87d-b836c81372bf.jpg
 wwwroot\images\inventarios\14f0f146-956d-4173-b73f-f9746437687e.png
 wwwroot\images\inventarios\289cd45b-b968-4b7f-afaf-ad9a48a06bfa.jpg
+wwwroot\images\inventarios\29092b18-84b5-425f-a439-34e6e3dbcabd.png
 wwwroot\images\inventarios\2b46e2a3-7bd1-4201-8038-a220ee0928e3.jpg
 wwwroot\images\inventarios\2c49f025-f8da-475a-80fe-91773ef678a8.png
 wwwroot\images\inventarios\2d2e1fe8-78fa-488a-b35e-0f88fc84ce9a.png
