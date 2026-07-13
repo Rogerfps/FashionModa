@@ -1,0 +1,145 @@
+﻿@model FashionM.Models.ClienteSemana
+
+@{
+    ViewData["Title"] = "Editar Visita";
+}
+
+<div class="container mt-4" style="max-width:900px;">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-warning">
+            <h3 class="mb-0">
+                ✏️ Editar Visita
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="ClienteCedula" type="hidden" />
+                <input asp-for="Semana" type="hidden" />
+                <input asp-for="Año" type="hidden" />
+                <input asp-for="FechaRegistro" type="hidden" />
+
+                <div class="row mb-4">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Semana
+                        </label>
+
+                        <input class="form-control"
+                               value="@Model.Semana"
+                               readonly />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Año
+                        </label>
+
+                        <input class="form-control"
+                               value="@Model.Año"
+                               readonly />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Fecha Registro
+                        </label>
+
+                        <input class="form-control"
+                               value="@Model.FechaRegistro.ToString("dd/MM/yyyy")"
+                               readonly />
+
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="FechaVisita" class="form-label">
+                        Fecha de la Visita
+                    </label>
+
+                    <input asp-for="FechaVisita"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="FechaVisita"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Usuario" class="form-label">
+                        Usuario
+                    </label>
+
+                    <input asp-for="Usuario"
+                           class="form-control" />
+
+                    <span asp-validation-for="Usuario"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label asp-for="Observaciones" class="form-label">
+                        Resumen de la visita
+                    </label>
+
+                    <textarea asp-for="Observaciones"
+                              rows="10"
+                              class="form-control"></textarea>
+
+                    <span asp-validation-for="Observaciones"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="d-flex justify-content-between">
+
+                    <a asp-action="Index"
+                       asp-route-clienteCedula="@Model.ClienteCedula"
+                       class="btn btn-secondary">
+
+                        ← Volver
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-warning">
+
+                        💾 Guardar Cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

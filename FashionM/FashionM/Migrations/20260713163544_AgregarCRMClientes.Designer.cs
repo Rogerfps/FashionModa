@@ -3,6 +3,7 @@ using System;
 using FashionM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FashionM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260713163544_AgregarCRMClientes")]
+    partial class AgregarCRMClientes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,44 +91,6 @@ namespace FashionM.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("FashionM.Models.ClienteSemana", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Año")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ClienteCedula")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("FechaRegistro")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("FechaVisita")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Observaciones")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Semana")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Usuario")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteCedula");
-
-                    b.ToTable("ClienteSemana");
                 });
 
             modelBuilder.Entity("FashionM.Models.Clientes", b =>
@@ -1505,17 +1470,6 @@ namespace FashionM.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("FashionM.Models.ClienteSemana", b =>
-                {
-                    b.HasOne("FashionM.Models.Clientes", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteCedula")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("FashionM.Models.CuentaPorCobrar", b =>

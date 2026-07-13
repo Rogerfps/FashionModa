@@ -59,6 +59,7 @@ namespace FashionM.Data
         public DbSet<CuentaPorCobrar> CuentasPorCobrar { get; set; }
 
         public DbSet<CuentaPorCobrarPago> CuentasPorCobrarPagos { get; set; }
+        public DbSet<ClienteSemana> ClienteSemana { get; set; }
 
 
 

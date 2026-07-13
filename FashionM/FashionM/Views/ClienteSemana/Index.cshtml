@@ -1,0 +1,152 @@
+﻿@model IEnumerable<FashionM.Models.ClienteSemana>
+
+@{
+    ViewData["Title"] = "Historial de Visitas";
+    var cliente = ViewBag.Cliente as FashionM.Models.Clientes;
+}
+
+<link rel="stylesheet" href="~/css/Cliente/ClienteSemana.css" />
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>📝 Historial de Visitas</h2>
+
+            <h5 class="text-muted">
+                @cliente.Nombre @cliente.Apellidos
+            </h5>
+
+            <small>
+                Código: @cliente.Codigo |
+                Cédula: @cliente.Cedula
+            </small>
+
+        </div>
+
+        <div>
+
+            <a asp-action="Create"
+               asp-route-clienteCedula="@cliente.Cedula"
+               class="btn btn-success">
+
+                ➕ Nueva Visita
+
+            </a>
+
+            <a asp-controller="Clientes"
+               asp-action="Details"
+               asp-route-id="@cliente.Cedula"
+               class="btn btn-secondary">
+
+                Volver
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <table class="table table-striped table-hover">
+
+        <thead class="table-dark">
+
+            <tr>
+
+                <th>Semana</th>
+
+                <th>Año</th>
+
+                <th>Fecha Visita</th>
+
+                <th>Fecha Registro</th>
+
+                <th>Usuario</th>
+
+                <th style="width:40%">Resumen</th>
+
+                <th></th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.Semana</td>
+
+                        <td>@item.Año</td>
+
+                        <td>
+
+                            @(item.FechaVisita?.ToString("dd/MM/yyyy") ?? "-")
+
+                        </td>
+
+                        <td>
+
+                            @item.FechaRegistro.ToString("dd/MM/yyyy")
+
+                        </td>
+
+                        <td>
+
+                            @item.Usuario
+
+                        </td>
+
+                        <td>
+
+                            @item.Observaciones
+
+                        </td>
+
+                        <td class="text-end">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-warning btn-sm">
+
+                                Editar
+
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.Id"
+                               class="btn btn-danger btn-sm">
+
+                                Eliminar
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+
+                    <td colspan="7" class="text-center">
+
+                        No hay visitas registradas para este cliente.
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

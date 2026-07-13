@@ -255,6 +255,79 @@ namespace FashionM.Controllers
             new SelectListItem { Value = "Extranjero", Text = "Extranjero" }
         };
         }
+
+        // ===============================
+        // CAMBIAR CALIFICACIÓN
+        // ===============================
+        [HttpPost]
+        public async Task<IActionResult> CambiarCalificacion(int cedula, int calificacion)
+        {
+            if (calificacion < 1 || calificacion > 5)
+                return BadRequest();
+
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.Cedula == cedula);
+
+            if (cliente == null)
+                return NotFound();
+
+            cliente.Calificacion = calificacion;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                calificacion = cliente.Calificacion
+            });
+        }
+
+        // ===============================
+        // CAMBIAR ÚLTIMA VISITA
+        // ===============================
+        [HttpPost]
+        public async Task<IActionResult> CambiarUltimaVisita(int cedula, DateTime fecha)
+        {
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.Cedula == cedula);
+
+            if (cliente == null)
+                return NotFound();
+
+            // Evita el error de PostgreSQL con DateTime Local
+            cliente.UltimaVisita = DateTime.SpecifyKind(fecha, DateTimeKind.Utc);
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                fecha = cliente.UltimaVisita?.ToString("yyyy-MM-dd")
+            });
+        }
+
+        // ===============================
+        // CAMBIAR ALERTA
+        // ===============================
+        [HttpPost]
+        public async Task<IActionResult> CambiarAlerta(int cedula)
+        {
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.Cedula == cedula);
+
+            if (cliente == null)
+                return NotFound();
+
+            cliente.Alerta = !cliente.Alerta;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                alerta = cliente.Alerta
+            });
+        }
     }
 }
 

@@ -119,6 +119,77 @@
             </div>
         </div>
 
+        <!-- CRM DEL CLIENTE -->
+        <div class="info-section mt-4">
+
+            <div class="section-title">
+                <span>📈</span> CRM del Cliente
+            </div>
+
+            <!-- Calificación -->
+            <div class="info-row">
+                <div class="info-label">Calificación:</div>
+
+                <div class="info-value">
+
+                    <div id="estrellas" style="font-size:30px;">
+
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="estrella"
+                                  data-valor="@i"
+                                  style="cursor:pointer;color:@(i <= Model.Calificacion ? "#ffc107" : "#d6d6d6")">
+                                ★
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Última visita -->
+            <div class="info-row">
+                <div class="info-label">Última visita:</div>
+
+                <div class="info-value d-flex align-items-center gap-3">
+
+                    <input type="date"
+                           id="ultimaVisita"
+                           class="form-control"
+                           style="max-width:220px;"
+                           value="@(Model.UltimaVisita?.ToString("yyyy-MM-dd"))" />
+
+                    <button id="guardarFecha"
+                            class="btn btn-success btn-sm">
+                        Guardar
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Alerta -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    Alerta:
+                </div>
+
+                <div class="info-value">
+
+                    <button id="btnAlerta"
+                            class="btn @(Model.Alerta ? "btn-danger" : "btn-secondary")">
+
+                        @(Model.Alerta ? "🔔 Activada" : "🔕 Desactivada")
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
         <!-- Botones de accion -->
         <div class="action-buttons">
             <a asp-action="Index" class="btn-neo-outline">
@@ -131,5 +202,159 @@
                 <span>🗑️</span> Eliminar
             </a>
         </div>
+
+        <a asp-controller="ClienteSemana"
+           asp-action="Index"
+           asp-route-clienteCedula="@Model.Cedula"
+           class="btn btn-primary">
+            📝 Historial de Visitas
+        </a>
+
     </div>
 </div>
+
+<script>
+
+    const cedula = @Model.Cedula;
+
+    //=====================
+    // ESTRELLAS
+    //=====================
+
+    document.querySelectorAll(".estrella").forEach(e => {
+
+        e.addEventListener("click", function () {
+
+            let valor = this.dataset.valor;
+
+            const datos = new URLSearchParams();
+            datos.append("cedula", cedula);
+            datos.append("calificacion", valor);
+
+            fetch("/Clientes/CambiarCalificacion", {
+                method: "POST",
+                body: datos
+            })
+            .then(response => {
+                if (!response.ok)
+                    throw new Error("Error al guardar la calificación.");
+
+                return response.json();
+            })
+            .then(() => {
+
+                document.querySelectorAll(".estrella").forEach(s => {
+
+                    if (parseInt(s.dataset.valor) <= parseInt(valor)) {
+                        s.style.color = "#ffc107";
+                    } else {
+                        s.style.color = "#d6d6d6";
+                    }
+
+                });
+
+            })
+            .catch(error => {
+                console.error(error);
+                alert("No se pudo guardar la calificación.");
+            });
+
+        });
+
+    });
+
+    //=====================
+    // FECHA
+    //=====================
+
+    document.getElementById("guardarFecha").addEventListener("click", () => {
+
+        const fecha = document.getElementById("ultimaVisita").value;
+
+        const datos = new URLSearchParams();
+        datos.append("cedula", cedula);
+        datos.append("fecha", fecha);
+
+        fetch("/Clientes/CambiarUltimaVisita", {
+            method: "POST",
+            body: datos
+        })
+        .then(response => {
+
+            if (!response.ok)
+                throw new Error("Error al guardar la fecha.");
+
+            return response.json();
+
+        })
+        .then(() => {
+
+            alert("Última visita actualizada.");
+
+        })
+        .catch(error => {
+
+            console.error(error);
+            alert("No se pudo guardar la fecha.");
+
+        });
+
+    });
+
+    //=====================
+    // ALERTA
+    //=====================
+
+    document.getElementById("btnAlerta").addEventListener("click", () => {
+
+        const datos = new URLSearchParams();
+        datos.append("cedula", cedula);
+
+        fetch("/Clientes/CambiarAlerta", {
+            method: "POST",
+            body: datos
+        })
+        .then(response => {
+
+            if (!response.ok)
+                throw new Error("Error al cambiar la alerta.");
+
+            return response.json();
+
+        })
+        .then(r => {
+
+            let b = document.getElementById("btnAlerta");
+
+            if (r.alerta) {
+
+                b.classList.remove("btn-secondary");
+                b.classList.add("btn-danger");
+
+                b.innerHTML = "🔔 Activada";
+
+                try {
+                    new Audio("/sounds/alert.mp3").play();
+                } catch { }
+
+            }
+            else {
+
+                b.classList.remove("btn-danger");
+                b.classList.add("btn-secondary");
+
+                b.innerHTML = "🔕 Desactivada";
+
+            }
+
+        })
+        .catch(error => {
+
+            console.error(error);
+            alert("No se pudo cambiar la alerta.");
+
+        });
+
+    });
+
+</script>

@@ -1,0 +1,104 @@
+﻿@model FashionM.Models.ClienteSemana
+
+@{
+    ViewData["Title"] = "Eliminar Visita";
+}
+
+<div class="container mt-4" style="max-width:900px;">
+
+    <div class="card shadow border-danger">
+
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">🗑️ Eliminar Visita</h3>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+                <strong>¿Está seguro que desea eliminar esta visita?</strong>
+                <br />
+                Esta acción no se puede deshacer.
+            </div>
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    Cliente
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Cliente.Nombre @Model.Cliente.Apellidos
+                </dd>
+
+                <dt class="col-sm-3">
+                    Semana
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Semana
+                </dd>
+
+                <dt class="col-sm-3">
+                    Año
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Año
+                </dd>
+
+                <dt class="col-sm-3">
+                    Fecha Visita
+                </dt>
+
+                <dd class="col-sm-9">
+                    @(Model.FechaVisita?.ToString("dd/MM/yyyy") ?? "-")
+                </dd>
+
+                <dt class="col-sm-3">
+                    Usuario
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Usuario
+                </dd>
+
+                <dt class="col-sm-3">
+                    Observaciones
+                </dt>
+
+                <dd class="col-sm-9" style="white-space:pre-wrap;">
+                    @Model.Observaciones
+                </dd>
+
+            </dl>
+
+            <form asp-action="Delete">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex justify-content-between">
+
+                    <a asp-action="Index"
+                       asp-route-clienteCedula="@Model.ClienteCedula"
+                       class="btn btn-secondary">
+
+                        ← Volver
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+
+                        🗑️ Eliminar Visita
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

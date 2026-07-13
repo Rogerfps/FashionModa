@@ -58,6 +58,13 @@ namespace FashionM.Models
         [StringLength(50)]
         public string Empresa { get; set; } = string.Empty;
 
+        [Range(1, 5)]
+        public int Calificacion { get; set; } = 3;
+
+        public DateTime? UltimaVisita { get; set; }
+
+        public bool Alerta { get; set; } = false;
+
         public ICollection<PedidoCliente> Pedidos { get; set; }
         = new List<PedidoCliente>();
 
