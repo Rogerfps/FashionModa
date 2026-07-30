@@ -1,0 +1,245 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --ocean-blue: #19376D;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-gray: #64748b;
+    --border-light: #e2e8f0;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-back {
+    background: #f1f5f9;
+    color: var(--deep-blue);
+    border: none;
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+    .btn-back:hover {
+        background: var(--deep-blue);
+        color: white;
+    }
+
+/* Card de información del producto */
+.product-info-card {
+    background: var(--pure-white);
+    border-radius: 16px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.product-icon {
+    width: 48px;
+    height: 48px;
+    background: #e6f0fa;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--deep-blue);
+}
+
+.product-code {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+}
+
+.product-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+
+/* Tabla */
+.table-wrapper {
+    background: var(--pure-white);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-light);
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+    .modern-table th {
+        background: var(--deep-blue);
+        color: white;
+        font-weight: 500;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding: 0.8rem 0.5rem;
+        white-space: nowrap;
+    }
+
+        .modern-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .modern-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+    .modern-table td {
+        padding: 1rem 0.5rem;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(87, 108, 188, 0.02);
+    }
+
+/* Badges de acción */
+.action-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+    .action-badge.crear {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .action-badge.editar {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .action-badge.eliminar {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+/* Botón ver cambios */
+.btn-view-changes {
+    background: #e6f0fa;
+    color: var(--info);
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+    .btn-view-changes:hover {
+        background: var(--info);
+        color: white;
+    }
+
+/* Fecha */
+.fecha-cell {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+/* Motivo */
+.motivo-cell {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--deep-blue);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-text {
+    color: var(--text-gray);
+    font-size: 1rem;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .modern-table {
+        font-size: 0.8rem;
+    }
+
+    .action-badge {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.65rem;
+    }
+
+    .motivo-cell {
+        max-width: 150px;
+    }
+}

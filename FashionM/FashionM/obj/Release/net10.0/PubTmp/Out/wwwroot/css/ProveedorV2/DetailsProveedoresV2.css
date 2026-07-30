@@ -1,0 +1,112 @@
+﻿:root {
+    --deep-blue: #0B2447;
+    --ocean-blue: #19376D;
+    --electric-blue: #576CBC;
+    --light-bg: #F5F9FF;
+    --pure-white: #FFFFFF;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-gray: #64748b;
+    --border-light: #e2e8f0;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-blue), var(--electric-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.action-buttons-header a {
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.btn-back {
+    background: #e2e8f0;
+    color: #0B2447;
+}
+
+.info-card, .filters-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--border-light);
+}
+
+.img-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+.shoe-card {
+    display: flex;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+    .shoe-card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+.shoe-content {
+    flex: 1;
+    padding: 1rem;
+}
+
+.shoe-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.badge-count {
+    background: #E9EEF5;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}

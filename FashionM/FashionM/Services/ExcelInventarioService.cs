@@ -200,9 +200,12 @@ namespace FashionM.Services
                 ws.Cell(fila, 3).Value = grupo.Key.Color;
                 ws.Cell(fila, 4).Value = grupo.Key.Detalle;
 
-                var tallas = grupo.ToDictionary(
-                    x => x.Numero,
-                    x => x.Cantidad);
+                var tallas = grupo
+                    .GroupBy(x => x.Numero)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Sum(x => x.Cantidad)
+                    );
 
                 int columna = 5;
 
