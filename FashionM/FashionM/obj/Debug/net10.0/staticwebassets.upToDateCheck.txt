@@ -55,6 +55,8 @@ wwwroot\imagenes\ZapatosProveedor\75c351c0-e30d-4065-95d0-945ed3754ae4.png
 wwwroot\imagenes\ZapatosProveedor\9c2340cd-29c2-4eb1-a9b8-d5355870bc62.png
 wwwroot\imagenes\ZapatosProveedor\a4ce057f-7df6-453e-927f-7ff70b4db225.png
 wwwroot\imagenes\ZapatosProveedor\caaba374-59bf-4708-b703-8cd25ee4d345.jpeg
+wwwroot\imagenes\ZapatosProveedor\dac62238-2675-4397-883a-b50b2c8fd48b.png
+wwwroot\imagenes\ZapatosProveedor\dbd06edf-b164-4482-919d-27b4ee1a4c6a.jpg
 wwwroot\imagenes\ZapatosProveedor\de6e3e9c-0590-46da-9a23-f00c1dc986b9.png
 wwwroot\imagenes\ZapatosProveedor\e354f876-8264-4b21-afef-e5c51b627532.jpeg
 wwwroot\imagenes\ZapatosProveedor\e7b274b4-9865-41ce-aa6d-babd2596061a.png

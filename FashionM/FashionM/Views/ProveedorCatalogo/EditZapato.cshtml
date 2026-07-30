@@ -206,38 +206,97 @@
         Suelas: @Model.Suelas.Count,
         Detalles: @Model.Detalles.Count,
         Tallas: @Model.Tallas.Count
-    };
+        };
 
-    // =========================
+    // ==========================================
+    // RENUMERAR COLECCIONES
+    // ==========================================
+    function renumerarColeccion(containerId, collectionName) {
+
+        const filas = document.querySelectorAll(`#${containerId} .item-row`);
+
+        filas.forEach((fila, index) => {
+
+            const input = fila.querySelector("input");
+
+            if (!input) return;
+
+            const propiedad = input.name.split(".")[1];
+
+            input.name = `${collectionName}[${index}].${propiedad}`;
+        });
+
+        counters[collectionName] = filas.length;
+    }
+
+    function renumerarTallas() {
+
+        const filas = document.querySelectorAll("#tallasContainer .talla-row");
+
+        filas.forEach((fila, index) => {
+
+            const inputs = fila.querySelectorAll("input");
+
+            inputs[0].name = `Tallas[${index}].Numero`;
+            inputs[1].name = `Tallas[${index}].Precio`;
+            inputs[2].name = `Tallas[${index}].PrecioColombia`;
+
+        });
+
+        counters["Tallas"] = filas.length;
+    }
+
+    // ==========================================
     // AGREGAR ITEMS
-    // =========================
+    // ==========================================
     function addItem(containerId, collectionName, fieldName) {
+
         const container = document.getElementById(containerId);
-        const index = counters[collectionName]++;
+
+        const index = counters[collectionName];
 
         const div = document.createElement("div");
         div.className = "item-row";
 
         div.innerHTML = `
-            <input name="${collectionName}[${index}].${fieldName}" class="form-control" placeholder="${fieldName}" />
-            <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
-        `;
+                <input name="${collectionName}[${index}].${fieldName}"
+                       class="form-control"
+                       placeholder="${fieldName}" />
+
+                <button type="button"
+                        class="btn-remove"
+                        onclick="removeItem(this,'${containerId}','${collectionName}')">
+                    ✕
+                </button>
+            `;
 
         container.appendChild(div);
+
+        counters[collectionName]++;
     }
 
-    function removeItem(button) {
+    function removeItem(button, containerId, collectionName) {
+
         button.closest(".item-row").remove();
+
+        renumerarColeccion(containerId, collectionName);
     }
 
+    // ==========================================
+    // ELIMINAR TALLA
+    // ==========================================
     function removeTallaItem(button) {
+
         button.closest(".talla-row").remove();
+
+        renumerarTallas();
     }
 
-    // =========================
+    // ==========================================
     // GENERAR TALLAS
-    // =========================
+    // ==========================================
     function generarTallas() {
+
         const tipo = document.getElementById("tipoZapato").value;
         const container = document.getElementById("tallasContainer");
 
@@ -250,42 +309,47 @@
         let fin = tipo === "adulto" ? 44 : 36;
 
         for (let talla = inicio; talla <= fin; talla++) {
-            const index = counters["Tallas"]++;
+
+            const index = counters["Tallas"];
 
             const div = document.createElement("div");
             div.className = "talla-row";
 
             div.innerHTML = `
-                <input type="text"
-                       name="Tallas[${index}].Numero"
-                       value="${talla}"
-                       class="form-control talla-numero"
-                       readonly />
+                    <input type="text"
+                           name="Tallas[${index}].Numero"
+                           value="${talla}"
+                           class="form-control talla-numero"
+                           readonly />
 
-                <input type="number"
-                       step="0.01"
-                       name="Tallas[${index}].Precio"
-                       class="form-control talla-precio"
-                       placeholder="₡ Precio" />
+                    <input type="number"
+                           step="0.01"
+                           name="Tallas[${index}].Precio"
+                           class="form-control talla-precio"
+                           placeholder="₡ Precio" />
 
-                <input type="number"
-                       step="0.01"
-                       name="Tallas[${index}].PrecioColombia"
-                       class="form-control talla-precio"
-                       placeholder="$ Precio Col" />
+                    <input type="number"
+                           step="0.01"
+                           name="Tallas[${index}].PrecioColombia"
+                           class="form-control talla-precio"
+                           placeholder="$ Precio Col" />
 
-                <button type="button"
-                        class="btn-remove"
-                        onclick="removeTallaItem(this)">✕</button>
-            `;
+                    <button type="button"
+                            class="btn-remove"
+                            onclick="removeTallaItem(this)">
+                        ✕
+                    </button>
+                `;
 
             container.appendChild(div);
+
+            counters["Tallas"]++;
         }
     }
 
-    // =========================
-    // COPIAR PRECIO BASE (PRO)
-    // =========================
+    // ==========================================
+    // COPIAR PRECIO BASE
+    // ==========================================
     function copiarPrecioBase() {
 
         const precioCR = document.querySelector('[name="PrecioVenta"]').value;
@@ -296,14 +360,39 @@
             return;
         }
 
-        // Precio Costa Rica
         document.querySelectorAll('[name$=".Precio"]').forEach(input => {
-            if (precioCR) input.value = precioCR;
+            if (precioCR)
+                input.value = precioCR;
         });
 
-        // Precio Colombia
         document.querySelectorAll('[name$=".PrecioColombia"]').forEach(input => {
-            if (precioCOL) input.value = precioCOL;
+            if (precioCOL)
+                input.value = precioCOL;
         });
     }
+
+    // ==========================================
+    // AL CARGAR LA PÁGINA
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", function() {
+
+        document.querySelectorAll("#coloresContainer .btn-remove").forEach(btn => {
+            btn.setAttribute("onclick", "removeItem(this,'coloresContainer','Colores')");
+        });
+
+        document.querySelectorAll("#suelasContainer .btn-remove").forEach(btn => {
+            btn.setAttribute("onclick", "removeItem(this,'suelasContainer','Suelas')");
+        });
+
+        document.querySelectorAll("#detallesContainer .btn-remove").forEach(btn => {
+            btn.setAttribute("onclick", "removeItem(this,'detallesContainer','Detalles')");
+        });
+
+        renumerarColeccion("coloresContainer", "Colores");
+        renumerarColeccion("suelasContainer", "Suelas");
+        renumerarColeccion("detallesContainer", "Detalles");
+        renumerarTallas();
+
+    });
+
 </script>
