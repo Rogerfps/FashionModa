@@ -235,10 +235,20 @@ namespace FashionM.Controllers
             if (cliente == null)
                 return NotFound();
 
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Clientes.Remove(cliente);
+                await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "No se puede eliminar este cliente porque tiene información relacionada (pedidos, proformas, ventas u otros registros).");
+
+                return View("Delete", cliente);
+            }
         }
 
         // ===============================
