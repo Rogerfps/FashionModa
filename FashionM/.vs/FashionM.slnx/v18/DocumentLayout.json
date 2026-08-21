@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\views\\ventas\\graficos.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\views\\ventas\\graficos.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|c:\\proyectos\\fashionmoda\\fashionmoda\\fashionm\\fashionm\\controllers\\ventascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2569876B-FE1B-C9CF-F0C1-6599B07CBE95}|FashionM\\FashionM.csproj|solutionrelative:fashionm\\controllers\\ventascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -67,19 +71,32 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Graficos.cshtml",
+              "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Ventas\\Graficos.cshtml",
+              "RelativeDocumentMoniker": "FashionM\\Views\\Ventas\\Graficos.cshtml",
+              "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\Ventas\\Graficos.cshtml",
+              "RelativeToolTip": "FashionM\\Views\\Ventas\\Graficos.cshtml",
+              "ViewState": "AgIAAEQEAAAAAAAAAAAAwG0EAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-21T19:58:35.209Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "VentasController.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\VentasController.cs",
               "RelativeDocumentMoniker": "FashionM\\Controllers\\VentasController.cs",
               "ToolTip": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\VentasController.cs",
               "RelativeToolTip": "FashionM\\Controllers\\VentasController.cs",
-              "ViewState": "AgIAAL4BAAAAAAAAAAAAAPwBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE8AAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-20T17:14:40.645Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Venta.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\Venta.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\Venta.cs",
@@ -91,7 +108,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "NotaCreditoDetalle.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\NotaCreditoDetalle.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\NotaCreditoDetalle.cs",
@@ -103,7 +120,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "NotaCredito.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\NotaCredito.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\NotaCredito.cs",
@@ -115,7 +132,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "PedidoDetails.css",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\wwwroot\\css\\PedidoCliente\\PedidoDetails.css",
               "RelativeDocumentMoniker": "FashionM\\wwwroot\\css\\PedidoCliente\\PedidoDetails.css",
@@ -127,7 +144,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Details.cshtml",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\PedidoCliente\\Details.cshtml",
               "RelativeDocumentMoniker": "FashionM\\Views\\PedidoCliente\\Details.cshtml",
@@ -139,7 +156,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "20260820143107_AgregarVendedorYTotalParesPedidoCliente.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260820143107_AgregarVendedorYTotalParesPedidoCliente.cs",
               "RelativeDocumentMoniker": "FashionM\\Migrations\\20260820143107_AgregarVendedorYTotalParesPedidoCliente.cs",
@@ -151,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Create.cshtml",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Views\\PedidoCliente\\Create.cshtml",
               "RelativeDocumentMoniker": "FashionM\\Views\\PedidoCliente\\Create.cshtml",
@@ -163,7 +180,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "PedidosClienteController.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Controllers\\PedidosClienteController.cs",
               "RelativeDocumentMoniker": "FashionM\\Controllers\\PedidosClienteController.cs",
@@ -175,7 +192,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "20260819201928_AgregarNumeroPedido.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Migrations\\20260819201928_AgregarNumeroPedido.cs",
               "RelativeDocumentMoniker": "FashionM\\Migrations\\20260819201928_AgregarNumeroPedido.cs",
@@ -187,7 +204,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "PedidoCliente.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\PedidoCliente.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\PedidoCliente.cs",
@@ -199,7 +216,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "PedidoProveedorDetalle.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\PedidoProveedorDetalle.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\PedidoProveedorDetalle.cs",
@@ -211,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "PedidoProveedor.cs",
               "DocumentMoniker": "C:\\Proyectos\\FashionModa\\FashionModa\\FashionM\\FashionM\\Models\\PedidoProveedor.cs",
               "RelativeDocumentMoniker": "FashionM\\Models\\PedidoProveedor.cs",
