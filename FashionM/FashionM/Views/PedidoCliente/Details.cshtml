@@ -10,7 +10,7 @@
     <!-- HEADER -->
     <div class="page-header">
         <h1 class="page-title">
-            <span>📦</span> Pedido #@Model.Id
+            <span>📦</span> Pedido #@Model.NumeroPedido
         </h1>
         <a asp-action="Index" class="btn-back">
             ← Volver
@@ -69,35 +69,75 @@
 
     <!-- INFORMACIÓN DEL PEDIDO -->
     <div class="info-card">
+
         <div class="section-title">
             <span>📋</span> Información del Pedido
         </div>
 
         <div class="info-grid">
+
             <div class="info-item">
                 <span class="info-label">Fecha Pedido</span>
-                <span class="info-value">@Model.FechaPedido.ToString("dd/MM/yyyy")</span>
+                <span class="info-value">
+                    @Model.FechaPedido.ToString("dd/MM/yyyy")
+                </span>
             </div>
+
             <div class="info-item">
                 <span class="info-label">Fecha Entrega</span>
-                <span class="info-value">@Model.FechaEntrega.ToString("dd/MM/yyyy")</span>
+                <span class="info-value">
+                    @Model.FechaEntrega.ToString("dd/MM/yyyy")
+                </span>
             </div>
+
             <div class="info-item">
                 <span class="info-label">Empresa</span>
-                <span class="info-value">@Model.Empresa</span>
+                <span class="info-value">
+                    @Model.Empresa
+                </span>
             </div>
+
             <div class="info-item">
                 <span class="info-label">Semana</span>
-                <span class="info-value">@Model.Semana</span>
+                <span class="info-value">
+                    @Model.Semana
+                </span>
             </div>
+
+            <div class="info-item">
+                <span class="info-label">Vendedor</span>
+                <span class="info-value">
+                    @(string.IsNullOrWhiteSpace(Model.Vendedor)
+                        ? "No asignado"
+                        : Model.Vendedor)
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Total de pares</span>
+                <span class="info-value">
+                    👟 @Model.TotalPares pares
+                </span>
+            </div>
+
             <div class="info-item full-width">
                 <span class="info-label">Observaciones</span>
-                <span class="info-value">@Model.Observaciones</span>
+                <span class="info-value">
+                    @(string.IsNullOrWhiteSpace(Model.Observaciones)
+                        ? "Sin observaciones"
+                        : Model.Observaciones)
+                </span>
             </div>
-            <div>
-                <strong>Agente:</strong> @Model.Agente
+
+            <div class="info-item">
+                <span class="info-label">Agente</span>
+                <span class="info-value">
+                    @Model.Agente
+                </span>
             </div>
+
         </div>
+
     </div>
 
     <!-- ESTADO -->
@@ -242,6 +282,8 @@
         <div class="total-label">Total del Pedido</div>
         <div class="total-value">₡ @Model.Total.ToString("N2")</div>
     </div>
+
+    
 </div>
 
 @section Scripts {

@@ -26,7 +26,9 @@ namespace FashionM.Controllers
         {
             int pageSize = 10;
 
-            
+            // =========================
+            // 🏢 EMPRESA
+            // =========================
             if (!Request.Query.ContainsKey("empresa"))
             {
                 empresa = HttpContext.Session.GetString("EmpresaNombre");
@@ -42,34 +44,43 @@ namespace FashionM.Controllers
                 .AsQueryable();
 
             // =========================
-            // 🔒 FILTRO POR ROL (CLAVE)
+            // 🔒 FILTRO POR ROL
             // =========================
             if (User.IsInRole("Vendedor"))
             {
-                var userName = User.Identity.Name;
+                var userName = User.Identity?.Name;
 
                 pedidos = pedidos.Where(p => p.Agente == userName);
             }
 
             // =========================
-            // 🔍 BUSCADOR INTELIGENTE
+            // 🔍 BUSCADOR
             // =========================
             if (!string.IsNullOrWhiteSpace(buscar))
             {
                 buscar = buscar.Trim().ToLower();
-                bool esNumero = int.TryParse(buscar, out int idBuscado);
+
+                bool esNumero = int.TryParse(buscar, out int numeroBuscado);
 
                 pedidos = pedidos.Where(p =>
-                    (esNumero && p.Id == idBuscado)
+                    // Número de pedido
+                    (esNumero && p.NumeroPedido == numeroBuscado)
+
+                    // Cliente
                     || p.Cliente.Nombre.ToLower().Contains(buscar)
                     || p.Cliente.Apellidos.ToLower().Contains(buscar)
+
+                    // Cédula
                     || p.Cliente.Cedula.ToString().Contains(buscar)
-                    || (p.Empresa != null && p.Empresa.ToLower().Contains(buscar))
+
+                    // Empresa
+                    || (p.Empresa != null &&
+                        p.Empresa.ToLower().Contains(buscar))
                 );
             }
 
             // =========================
-            // 🏢 EMPRESA FLEXIBLE
+            // 🏢 FILTRO POR EMPRESA
             // =========================
             if (!string.IsNullOrWhiteSpace(empresa))
             {
@@ -87,11 +98,12 @@ namespace FashionM.Controllers
             }
 
             // =========================
-            // 📅 SEMANA
+            // 📅 FILTRO POR SEMANA
             // =========================
             if (semana.HasValue)
             {
-                pedidos = pedidos.Where(p => p.Semana == semana.Value);
+                pedidos = pedidos.Where(p =>
+                    p.Semana == semana.Value);
             }
 
             // =========================
@@ -99,6 +111,9 @@ namespace FashionM.Controllers
             // =========================
             int total = await pedidos.CountAsync();
 
+            // =========================
+            // 📄 PEDIDOS
+            // =========================
             var lista = await pedidos
                 .OrderByDescending(p => p.FechaPedido)
                 .Skip((page - 1) * pageSize)
@@ -108,7 +123,9 @@ namespace FashionM.Controllers
             // =========================
             // 📄 PAGINACIÓN
             // =========================
-            ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)pageSize);
+            ViewBag.TotalPaginas =
+                (int)Math.Ceiling(total / (double)pageSize);
+
             ViewBag.PaginaActual = page;
 
             // =========================
@@ -127,7 +144,6 @@ namespace FashionM.Controllers
             ViewBag.Empresa = empresa;
 
             return View(lista);
-
         }
 
         // =====================================================
@@ -153,8 +169,23 @@ namespace FashionM.Controllers
         // =====================================================
         // CREATE GET
         // =====================================================
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var empresaNombre = HttpContext.Session.GetString("EmpresaNombre");
+
+            var empresa = await _context.Empresas
+                .FirstOrDefaultAsync(e => e.Nombre == empresaNombre);
+
+            if (empresa == null)
+                return RedirectToAction("SeleccionarEmpresa", "Home");
+
+            var vendedores = empresa.Agentes
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(v => v.Trim())
+                .ToList();
+
+            ViewBag.Vendedores = vendedores;
+
             return View(new PedidoCliente
             {
                 FechaPedido = DateTime.UtcNow,
@@ -167,7 +198,7 @@ namespace FashionM.Controllers
         // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(PedidoCliente pedido)
+        public async Task<IActionResult> Create(PedidoCliente pedido)
         {
             ModelState.Remove("Cliente");
 
@@ -177,18 +208,134 @@ namespace FashionM.Controllers
             if (pedido.Detalles == null || !pedido.Detalles.Any())
                 ModelState.AddModelError("", "Debe agregar productos.");
 
-            if (!ModelState.IsValid)
-                return View(pedido);
+            // =====================================================
+            // EMPRESA
+            // =====================================================
 
-            // 🔥 AGENTE AUTOMÁTICO
+            var empresa = pedido.Empresa?.Trim();
+
+            if (string.IsNullOrWhiteSpace(empresa))
+            {
+                empresa = HttpContext.Session.GetString("EmpresaNombre");
+            }
+
+            if (string.IsNullOrWhiteSpace(empresa))
+            {
+                ModelState.AddModelError("", "No se pudo determinar la empresa.");
+
+                return View(pedido);
+            }
+
+            pedido.Empresa = empresa;
+
+            // =====================================================
+            // BUSCAR EMPRESA EN BASE DE DATOS
+            // =====================================================
+
+            var empresaDb = await _context.Empresas
+                .FirstOrDefaultAsync(e => e.Nombre == empresa);
+
+            if (empresaDb == null)
+            {
+                ModelState.AddModelError("", "No se encontró la empresa seleccionada.");
+
+                return View(pedido);
+            }
+
+            // =====================================================
+            // OBTENER VENDEDORES DE LA EMPRESA
+            // =====================================================
+
+            var vendedoresEmpresa = empresaDb.Agentes
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(v => v.Trim())
+                .ToList();
+
+            // =====================================================
+            // VALIDAR VENDEDOR
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(pedido.Vendedor) ||
+                !vendedoresEmpresa.Contains(pedido.Vendedor.Trim()))
+            {
+                ModelState.AddModelError(
+                    "Vendedor",
+                    "Debe seleccionar un vendedor válido."
+                );
+
+                ViewBag.Vendedores = vendedoresEmpresa;
+
+                return View(pedido);
+            }
+
+            pedido.Vendedor = pedido.Vendedor.Trim();
+
+            // =====================================================
+            // VALIDAR MODELSTATE
+            // =====================================================
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Vendedores = vendedoresEmpresa;
+
+                return View(pedido);
+            }
+
+            // =====================================================
+            // GENERAR NUMERO DE PEDIDO
+            // =====================================================
+
+            var numerosExistentes = await _context.PedidosCliente
+                .Where(p => p.Empresa == empresa)
+                .Select(p => p.NumeroPedido)
+                .OrderBy(n => n)
+                .ToListAsync();
+
+            int numeroPedido = 1;
+
+            foreach (var numero in numerosExistentes)
+            {
+                if (numero == numeroPedido)
+                {
+                    numeroPedido++;
+                }
+                else if (numero > numeroPedido)
+                {
+                    break;
+                }
+            }
+
+            pedido.NumeroPedido = numeroPedido;
+
+            // =====================================================
+            // DATOS AUTOMÁTICOS
+            // =====================================================
+
+            // Usuario que creó el pedido
             pedido.Agente = User.Identity?.Name;
 
             pedido.FechaPedido = DateTime.UtcNow;
             pedido.FechaEntrega = DateTime.UtcNow.AddDays(60);
+
+            // =====================================================
+            // TOTAL DE PARES
+            // =====================================================
+
+            pedido.TotalPares = pedido.Detalles.Sum(d => d.Cantidad);
+
+            // =====================================================
+            // TOTAL DINERO
+            // =====================================================
+
             pedido.Total = pedido.Detalles.Sum(d => d.SubTotal);
 
+            // =====================================================
+            // GUARDAR
+            // =====================================================
+
             _context.PedidosCliente.Add(pedido);
-            _context.SaveChanges();
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -571,6 +718,29 @@ namespace FashionM.Controllers
                 .ToList();
 
             return Json(codigos);
+        }
+
+        // =====================================================
+        // OBTENER VENDEDORES POR EMPRESA
+        // =====================================================
+        [HttpGet]
+        public async Task<IActionResult> ObtenerVendedores(string empresa)
+        {
+            if (string.IsNullOrWhiteSpace(empresa))
+                return Json(new List<string>());
+
+            var empresaDb = await _context.Empresas
+                .FirstOrDefaultAsync(e => e.Nombre == empresa);
+
+            if (empresaDb == null)
+                return Json(new List<string>());
+
+            var vendedores = empresaDb.Agentes
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(v => v.Trim())
+                .ToList();
+
+            return Json(vendedores);
         }
     }
 }

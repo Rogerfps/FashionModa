@@ -28,7 +28,7 @@
                    name="buscar"
                    value="@Context.Request.Query["buscar"]"
                    class="filter-input"
-                   placeholder="Nombre, cédula o ID..." />
+                   placeholder="Número de pedido, nombre o cédula..." />
         </div>
 
         <!-- EMPRESA -->
@@ -121,7 +121,7 @@
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.Id</td>
+                            <td>@item.NumeroPedido</td>
                             <td>@item.FechaPedido.ToString("dd/MM/yyyy")</td>
                             <td>@item.Semana</td>
 

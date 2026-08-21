@@ -10,6 +10,8 @@ namespace FashionM.Models
         [Key]
         public int Id { get; set; }
 
+        public int NumeroPedido { get; set; }
+
         [Required]
         public int ClienteCedula { get; set; }
 
@@ -31,6 +33,10 @@ namespace FashionM.Models
 
         public string? Empresa { get; set; }
         public string? Agente { get; set; }
+
+        public string? Vendedor { get; set; }
+
+        public int TotalPares { get; set; }
         public int Semana { get; set; } = 0;
 
         public ICollection<PedidoClienteDetalle> Detalles { get; set; } = new List<PedidoClienteDetalle>();

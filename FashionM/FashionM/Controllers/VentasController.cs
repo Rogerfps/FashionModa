@@ -1,4 +1,5 @@
 ﻿using FashionM.Data;
+using FashionM.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -78,14 +79,21 @@ namespace FashionM.Controllers
         [Authorize(Roles = "Admin,Secretaria")]
         public async Task<IActionResult> Graficos(int? mes, int? anio)
         {
+            // ========================================
+            // 📦 CARGAR VENTAS
+            // ========================================
+
             var ventas = await _context.Ventas
                 .Include(v => v.Cliente)
                 .Include(v => v.Empresa)
                 .Include(v => v.Detalles)
+                .Include(v => v.NotasCredito)
+                    .ThenInclude(nc => nc.Detalles)
                 .ToListAsync();
 
+
             // ========================================
-            // 📅 NOMBRES MESES
+            // 📅 NOMBRES DE LOS MESES
             // ========================================
 
             string[] nombresMeses =
@@ -105,6 +113,11 @@ namespace FashionM.Controllers
         "Diciembre"
     };
 
+
+            // ========================================
+            // 📅 AÑO Y MES SELECCIONADOS
+            // ========================================
+
             int anioActual = anio ?? DateTime.Now.Year;
             int mesActual = mes ?? DateTime.Now.Month;
 
@@ -112,19 +125,121 @@ namespace FashionM.Controllers
             ViewBag.MesSeleccionado = mesActual;
             ViewBag.MesActual = nombresMeses[mesActual];
 
+
+            // ========================================
+            // 📅 AÑOS DISPONIBLES
+            // ========================================
+
             ViewBag.Anios = ventas
                 .Select(v => v.Año)
                 .Distinct()
                 .OrderByDescending(x => x)
                 .ToList();
 
-            //=========================================
-            // FILTRO GENERAL
-            //=========================================
 
-            var ventasFiltradas = ventas
+            // ========================================
+            // 🧮 FUNCIÓN PARA CALCULAR LA VENTA NETA
+            // ========================================
+            //
+            // Venta normal:
+            //   Pares = CantidadZapatos
+            //   Total = Total
+            //
+            // Venta con devolución parcial:
+            //   Pares = CantidadZapatos - devueltos
+            //   Total = Total - TotalDevuelto
+            //
+            // Venta anulada:
+            //   Pares = 0
+            //   Total = 0
+            //
+            // ========================================
+
+            var ventasConMetricas = ventas
                 .Where(v => v.Año == anioActual)
+                .Select(v =>
+                {
+                    // ----------------------------------------
+                    // Si la venta está ANULADA no cuenta
+                    // ----------------------------------------
+
+                    if (v.Estado != null &&
+                        v.Estado.Trim().ToUpper() == "ANULADA")
+                    {
+                        return new
+                        {
+                            Venta = v,
+                            ParesNetos = 0,
+                            TotalNeto = 0m
+                        };
+                    }
+
+
+                    // ----------------------------------------
+                    // NOTAS DE CRÉDITO ACTIVAS
+                    // ----------------------------------------
+
+                    var notasCreditoActivas = v.NotasCredito?
+                        .Where(nc =>
+                            nc.Estado != null &&
+                            nc.Estado.Trim().ToUpper() == "ACTIVA")
+                        .ToList()
+                        ?? new List<NotaCredito>();
+
+
+                    // ----------------------------------------
+                    // TOTAL DE PARES DEVUELTOS
+                    // ----------------------------------------
+
+                    int paresDevueltos = notasCreditoActivas
+                        .SelectMany(nc => nc.Detalles)
+                        .Sum(d => d.CantidadDevuelta);
+
+
+                    // ----------------------------------------
+                    // DINERO DEVUELTO
+                    // ----------------------------------------
+
+                    decimal dineroDevuelto = notasCreditoActivas
+                        .Sum(nc => nc.TotalDevuelto);
+
+
+                    // ----------------------------------------
+                    // PARES NETOS
+                    // ----------------------------------------
+
+                    int paresNetos =
+                        v.CantidadZapatos - paresDevueltos;
+
+
+                    // Evitamos valores negativos
+                    if (paresNetos < 0)
+                        paresNetos = 0;
+
+
+                    // ----------------------------------------
+                    // TOTAL NETO
+                    // ----------------------------------------
+
+                    decimal totalNeto =
+                        v.Total - dineroDevuelto;
+
+
+                    // Evitamos valores negativos
+                    if (totalNeto < 0)
+                        totalNeto = 0;
+
+
+                    return new
+                    {
+                        Venta = v,
+                        ParesNetos = paresNetos,
+                        TotalNeto = totalNeto
+                    };
+
+                })
                 .ToList();
+
 
             // ========================================
             // 📅 PARES POR SEMANA
@@ -137,32 +252,39 @@ namespace FashionM.Controllers
 
                     Semana = $"Semana {semana}",
 
-                    Pares = ventasFiltradas
-                        .Where(v => v.Semana == semana)
-                        .Sum(v => v.CantidadZapatos),
+                    Pares = ventasConMetricas
+                        .Where(x => x.Venta.Semana == semana)
+                        .Sum(x => x.ParesNetos),
 
-                    Total = ventasFiltradas
-                        .Where(v => v.Semana == semana)
-                        .Sum(v => v.Total)
+                    Total = ventasConMetricas
+                        .Where(x => x.Venta.Semana == semana)
+                        .Sum(x => x.TotalNeto)
                 })
                 .OrderBy(x => x.NumeroSemana)
                 .ToList();
 
-            ViewBag.Semanas = ventasSemana.Select(x => x.Semana);
 
-            ViewBag.SemanaPares = ventasSemana.Select(x => x.Pares);
+            ViewBag.Semanas =
+                ventasSemana.Select(x => x.Semana);
 
-            ViewBag.SemanaTotales = ventasSemana.Select(x => x.Total);
+            ViewBag.SemanaPares =
+                ventasSemana.Select(x => x.Pares);
+
+            ViewBag.SemanaTotales =
+                ventasSemana.Select(x => x.Total);
+
 
             // ========================================
             // 📆 PARES POR MES + EMPRESA
             // ========================================
 
-            var empresasVentasMes = ventasFiltradas
-                .GroupBy(v => new
+            var empresasVentasMes = ventasConMetricas
+                .GroupBy(x => new
                 {
-                    v.Mes,
-                    Empresa = v.Empresa!.Nombre
+                    x.Venta.Mes,
+                    Empresa = x.Venta.Empresa != null
+                        ? x.Venta.Empresa.Nombre
+                        : "Sin empresa"
                 })
                 .Select(g => new
                 {
@@ -170,131 +292,218 @@ namespace FashionM.Controllers
 
                     Empresa = g.Key.Empresa,
 
-                    Pares = g.Sum(x => x.CantidadZapatos),
+                    Pares = g.Sum(x => x.ParesNetos),
 
-                    Total = g.Sum(x => x.Total)
+                    Total = g.Sum(x => x.TotalNeto)
                 })
                 .ToList();
 
-            ViewBag.EmpresasVentasMes = empresasVentasMes;
+
+            ViewBag.EmpresasVentasMes =
+                empresasVentasMes;
+
 
             // ========================================
             // 👤 VENTAS POR AGENTE
             // ========================================
 
-            var agentesMes = ventasFiltradas
-                .Where(v => v.Mes == mesActual)
-                .GroupBy(v => v.AgenteVenta)
+            var agentesMes = ventasConMetricas
+                .Where(x => x.Venta.Mes == mesActual)
+                .GroupBy(x => x.Venta.AgenteVenta)
                 .Select(g => new
                 {
                     Agente = g.Key,
 
-                    Pares = g.Sum(x => x.CantidadZapatos),
+                    Pares = g.Sum(x => x.ParesNetos),
 
-                    Total = g.Sum(x => x.Total)
+                    Total = g.Sum(x => x.TotalNeto)
                 })
                 .OrderByDescending(x => x.Pares)
                 .ToList();
 
-            ViewBag.Agentes = agentesMes.Select(x => x.Agente);
 
-            ViewBag.AgentePares = agentesMes.Select(x => x.Pares);
+            ViewBag.Agentes =
+                agentesMes.Select(x => x.Agente);
 
-            ViewBag.AgenteTotales = agentesMes.Select(x => x.Total);
+            ViewBag.AgentePares =
+                agentesMes.Select(x => x.Pares);
+
+            ViewBag.AgenteTotales =
+                agentesMes.Select(x => x.Total);
+
 
             // ========================================
             // 🏢 VENTAS POR EMPRESA
             // ========================================
 
-            var empresasMes = ventasFiltradas
-                .Where(v => v.Mes == mesActual)
-                .GroupBy(v => v.Empresa!.Nombre)
+            var empresasMes = ventasConMetricas
+                .Where(x => x.Venta.Mes == mesActual)
+                .GroupBy(x =>
+                    x.Venta.Empresa != null
+                        ? x.Venta.Empresa.Nombre
+                        : "Sin empresa")
                 .Select(g => new
                 {
                     Empresa = g.Key,
 
-                    Pares = g.Sum(x => x.CantidadZapatos),
+                    Pares = g.Sum(x => x.ParesNetos),
 
-                    Total = g.Sum(x => x.Total)
+                    Total = g.Sum(x => x.TotalNeto)
                 })
                 .OrderByDescending(x => x.Pares)
                 .ToList();
 
-            ViewBag.Empresas = empresasMes.Select(x => x.Empresa);
 
-            ViewBag.EmpresaPares = empresasMes.Select(x => x.Pares);
+            ViewBag.Empresas =
+                empresasMes.Select(x => x.Empresa);
 
-            ViewBag.EmpresaTotales = empresasMes.Select(x => x.Total);
+            ViewBag.EmpresaPares =
+                empresasMes.Select(x => x.Pares);
+
+            ViewBag.EmpresaTotales =
+                empresasMes.Select(x => x.Total);
+
 
             // ========================================
             // 📄 PROFORMA VS FACTURA
             // ========================================
 
-            var tiposDocumento = ventasFiltradas
-                .Where(v => v.Mes == mesActual)
-                .GroupBy(v => v.TipoDocumento)
+            var tiposDocumento = ventasConMetricas
+                .Where(x => x.Venta.Mes == mesActual)
+                .GroupBy(x => x.Venta.TipoDocumento)
                 .Select(g => new
                 {
                     Tipo = g.Key,
 
-                    Total = g.Sum(x => x.Total)
+                    Total = g.Sum(x => x.TotalNeto)
                 })
                 .ToList();
 
-            ViewBag.TipoDocumento = tiposDocumento.Select(x => x.Tipo);
 
-            ViewBag.TipoDocumentoTotales = tiposDocumento.Select(x => x.Total);
+            ViewBag.TipoDocumento =
+                tiposDocumento.Select(x => x.Tipo);
+
+            ViewBag.TipoDocumentoTotales =
+                tiposDocumento.Select(x => x.Total);
+
 
             // ========================================
-            // 👟 PRODUCTOS MÁS VENDIDOS
+            // 👟 TOP 10 PRODUCTOS MÁS VENDIDOS
+            // ========================================
+            //
+            // Aquí también debemos descontar devoluciones.
+            //
+            // Ejemplo:
+            //
+            // Venta:
+            //   Zapato ABC = 10 pares
+            //
+            // Nota crédito:
+            //   Zapato ABC = 2 pares
+            //
+            // Resultado:
+            //   Zapato ABC = 8 pares
+            //
             // ========================================
 
-            var productosTop = ventasFiltradas
-                .Where(v => v.Mes == mesActual)
-                .SelectMany(v => v.Detalles)
-                .GroupBy(d => d.InventarioCodigo)
-                .Select(g => new
+            var productosVenta = ventasConMetricas
+                .Where(x => x.Venta.Mes == mesActual)
+                .SelectMany(x => x.Venta.Detalles.Select(d => new
                 {
-                    Producto = g.Key,
+                    Producto = d.InventarioCodigo,
 
-                    Cantidad = g.Sum(x => x.Cantidad)
-                })
-                .OrderByDescending(x => x.Cantidad)
-                .Take(15)
+                    CantidadVenta = d.Cantidad,
+
+                    VentaId = x.Venta.Id,
+
+                    NotasCredito = x.Venta.NotasCredito
+                        .Where(nc =>
+                            nc.Estado != null &&
+                            nc.Estado.Trim().ToUpper() == "ACTIVA")
+                        .ToList()
+                }))
                 .ToList();
 
-            ViewBag.Productos = productosTop.Select(x => x.Producto);
 
-            ViewBag.ProductosCantidad = productosTop.Select(x => x.Cantidad);
+            var productosTop = productosVenta
+                .GroupBy(x => x.Producto)
+                .Select(g =>
+                {
+                    int vendidos = g.Sum(x => x.CantidadVenta);
+
+                    int devueltos = g
+                        .SelectMany(x => x.NotasCredito)
+                        .SelectMany(nc => nc.Detalles)
+                        .Where(d =>
+                            d.InventarioCodigo == g.Key)
+                        .Sum(d => d.CantidadDevuelta);
+
+                    int cantidadNeta = vendidos - devueltos;
+
+                    if (cantidadNeta < 0)
+                        cantidadNeta = 0;
+
+                    return new
+                    {
+                        Producto = g.Key,
+
+                        Cantidad = cantidadNeta
+                    };
+                })
+                .Where(x => x.Cantidad > 0)
+                .OrderByDescending(x => x.Cantidad)
+                .Take(10)
+                .ToList();
+
+
+            ViewBag.Productos =
+                productosTop.Select(x => x.Producto);
+
+            ViewBag.ProductosCantidad =
+                productosTop.Select(x => x.Cantidad);
+
 
             // ========================================
-            // 👤 CLIENTES TOP
+            // 👤 TOP CLIENTES
             // ========================================
 
-            var clientesTop = ventasFiltradas
-                .Where(v => v.Mes == mesActual)
-                .GroupBy(v => $"{v.Cliente!.Nombre} {v.Cliente.Apellidos}")
+            var clientesTop = ventasConMetricas
+                .Where(x => x.Venta.Mes == mesActual)
+                .GroupBy(x =>
+                    x.Venta.Cliente != null
+                        ? $"{x.Venta.Cliente.Nombre} {x.Venta.Cliente.Apellidos}"
+                        : "Sin cliente")
                 .Select(g => new
                 {
                     Cliente = g.Key,
 
-                    Pares = g.Sum(x => x.CantidadZapatos),
+                    Pares = g.Sum(x => x.ParesNetos),
 
-                    Total = g.Sum(x => x.Total)
+                    Total = g.Sum(x => x.TotalNeto)
                 })
+                .Where(x => x.Pares > 0)
                 .OrderByDescending(x => x.Pares)
                 .Take(10)
                 .ToList();
 
-            ViewBag.Clientes = clientesTop.Select(x => x.Cliente);
 
-            ViewBag.ClientesPares = clientesTop.Select(x => x.Pares);
+            ViewBag.Clientes =
+                clientesTop.Select(x => x.Cliente);
 
-            ViewBag.ClientesTotales = clientesTop.Select(x => x.Total);
+            ViewBag.ClientesPares =
+                clientesTop.Select(x => x.Pares);
 
-            return View(ventasFiltradas);
+            ViewBag.ClientesTotales =
+                clientesTop.Select(x => x.Total);
+
+
+            // ========================================
+            // 📊 VISTA
+            // ========================================
+
+            return View(
+                ventasConMetricas.Select(x => x.Venta).ToList()
+            );
         }
     }
 }
-
-
