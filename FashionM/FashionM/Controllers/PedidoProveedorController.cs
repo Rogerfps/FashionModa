@@ -99,19 +99,18 @@ namespace FashionM.Controllers
             {
                 _context.PedidosProveedor.RemoveRange(existentes);
 
-                var main = await _context.PedidosMain
+                var mainExistente = await _context.PedidosMain
                     .FirstOrDefaultAsync(p => p.Semana == semana);
 
-                if (main == null)
+                if (mainExistente == null)
                 {
-                    main = new PedidoMain
+                    mainExistente = new PedidoMain
                     {
                         Semana = semana,
                         FechaGenerado = DateTime.UtcNow
                     };
 
-                    _context.PedidosMain.Add(main);
-                    await _context.SaveChangesAsync();
+                    _context.PedidosMain.Add(mainExistente);
                 }
 
                 await _context.SaveChangesAsync();
@@ -149,7 +148,7 @@ namespace FashionM.Controllers
             }
 
             // =========================
-            // 🔥 CREAR MAIN
+            // 🔥 CREAR / OBTENER MAIN
             // =========================
             var pedidoMain = await _context.PedidosMain
                 .FirstOrDefaultAsync(p => p.Semana == semana);
@@ -163,25 +162,51 @@ namespace FashionM.Controllers
                 };
 
                 _context.PedidosMain.Add(pedidoMain);
+
                 await _context.SaveChangesAsync();
             }
 
             // =========================
-            // 🔥 AGRUPAR DETALLES
+            // 🔥 DETALLES DE PRODUCCIÓN
             // =========================
+            //
+            // IMPORTANTE:
+            // Aquí mantenemos separado cada Pedido Cliente.
+            //
+            // Ejemplo:
+            //
+            // Pedido #48 → Zapato X → 10
+            // Pedido #52 → Zapato X → 20
+            //
+            // Se guardarán como DOS detalles diferentes
+            // dentro del PedidoProveedor.
+            //
+            // Posteriormente el Excel puede volver a
+            // agruparlos para el proveedor.
+            // =========================
+
             var detallesAgrupados = pedidosClientes
-                .SelectMany(p => p.Detalles.Where(d => !d.EsStock),(pedido, detalle) => new
-                {
-                    pedido.Empresa,
-                    ProveedorCatalogoId = detalle.ProveedorCatalogoId.Value,
-                    detalle.CodigoProducto,
-                    detalle.Color,
-                    detalle.Detalle,
-                    detalle.Talla,
-                    detalle.Cantidad
-                })
+                .SelectMany(
+                    p => p.Detalles.Where(d => !d.EsStock),
+                    (pedido, detalle) => new
+                    {
+                        PedidoClienteId = pedido.Id,
+                        NumeroPedidoCliente = pedido.NumeroPedido,
+
+                        pedido.Empresa,
+
+                        ProveedorCatalogoId = detalle.ProveedorCatalogoId!.Value,
+
+                        detalle.CodigoProducto,
+                        detalle.Color,
+                        detalle.Detalle,
+                        detalle.Talla,
+                        detalle.Cantidad
+                    })
                 .GroupBy(x => new
                 {
+                    x.PedidoClienteId,
+                    x.NumeroPedidoCliente,
                     x.Empresa,
                     x.ProveedorCatalogoId,
                     x.CodigoProducto,
@@ -191,23 +216,31 @@ namespace FashionM.Controllers
                 })
                 .Select(g => new
                 {
+                    g.Key.PedidoClienteId,
+                    g.Key.NumeroPedidoCliente,
                     g.Key.Empresa,
                     g.Key.ProveedorCatalogoId,
                     g.Key.CodigoProducto,
                     g.Key.Color,
                     g.Key.Detalle,
                     g.Key.Talla,
+
                     Cantidad = g.Sum(x => x.Cantidad)
                 })
                 .ToList();
 
+            // =========================
+            // 🔥 VALIDAR CANTIDAD
+            // =========================
             var cantidadProduccion = pedidosClientes
                 .SelectMany(p => p.Detalles)
                 .Count(d => !d.EsStock);
 
             if (cantidadProduccion == 0)
             {
-                TempData["Error"] = "Todos los productos del pedido están marcados como stock. No hay productos para enviar a producción.";
+                TempData["Error"] =
+                    "Todos los productos del pedido están marcados como stock. No hay productos para enviar a producción.";
+
                 return RedirectToAction("Index");
             }
 
@@ -230,9 +263,13 @@ namespace FashionM.Controllers
                     Semana = semana,
                     FechaPedido = DateTime.UtcNow,
                     ProveedorCatalogoId = grupo.Key.ProveedorCatalogoId,
+
                     Detalles = new List<PedidoProveedorDetalle>()
                 };
 
+                // =========================
+                // 🔥 AGREGAR DETALLES
+                // =========================
                 foreach (var item in grupo)
                 {
                     pedidoProveedor.Detalles.Add(new PedidoProveedorDetalle
@@ -241,19 +278,29 @@ namespace FashionM.Controllers
                         Color = item.Color,
                         Talla = item.Talla,
                         Detalle = item.Detalle,
-                        Cantidad = item.Cantidad
+                        Cantidad = item.Cantidad,
+
+                        // =========================
+                        // 🔎 RASTREO
+                        // =========================
+                        PedidoClienteId = item.PedidoClienteId,
+                        NumeroPedidoCliente = item.NumeroPedidoCliente
                     });
                 }
 
                 _context.PedidosProveedor.Add(pedidoProveedor);
             }
 
+            // =========================
+            // 💾 GUARDAR
+            // =========================
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Pedidos generados correctamente";
 
             return RedirectToAction("Index");
         }
+
 
         // =====================================================
         // DETAILS
@@ -263,6 +310,7 @@ namespace FashionM.Controllers
             var pedido = await _context.PedidosProveedor
                 .Include(p => p.Proveedor)
                 .Include(p => p.Detalles)
+                    .ThenInclude(d => d.PedidoCliente)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (pedido == null)
@@ -273,7 +321,9 @@ namespace FashionM.Controllers
                 .Distinct()
                 .ToList();
 
-            // 🔥 CAMBIO CLAVE AQUÍ
+            // =========================
+            // ZAPATOS DEL PROVEEDOR
+            // =========================
             var zapatos = await _context.ZapatosProveedor
                 .Where(z => codigos.Contains(z.Codigo.Trim()))
                 .ToListAsync();

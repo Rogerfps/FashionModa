@@ -103,6 +103,7 @@
                     }
 
                     <th>Total</th>
+                    <th>Pedidos Cliente</th>
                 </tr>
             </thead>
 
@@ -164,6 +165,51 @@
 
                         <!-- TOTAL -->
                         <td class="fw-bold">@totalFila</td>
+
+                        <td>
+                            @{
+                                var pedidosCliente = g
+                                    .Where(x => x.NumeroPedidoCliente > 0)
+                                    .GroupBy(x => new
+                                    {
+                                        x.PedidoClienteId,
+                                        x.NumeroPedidoCliente
+                                    })
+                                    .Select(p => new
+                                    {
+                                        NumeroPedido = p.Key.NumeroPedidoCliente,
+                                        Cantidad = p.Sum(x => x.Cantidad)
+                                    })
+                                    .OrderBy(x => x.NumeroPedido)
+                                    .ToList();
+                            }
+
+                            @if (pedidosCliente.Any())
+                            {
+                                <div class="pedidos-rastreo">
+
+                                    @foreach (var pedidoCliente in pedidosCliente)
+                                    {
+                                        <div class="pedido-rastreo-item">
+
+                                            <span class="pedido-badge">
+                                                #@pedidoCliente.NumeroPedido
+                                            </span>
+
+                                            <span class="pedido-cantidad">
+                                                @pedidoCliente.Cantidad pares
+                                            </span>
+
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
