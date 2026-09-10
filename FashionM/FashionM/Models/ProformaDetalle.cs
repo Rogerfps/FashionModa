@@ -24,6 +24,11 @@ namespace FashionM.Models
         public decimal PrecioUnitario { get; set; }
 
         public decimal SubTotal { get; set; }
+
+        public decimal DescuentoPorcentaje { get; set; }
+        public decimal DescuentoMonto { get; set; }
+
+        public int CantidadDevuelta { get; set; }
     }
 }
 

@@ -32,6 +32,7 @@
 
     </div>
 
+
     <!-- INFO -->
     <div class="info-card">
 
@@ -49,6 +50,7 @@
 
             </div>
 
+
             <div class="info-item">
 
                 <div class="info-label">
@@ -61,6 +63,7 @@
                 </div>
 
             </div>
+
 
             <div class="info-item">
 
@@ -78,6 +81,7 @@
 
     </div>
 
+
     <!-- FORM -->
     <div class="form-card">
 
@@ -89,6 +93,7 @@
 
         </div>
 
+
         <form asp-action="CrearZapato"
               method="post"
               id="formProforma">
@@ -97,7 +102,9 @@
                    name="proformaId"
                    value="@Model.Id" />
 
+
             <div class="row g-3">
+
 
                 <!-- PRODUCTO -->
                 <div class="col-md-4 position-relative">
@@ -123,6 +130,7 @@
 
                 </div>
 
+
                 <!-- COLOR -->
                 <div class="col-md-3">
 
@@ -143,6 +151,7 @@
 
                 </div>
 
+
                 <!-- DETALLE -->
                 <div class="col-md-3">
 
@@ -162,17 +171,26 @@
 
                 </div>
 
-                <!-- BTN -->
-                <div class="col-md-2 d-flex align-items-end">
 
-                    <button type="submit"
-                            class="btn-add">
+                <!-- DESCUENTO PRODUCTO -->
+                <div class="col-md-2">
 
-                        ➕ Agregar
+                    <label class="form-label">
+                        Descuento %
+                    </label>
 
-                    </button>
+                    <input type="number"
+                           name="descuentoProducto"
+                           id="descuentoProducto"
+                           class="form-control"
+                           value="0"
+                           min="0"
+                           max="100"
+                           step="0.01"
+                           placeholder="0" />
 
                 </div>
+
 
                 <!-- TABLA -->
                 <div class="col-12">
@@ -185,13 +203,27 @@
 
                 </div>
 
+
+                <!-- BTN -->
+                <div class="col-12 d-flex justify-content-end">
+
+                    <button type="submit"
+                            class="btn-add">
+
+                        ➕ Agregar Producto
+
+                    </button>
+
+                </div>
+
             </div>
 
         </form>
 
     </div>
 
-    <!-- TABLA ACTUAL -->
+
+    <!-- PRODUCTOS ACTUALES -->
     <div class="table-wrapper">
 
         <div class="section-title">
@@ -202,6 +234,7 @@
 
         </div>
 
+
         <div class="table-responsive">
 
             <table class="productos-table">
@@ -211,20 +244,55 @@
                     <tr>
 
                         <th>Código</th>
+
                         <th>Color</th>
+
                         <th>Talla</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-right">Precio</th>
-                        <th class="text-right">Subtotal</th>
+
+                        <th class="text-center">
+                            Cantidad
+                        </th>
+
+                        <th class="text-center">
+                            Devuelto
+                        </th>
+
+                        <th class="text-center">
+                            Actual
+                        </th>
+
+                        <th class="text-right">
+                            Precio
+                        </th>
+
+                        <th class="text-right">
+                            Descuento
+                        </th>
+
+                        <th class="text-right">
+                            Subtotal
+                        </th>
+
+                        <th class="text-center">
+                            Devolver
+                        </th>
 
                     </tr>
 
                 </thead>
 
+
                 <tbody>
 
                     @foreach (var item in Model.Detalles)
                     {
+                        var cantidadActual =
+                            Math.Max(
+                                0,
+                                item.Cantidad -
+                                item.CantidadDevuelta
+                            );
+
                         <tr>
 
                             <td>
@@ -243,12 +311,100 @@
                                 @item.Cantidad
                             </td>
 
+                            <td class="text-center">
+
+                                @if (item.CantidadDevuelta > 0)
+                                {
+                                    <span>
+                                        @item.CantidadDevuelta
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>0</span>
+                                }
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <strong>
+                                    @cantidadActual
+                                </strong>
+
+                            </td>
+
                             <td class="text-right">
+
                                 ₡ @item.PrecioUnitario.ToString("N2")
+
+                            </td>
+
+                            <td class="text-right">
+
+                                @if (item.DescuentoPorcentaje > 0)
+                                {
+                                    <span>
+                                        @item.DescuentoPorcentaje.ToString("N2")%
+                                    </span>
+
+                                    <br />
+
+                                    <small>
+                                        -₡ @item.DescuentoMonto.ToString("N2")
+                                    </small>
+                                }
+                                else
+                                {
+                                    <span>0%</span>
+                                }
+
                             </td>
 
                             <td class="text-right fw-bold">
+
                                 ₡ @item.SubTotal.ToString("N2")
+
+                            </td>
+
+                            <td class="text-center">
+
+                                @if (cantidadActual > 0)
+                                {
+                                    <form asp-action="DevolverProducto"
+                                          method="post"
+                                          class="d-flex justify-content-center align-items-center gap-1">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="detalleId"
+                                               value="@item.Id" />
+
+                                        <input type="number"
+                                               name="cantidadDevuelta"
+                                               value="1"
+                                               min="1"
+                                               max="@cantidadActual"
+                                               class="form-control form-control-sm"
+                                               style="width: 70px;" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-warning"
+                                                title="Devolver producto"
+                                                onclick="return confirm('¿Está seguro de devolver esta cantidad al inventario?');">
+                                            ↩️
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Devuelto
+                                    </span>
+                                }
+
                             </td>
 
                         </tr>
@@ -260,20 +416,91 @@
 
         </div>
 
-        <!-- TOTAL -->
+
+        <!-- RESUMEN -->
         <div class="total-footer">
 
-            <span>Total:</span>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+
+                <span>
+                    Subtotal:
+                </span>
+
+                <span>
+                    ₡ @{
+                    var subtotalAntesDescuentoGeneral =
+                        Model.Total + Model.DescuentoMonto;
+                }
+                @subtotalAntesDescuentoGeneral.ToString("N2")
+            </span>
+
+        </div>
+
+
+        <!-- DESCUENTO GENERAL -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <form asp-action="AplicarDescuentoGeneral"
+                  method="post"
+                  class="d-flex align-items-center gap-2">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="proformaId"
+                       value="@Model.Id" />
+
+                <span>
+                    Descuento general:
+                </span>
+
+                <input type="number"
+                       name="descuentoPorcentaje"
+                       value="@Model.DescuentoPorcentaje.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                       min="0"
+                       max="100"
+                       step="0.01"
+                       class="form-control"
+                       style="width:100px;" />
+
+                <span>%</span>
+
+                <button type="submit"
+                        class="btn btn-sm btn-primary">
+
+                    Aplicar
+
+                </button>
+
+            </form>
+
 
             <span>
-                ₡ @Model.Total.ToString("N2")
+                -₡ @Model.DescuentoMonto.ToString("N2")
             </span>
+
+        </div>
+
+
+        <!-- TOTAL -->
+        <div class="d-flex justify-content-between align-items-center">
+
+            <strong>
+                Total:
+            </strong>
+
+            <strong>
+                ₡ @Model.Total.ToString("N2")
+            </strong>
 
         </div>
 
     </div>
 
 </div>
+
+</div>
+
 
 @section Scripts {
 
@@ -308,34 +535,30 @@
 
         let variantes = [];
 
+
         // ========================================
         // BUSCAR PRODUCTO
         // ========================================
 
         input.addEventListener(
             "keyup",
-            function ()
-            {
+            function() {
                 clearTimeout(timeout);
 
                 let term = this.value;
 
-                timeout = setTimeout(() =>
-                {
-                    if (term.length < 1)
-                    {
+                timeout = setTimeout(() => {
+                    if (term.length < 1) {
                         lista.innerHTML = "";
                         return;
                     }
 
-                    fetch(`/Proformas/BuscarProductos?term=${term}&proformaId=@Model.Id`)
+                    fetch(`/Proformas/BuscarProductos?term=${encodeURIComponent(term)}&proformaId=@Model.Id`)
                         .then(r => r.json())
-                        .then(data =>
-                        {
+                        .then(data => {
                             lista.innerHTML = "";
 
-                            data.forEach(p =>
-                            {
+                            data.forEach(p => {
                                 let item =
                                     document.createElement("a");
 
@@ -345,8 +568,7 @@
                                 item.innerHTML =
                                     `<strong>${p.codigo}</strong> - ${p.marca}`;
 
-                                item.onclick = () =>
-                                {
+                                item.onclick = () => {
                                     input.value = p.codigo;
 
                                     hidden.value = p.codigo;
@@ -363,16 +585,15 @@
                 }, 300);
             });
 
+
         // ========================================
         // CARGAR VARIANTES
         // ========================================
 
-        function cargarVariantes(codigo)
-        {
-            fetch(`/Proformas/ObtenerVariantes?codigo=${codigo}&proformaId=@Model.Id`)
+        function cargarVariantes(codigo) {
+            fetch(`/Proformas/ObtenerVariantes?codigo=${encodeURIComponent(codigo)}&proformaId=@Model.Id`)
                 .then(r => r.json())
-                .then(data =>
-                {
+                .then(data => {
                     variantes = data;
 
                     llenarSelect(
@@ -390,14 +611,14 @@
                 });
         }
 
+
         // ========================================
         // COLOR CHANGE
         // ========================================
 
         color.addEventListener(
             "change",
-            () =>
-            {
+            () => {
                 let c = color.value;
 
                 let filtradasColor =
@@ -419,8 +640,7 @@
                     "(Sin detalle)"
                 );
 
-                if (unicos.length === 1)
-                {
+                if (unicos.length === 1) {
                     detalle.value = unicos[0];
 
                     detalle.dispatchEvent(
@@ -428,13 +648,13 @@
                     );
                 }
 
-                if (unicos.length === 0)
-                {
+                if (unicos.length === 0) {
                     renderTallas(
                         filtradasColor
                     );
                 }
             });
+
 
         // ========================================
         // DETALLE CHANGE
@@ -442,8 +662,7 @@
 
         detalle.addEventListener(
             "change",
-            () =>
-            {
+            () => {
                 let c = color.value;
 
                 let d = detalle.value;
@@ -452,81 +671,96 @@
                     variantes.filter(v =>
                         v.color === c &&
                         (v.detalle || "").trim()
-                            === (d || "").trim()
+                        === (d || "").trim()
                     );
 
                 renderTallas(filtradas);
             });
 
+
         // ========================================
         // RENDER TALLAS
         // ========================================
 
-        function renderTallas(data)
-        {
+        function renderTallas(data) {
             let html = `
-                <table class="productos-table">
-                    <thead>
-                        <tr>
-                            <th>Talla</th>
-                            <th>Stock</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+                        <table class="productos-table">
 
-            data.forEach((v, i) =>
-            {
+                            <thead>
+
+                                <tr>
+
+                                    <th>Talla</th>
+
+                                    <th>Stock</th>
+
+                                    <th>Precio</th>
+
+                                    <th>Cantidad</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+                    `;
+
+            data.forEach((v, i) => {
                 let precio =
                     Number(v.precio || 0);
 
                 html += `
-                    <tr>
+                            <tr>
 
-                        <td>${v.talla}</td>
+                                <td>
+                                    ${v.talla}
+                                </td>
 
-                        <td>${v.stock ?? '-'}</td>
+                                <td>
+                                    ${v.stock ?? '-'}
+                                </td>
 
-                        <td>
-                            ₡ ${precio.toFixed(2)}
-                        </td>
+                                <td>
+                                    ₡ ${precio.toFixed(2)}
+                                </td>
 
-                        <td>
+                                <td>
 
-                            <input type="hidden"
-                                   name="tallas[${i}]"
-                                   value="${v.talla}" />
+                                    <input type="hidden"
+                                           name="tallas[${i}]"
+                                           value="${v.talla}" />
 
-                            <input type="hidden"
-                                   name="preciosCosto[${i}]"
-                                   value="${precio}" />
+                                    <input type="hidden"
+                                           name="preciosCosto[${i}]"
+                                           value="${precio}" />
 
-                            <input type="hidden"
-                                   name="preciosVenta[${i}]"
-                                   value="${precio}" />
+                                    <input type="hidden"
+                                           name="preciosVenta[${i}]"
+                                           value="${precio}" />
 
-                            <input type="number"
-                                   name="cantidades[${i}]"
-                                   min="0"
-                                   class="form-control" />
+                                    <input type="number"
+                                           name="cantidades[${i}]"
+                                           min="0"
+                                           max="${v.stock ?? ''}"
+                                           class="form-control" />
 
-                        </td>
+                                </td>
 
-                    </tr>
-                `;
+                            </tr>
+                        `;
             });
 
             html += `
-                    </tbody>
-                </table>
-            `;
+                            </tbody>
+
+                        </table>
+                    `;
 
             document.getElementById(
                 "tablaTallas"
             ).innerHTML = html;
         }
+
 
         // ========================================
         // SUBMIT
@@ -536,8 +770,7 @@
             "formProforma"
         ).addEventListener(
             "submit",
-            function (e)
-            {
+            function(e) {
                 let inputsCantidad =
                     document.querySelectorAll(
                         "input[name^='cantidades']"
@@ -566,15 +799,14 @@
 
                 let nuevosVentas = [];
 
+
                 inputsCantidad.forEach(
-                    (input, index) =>
-                    {
+                    (input, index) => {
                         let cantidad =
                             parseInt(input.value);
 
                         if (!isNaN(cantidad)
-                            && cantidad > 0)
-                        {
+                            && cantidad > 0) {
                             nuevasTallas.push(
                                 inputsTalla[index].value
                             );
@@ -597,8 +829,8 @@
                         }
                     });
 
-                if (nuevasCantidades.length === 0)
-                {
+
+                if (nuevasCantidades.length === 0) {
                     e.preventDefault();
 
                     alert(
@@ -608,7 +840,31 @@
                     return;
                 }
 
+
+                // ========================================
+                // VALIDAR DESCUENTO PRODUCTO
+                // ========================================
+
+                const descuento =
+                    parseFloat(
+                        document.getElementById(
+                            "descuentoProducto"
+                        ).value
+                    ) || 0;
+
+                if (descuento < 0 || descuento > 100) {
+                    e.preventDefault();
+
+                    alert(
+                        "El descuento debe estar entre 0% y 100%."
+                    );
+
+                    return;
+                }
+
+
                 // LIMPIAR INPUTS VIEJOS
+
                 inputsCantidad.forEach(i => i.remove());
 
                 inputsTalla.forEach(i => i.remove());
@@ -617,31 +873,34 @@
 
                 inputsVenta.forEach(i => i.remove());
 
+
                 // CREAR NUEVOS
-                nuevasTallas.forEach((t, i) =>
-                {
+
+                nuevasTallas.forEach((t, i) => {
                     this.insertAdjacentHTML(
                         "beforeend",
                         `
-                        <input type="hidden"
-                               name="tallas[${i}]"
-                               value="${t}" />
+                                    <input type="hidden"
+                                           name="tallas[${i}]"
+                                           value="${t}" />
 
-                        <input type="hidden"
-                               name="cantidades[${i}]"
-                               value="${nuevasCantidades[i]}" />
+                                    <input type="hidden"
+                                           name="cantidades[${i}]"
+                                           value="${nuevasCantidades[i]}" />
 
-                        <input type="hidden"
-                               name="preciosCosto[${i}]"
-                               value="${nuevosCostos[i]}" />
+                                    <input type="hidden"
+                                           name="preciosCosto[${i}]"
+                                           value="${nuevosCostos[i]}" />
 
-                        <input type="hidden"
-                               name="preciosVenta[${i}]"
-                               value="${nuevosVentas[i]}" />
-                        `
+                                    <input type="hidden"
+                                           name="preciosVenta[${i}]"
+                                           value="${nuevosVentas[i]}" />
+                                `
                     );
                 });
+
             });
+
 
         // ========================================
         // LLENAR SELECT
@@ -651,13 +910,11 @@
             select,
             items,
             textoDefault
-        )
-        {
+        ) {
             select.innerHTML =
                 `<option value="">${textoDefault}</option>`;
 
-            items.forEach(i =>
-            {
+            items.forEach(i => {
                 let o =
                     document.createElement(
                         "option"

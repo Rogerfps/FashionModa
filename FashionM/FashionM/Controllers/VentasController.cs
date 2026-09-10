@@ -77,7 +77,7 @@ namespace FashionM.Controllers
         }
 
         [Authorize(Roles = "Admin,Secretaria")]
-        public async Task<IActionResult> Graficos(int? mes, int? anio, string? tipo)
+        public async Task<IActionResult> Graficos(int? mes, int? anio, string? tipo, int? empresaId)
         {
             var ventas = await _context.Ventas
                 .Include(v => v.Cliente)
@@ -118,6 +118,16 @@ namespace FashionM.Controllers
                 ? "pares"
                 : tipo.ToLower();
 
+            // ========================================
+            // 🏢 FILTRO DE EMPRESA PARA GRÁFICO SEMANAL
+            // ========================================
+
+            ViewBag.EmpresaSeleccionada = empresaId ?? 0;
+
+            ViewBag.EmpresasFiltro = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
             ViewBag.AnioSeleccionado = anioActual;
             ViewBag.MesSeleccionado = mesActual;
             ViewBag.MesActual = nombresMeses[mesActual];
@@ -146,6 +156,22 @@ namespace FashionM.Controllers
             // 📅 VENTAS POR SEMANA
             // ========================================
 
+            // ========================================
+            // 📅 VENTAS POR SEMANA
+            // ========================================
+
+            // Base: ventas del año seleccionado
+            var ventasSemanaBase = ventasFiltradas;
+
+            // Si se seleccionó una empresa,
+            // filtramos únicamente para el gráfico semanal
+            if (empresaId.HasValue && empresaId.Value > 0)
+            {
+                ventasSemanaBase = ventasSemanaBase
+                    .Where(v => v.EmpresaId == empresaId.Value)
+                    .ToList();
+            }
+
             var ventasSemana = Enumerable.Range(1, 52)
                 .Select(semana => new
                 {
@@ -153,21 +179,25 @@ namespace FashionM.Controllers
 
                     Semana = $"Semana {semana}",
 
-                    Pares = ventasFiltradas
+                    Pares = ventasSemanaBase
                         .Where(v => v.Semana == semana)
                         .Sum(v => v.CantidadZapatos),
 
-                    Total = ventasFiltradas
+                    Total = ventasSemanaBase
                         .Where(v => v.Semana == semana)
                         .Sum(v => v.Total)
                 })
                 .ToList();
 
-            ViewBag.Semanas = ventasSemana.Select(x => x.Semana);
+            ViewBag.Semanas =
+                ventasSemana.Select(x => x.Semana);
 
-            ViewBag.SemanaPares = ventasSemana.Select(x => x.Pares);
+            ViewBag.SemanaPares =
+                ventasSemana.Select(x => x.Pares);
 
-            ViewBag.SemanaTotales = ventasSemana.Select(x => x.Total);
+            ViewBag.SemanaTotales =
+                ventasSemana.Select(x => x.Total);
+
 
             // ========================================
             // 📆 VENTAS POR MES + EMPRESA

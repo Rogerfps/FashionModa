@@ -139,181 +139,134 @@ namespace FashionM.Controllers
             string color,
             string[] tallas,
             int[] cantidades,
-            decimal[] preciosVenta
-        )
+            decimal[] preciosVenta,
+            decimal descuentoProducto = 0)
         {
-            // ========================================
-            // VALIDAR TALLAS
-            // ========================================
-
-            if (tallas == null || tallas.Length == 0)
+            if (tallas == null || cantidades == null || preciosVenta == null)
             {
-                TempData["Error"] =
-                    "Debe agregar al menos una talla";
-
-                return RedirectToAction(
-                    "AgregarProducto",
-                    new { id = proformaId });
+                TempData["Error"] = "Debe seleccionar al menos una talla.";
+                return RedirectToAction(nameof(AgregarProducto), new { id = proformaId });
             }
 
-            // ========================================
-            // VALIDAR PRECIOS
-            // ========================================
-
-            if (preciosVenta == null)
+            if (tallas.Length != cantidades.Length || tallas.Length != preciosVenta.Length)
             {
-                TempData["Error"] =
-                    "No se recibieron precios.";
-
-                return RedirectToAction(
-                    "AgregarProducto",
-                    new { id = proformaId });
+                TempData["Error"] = "Los datos de las tallas no coinciden.";
+                return RedirectToAction(nameof(AgregarProducto), new { id = proformaId });
             }
 
-            // ========================================
-            // RECORRER TALLAS
-            // ========================================
-
-            for (int i = 0; i < tallas.Length; i++)
+            if (descuentoProducto < 0 || descuentoProducto > 100)
             {
-                // 🔥 VALIDAR ÍNDICES
-                if (i >= cantidades.Length ||
-                    i >= preciosVenta.Length)
+                TempData["Error"] = "El descuento debe estar entre 0% y 100%.";
+                return RedirectToAction(nameof(AgregarProducto), new { id = proformaId });
+            }
+
+            var proforma = await _context.Proformas
+                .Include(p => p.Detalles)
+                .FirstOrDefaultAsync(p => p.Id == proformaId);
+
+            if (proforma == null)
+                return NotFound();
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                for (int i = 0; i < tallas.Length; i++)
                 {
-                    continue;
-                }
+                    if (cantidades[i] <= 0)
+                        continue;
 
-                // 🔥 VALIDAR CANTIDAD
-                if (cantidades[i] <= 0)
-                    continue;
-
-                // ========================================
-                // BUSCAR INVENTARIO
-                // ========================================
-
-                var inventario =
-                    await _context.TallasInventario
+                    var inventario = await _context.TallasInventario
                         .FirstOrDefaultAsync(t =>
                             t.InventarioCodigo == codigo &&
                             t.Color == color &&
                             t.Numero == tallas[i]);
 
-                if (inventario == null)
-                    continue;
-
-                // ========================================
-                // VALIDAR STOCK
-                // ========================================
-
-                if (inventario.Cantidad < cantidades[i])
-                {
-                    TempData["Error"] =
-                        $"Stock insuficiente para talla {tallas[i]}";
-
-                    return RedirectToAction(
-                        "AgregarProducto",
-                        new { id = proformaId });
-                }
-
-                // ========================================
-                // RESTAR INVENTARIO
-                // ========================================
-
-                inventario.Cantidad -=
-                    cantidades[i];
-
-                // ========================================
-                // CREAR DETALLE
-                // ========================================
-
-                var detalle =
-                    new ProformaDetalle
+                    if (inventario == null)
                     {
-                        ProformaId =
-                            proformaId,
+                        TempData["Error"] =
+                            $"No se encontró inventario para {codigo}, color {color}, talla {tallas[i]}.";
 
-                        // FK al inventario
-                        InventarioCodigo =
-                            codigo,
+                        await transaction.RollbackAsync();
 
-                        // Copia permanente del código
-                        CodigoProducto =
-                            codigo,
+                        return RedirectToAction(nameof(AgregarProducto),
+                            new { id = proformaId });
+                    }
 
-                        Color =
-                            color,
+                    if (inventario.Cantidad < cantidades[i])
+                    {
+                        TempData["Error"] =
+                            $"Stock insuficiente para {codigo}, talla {tallas[i]}. " +
+                            $"Disponible: {inventario.Cantidad}.";
 
-                        Talla =
-                            tallas[i],
+                        await transaction.RollbackAsync();
 
-                        Cantidad =
-                            cantidades[i],
+                        return RedirectToAction(nameof(AgregarProducto),
+                            new { id = proformaId });
+                    }
 
-                        PrecioUnitario =
-                            preciosVenta[i],
+                    decimal precio = preciosVenta[i];
 
-                        SubTotal =
-                            cantidades[i]
-                            * preciosVenta[i]
+                    decimal subtotalBruto =
+                        cantidades[i] * precio;
+
+                    decimal descuentoMonto =
+                        Math.Round(
+                            subtotalBruto * (descuentoProducto / 100m),
+                            2);
+
+                    decimal subtotalFinal =
+                        subtotalBruto - descuentoMonto;
+
+                    // Restar del inventario
+                    inventario.Cantidad -= cantidades[i];
+
+                    var detalle = new ProformaDetalle
+                    {
+                        ProformaId = proformaId,
+                        InventarioCodigo = codigo,
+                        CodigoProducto = codigo,
+                        Color = color,
+                        Talla = tallas[i],
+                        Cantidad = cantidades[i],
+                        PrecioUnitario = precio,
+
+                        // Descuento aplicado a esta línea
+                        DescuentoPorcentaje = descuentoProducto,
+                        DescuentoMonto = descuentoMonto,
+
+                        // Subtotal después del descuento del producto
+                        SubTotal = subtotalFinal,
+
+                        CantidadDevuelta = 0
                     };
 
-                _context.ProformaDetalles
-                    .Add(detalle);
-            }
-
-            // ========================================
-            // GUARDAR DETALLES
-            // ========================================
-
-            await _context.SaveChangesAsync();
-
-            // ========================================
-            // ACTUALIZAR TOTAL
-            // ========================================
-
-            var proforma =
-                await _context.Proformas
-                    .Include(p => p.Detalles)
-                    .FirstOrDefaultAsync(p =>
-                        p.Id == proformaId);
-
-            if (proforma != null)
-            {
-                proforma.Total =
-                    proforma.Detalles
-                        .Sum(d => d.SubTotal);
+                    _context.ProformaDetalles.Add(detalle);
+                }
 
                 await _context.SaveChangesAsync();
+
+                // Recalcular todos los totales
+                await RecalcularTotalesProforma(proformaId);
+
+                await transaction.CommitAsync();
+
+                return RedirectToAction(nameof(AgregarProducto),
+                    new { id = proformaId });
             }
+            catch
+            {
+                await transaction.RollbackAsync();
 
-            // ========================================
-            // RECARGAR PROFORMA
-            // ========================================
+                TempData["Error"] =
+                    "Ocurrió un error al agregar el producto.";
 
-            await _context.Entry(
-                await _context.Proformas
-                    .FirstAsync(x => x.Id == proformaId)
-            ).ReloadAsync();
-
-            // ========================================
-            // CREAR / ACTUALIZAR VENTA
-            // ========================================
-
-            //await CrearActualizarVenta(proformaId);
-
-            // ========================================
-            // REDIRECT
-            // ========================================
-
-            return RedirectToAction(
-                "AgregarProducto",
-                new { id = proformaId });
+                return RedirectToAction(nameof(AgregarProducto),
+                    new { id = proformaId });
+            }
         }
 
-        // ==========================
-        // ACTUALIZAR TOTAL
-        // ==========================
-        private async Task ActualizarTotal(int proformaId)
+        private async Task RecalcularTotalesProforma(int proformaId)
         {
             var proforma = await _context.Proformas
                 .Include(p => p.Detalles)
@@ -322,9 +275,87 @@ namespace FashionM.Controllers
             if (proforma == null)
                 return;
 
-            proforma.Total = proforma.Detalles.Sum(d => d.SubTotal);
+            decimal subtotalProforma = 0;
+
+            foreach (var detalle in proforma.Detalles)
+            {
+                int cantidadActual =
+                    detalle.Cantidad - detalle.CantidadDevuelta;
+
+                if (cantidadActual < 0)
+                    cantidadActual = 0;
+
+                decimal subtotalBruto =
+                    cantidadActual * detalle.PrecioUnitario;
+
+                decimal descuentoDetalle =
+                    Math.Round(
+                        subtotalBruto *
+                        (detalle.DescuentoPorcentaje / 100m),
+                        2);
+
+                detalle.DescuentoMonto = descuentoDetalle;
+
+                detalle.SubTotal =
+                    subtotalBruto - descuentoDetalle;
+
+                subtotalProforma += detalle.SubTotal;
+            }
+
+            // Descuento general aplicado DESPUÉS
+            // del descuento individual
+            proforma.DescuentoMonto =
+                Math.Round(
+                    subtotalProforma *
+                    (proforma.DescuentoPorcentaje / 100m),
+                    2);
+
+            proforma.Total =
+                subtotalProforma -
+                proforma.DescuentoMonto;
 
             await _context.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AplicarDescuentoGeneral(
+    int proformaId,
+    decimal descuentoPorcentaje)
+        {
+            var proforma = await _context.Proformas
+                .FirstOrDefaultAsync(p => p.Id == proformaId);
+
+            if (proforma == null)
+                return NotFound();
+
+            if (descuentoPorcentaje < 0 ||
+                descuentoPorcentaje > 100)
+            {
+                TempData["Error"] =
+                    "El descuento debe estar entre 0% y 100%.";
+
+                return RedirectToAction(nameof(AgregarProducto),
+                    new { id = proformaId });
+            }
+
+            proforma.DescuentoPorcentaje =
+                descuentoPorcentaje;
+
+            await _context.SaveChangesAsync();
+
+            await RecalcularTotalesProforma(proformaId);
+
+            return RedirectToAction(nameof(AgregarProducto),
+                new { id = proformaId });
+        }
+
+        // ==========================
+        // ACTUALIZAR TOTAL
+        // ==========================
+        private async Task ActualizarTotal(int proformaId)
+        {
+            await RecalcularTotalesProforma(proformaId);
         }
 
         private async Task CrearActualizarVenta(int proformaId)
@@ -547,6 +578,99 @@ namespace FashionM.Controllers
         }
 
         // ==========================
+        // DEVOLVER PRODUCTO
+        // ==========================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DevolverProducto(
+            int detalleId,
+            int cantidadDevuelta)
+        {
+            if (cantidadDevuelta <= 0)
+            {
+                TempData["Error"] =
+                    "La cantidad a devolver debe ser mayor que cero.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var detalle = await _context.ProformaDetalles
+                .Include(d => d.Proforma)
+                .FirstOrDefaultAsync(d => d.Id == detalleId);
+
+            if (detalle == null)
+                return NotFound();
+
+            int cantidadDisponibleParaDevolver =
+                detalle.Cantidad - detalle.CantidadDevuelta;
+
+            if (cantidadDevuelta > cantidadDisponibleParaDevolver)
+            {
+                TempData["Error"] =
+                    $"No puede devolver {cantidadDevuelta} unidades. " +
+                    $"Solo quedan {cantidadDisponibleParaDevolver} unidades disponibles para devolución.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = detalle.ProformaId });
+            }
+
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var inventario = await _context.TallasInventario
+                    .FirstOrDefaultAsync(t =>
+                        t.InventarioCodigo == detalle.InventarioCodigo &&
+                        t.Color == detalle.Color &&
+                        t.Numero == detalle.Talla);
+
+                if (inventario == null)
+                {
+                    TempData["Error"] =
+                        "No se encontró el producto correspondiente en el inventario.";
+
+                    await transaction.RollbackAsync();
+
+                    return RedirectToAction(
+                        nameof(AgregarProducto),
+                        new { id = detalle.ProformaId });
+                }
+
+                inventario.Cantidad += cantidadDevuelta;
+
+                detalle.CantidadDevuelta += cantidadDevuelta;
+
+                await _context.SaveChangesAsync();
+
+                await RecalcularTotalesProforma(
+                    detalle.ProformaId);
+
+                await transaction.CommitAsync();
+
+                TempData["Success"] =
+                    $"Se devolvieron {cantidadDevuelta} unidades al inventario.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = detalle.ProformaId });
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+
+                TempData["Error"] =
+                    "Ocurrió un error al devolver el producto.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = detalle.ProformaId });
+            }
+        }
+
+        // ==========================
         // PDF
         // ==========================
         public async Task<IActionResult> GenerarPDF(int id)
@@ -584,21 +708,55 @@ namespace FashionM.Controllers
 
             // 🔥 AGRUPAR DETALLES (AQUÍ ESTÁ LA MAGIA)
             var detallesAgrupados = proforma.Detalles
-                .GroupBy(d => new
-                {
-                    d.InventarioCodigo,
-                    d.Color,
-                    d.PrecioUnitario
-                })
-                .Select(g => new
-                {
-                    Codigo = g.Key.InventarioCodigo,
-                    Color = g.Key.Color,
-                    Cantidad = g.Sum(x => x.Cantidad),
-                    PrecioUnitario = g.Key.PrecioUnitario,
-                    SubTotal = g.Sum(x => x.SubTotal)
-                })
-                .ToList();
+    .GroupBy(d => new
+    {
+        d.InventarioCodigo,
+        d.Color,
+        d.PrecioUnitario,
+        d.DescuentoPorcentaje
+    })
+    .Select(g =>
+    {
+        int cantidadReal = g.Sum(x =>
+            Math.Max(0, x.Cantidad - x.CantidadDevuelta));
+
+        decimal subtotalBruto =
+            cantidadReal * g.Key.PrecioUnitario;
+
+        decimal descuentoProducto =
+            Math.Round(
+                subtotalBruto *
+                (g.Key.DescuentoPorcentaje / 100m),
+                2);
+
+        decimal subtotal =
+            subtotalBruto - descuentoProducto;
+
+        return new
+        {
+            Codigo = g.Key.InventarioCodigo,
+            Color = g.Key.Color,
+            Cantidad = cantidadReal,
+            PrecioUnitario = g.Key.PrecioUnitario,
+            DescuentoPorcentaje = g.Key.DescuentoPorcentaje,
+            DescuentoMonto = descuentoProducto,
+            SubTotal = subtotal
+        };
+    })
+    // No mostrar productos completamente devueltos
+            .Where(x => x.Cantidad > 0)
+            .ToList();
+
+            var subtotalProductos = detallesAgrupados
+                .Sum(x => x.SubTotal);
+
+            var descuentoGeneral = Math.Round(
+                subtotalProductos *
+                (proforma.DescuentoPorcentaje / 100m),
+                2);
+
+            var totalPares = detallesAgrupados
+                .Sum(x => x.Cantidad);
 
             var primaryColor = "#0f172a";
             var accentColor = "#2563eb";
@@ -676,40 +834,178 @@ namespace FashionM.Controllers
                                     columns.RelativeColumn();
                                     columns.RelativeColumn();
                                     columns.RelativeColumn();
+                                    columns.RelativeColumn();
                                 });
 
                                 table.Header(header =>
                                 {
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Código").Bold();
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).Text("Color").Bold();
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Cant").Bold();
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Precio").Bold();
-                                    header.Cell().BorderBottom(2).BorderColor(accentColor).Padding(6).AlignRight().Text("Subtotal").Bold();
+                                    table.Header(header =>
+                                    {
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .Text("Código")
+                                            .Bold();
+
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .Text("Color")
+                                            .Bold();
+
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .AlignRight()
+                                            .Text("Cant")
+                                            .Bold();
+
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .AlignRight()
+                                            .Text("Precio")
+                                            .Bold();
+
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .AlignRight()
+                                            .Text("Desc.")
+                                            .Bold();
+
+                                        header.Cell()
+                                            .BorderBottom(2)
+                                            .BorderColor(accentColor)
+                                            .Padding(6)
+                                            .AlignRight()
+                                            .Text("Subtotal")
+                                            .Bold();
+                                    });
                                 });
 
                                 foreach (var item in detallesAgrupados)
                                 {
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Codigo);
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).Text(item.Color);
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text(item.Cantidad.ToString());
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.PrecioUnitario:N2}");
-                                    table.Cell().BorderBottom(1).BorderColor("#e5e7eb").Padding(6).AlignRight().Text($"₡ {item.SubTotal:N2}");
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .Text(item.Codigo);
+
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .Text(item.Color);
+
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text(item.Cantidad.ToString());
+
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text($"₡ {item.PrecioUnitario:N2}");
+
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text(item.DescuentoPorcentaje > 0
+                                            ? $"{item.DescuentoPorcentaje:N2}%"
+                                            : "0%");
+
+                                    table.Cell()
+                                        .BorderBottom(1)
+                                        .BorderColor("#e5e7eb")
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text($"₡ {item.SubTotal:N2}");
                                 }
                             });
 
                             // 🔷 TOTAL
-                            content.Item().AlignRight().Width(250).Column(total =>
-                            {
-                                total.Item().BorderTop(2).BorderColor("#e5e7eb");
-
-                                total.Item().Row(row =>
+                            content.Item()
+                                .AlignRight()
+                                .Width(300)
+                                .Column(total =>
                                 {
-                                    row.RelativeItem().Text("TOTAL").Bold().FontSize(12);
+                                    total.Spacing(5);
 
-                                    row.RelativeItem().AlignRight().Text($"₡ {proforma.Total:N2}")
-                                        .Bold().FontSize(18).FontColor(primaryColor);
+                                    total.Item()
+                                        .BorderTop(2)
+                                        .BorderColor("#e5e7eb");
+
+                                    // TOTAL DE PARES
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem()
+                                            .Text("TOTAL DE PARES")
+                                            .Bold()
+                                            .FontSize(11);
+
+                                        row.RelativeItem()
+                                            .AlignRight()
+                                            .Text(totalPares.ToString())
+                                            .Bold()
+                                            .FontSize(11);
+                                    });
+
+                                    // SUBTOTAL
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem()
+                                            .Text("SUBTOTAL");
+
+                                        row.RelativeItem()
+                                            .AlignRight()
+                                            .Text($"₡ {subtotalProductos:N2}");
+                                    });
+
+                                    // DESCUENTO GENERAL
+                                    if (proforma.DescuentoPorcentaje > 0)
+                                    {
+                                        total.Item().Row(row =>
+                                        {
+                                            row.RelativeItem()
+                                                .Text(
+                                                    $"Descuento general ({proforma.DescuentoPorcentaje:N2}%)");
+
+                                            row.RelativeItem()
+                                                .AlignRight()
+                                                .Text($"-₡ {descuentoGeneral:N2}");
+                                        });
+                                    }
+
+                                    // TOTAL FINAL
+                                    total.Item()
+                                        .PaddingTop(5)
+                                        .Row(row =>
+                                        {
+                                            row.RelativeItem()
+                                            .Text("TOTAL")
+                                            .Bold()
+                                            .FontSize(12);
+
+                                            row.RelativeItem()
+                                            .AlignRight()
+                                            .Text($"₡ {proforma.Total:N2}")
+                                            .Bold()
+                                            .FontSize(18)
+                                            .FontColor(primaryColor);
+                                        });
                                 });
-                            });
 
                             // 🔷 DETALLE
                             if (!string.IsNullOrWhiteSpace(proforma.Detalle))
@@ -860,7 +1156,6 @@ namespace FashionM.Controllers
             return Json(agentes);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GenerarVenta(int id)
@@ -888,9 +1183,7 @@ namespace FashionM.Controllers
                 var ventaExistente =
                     await _context.Ventas
                         .FirstOrDefaultAsync(v =>
-
                             v.DocumentoId == proforma.Id &&
-
                             v.TipoDocumento == "PROFORMA"
                         );
 
@@ -904,7 +1197,18 @@ namespace FashionM.Controllers
                         new { id });
                 }
 
-                int cantidadZapatos = proforma.Detalles.Sum(x => x.Cantidad);
+                // ========================================
+                // CANTIDAD REAL DE ZAPATOS
+                // DESPUÉS DE DEVOLUCIONES
+                // ========================================
+
+                int cantidadZapatos =
+                    proforma.Detalles.Sum(x =>
+                        Math.Max(
+                            0,
+                            x.Cantidad - x.CantidadDevuelta
+                        )
+                    );
 
                 // ========================================
                 // FECHA UTC
@@ -963,15 +1267,49 @@ namespace FashionM.Controllers
                 await _context.SaveChangesAsync();
 
                 // ========================================
-                // DETALLES
+                // DETALLES DE LA VENTA
                 // ========================================
 
                 foreach (var item in proforma.Detalles)
                 {
+                    // Cantidad que realmente queda
+                    // después de las devoluciones
+                    int cantidadActual =
+                        Math.Max(
+                            0,
+                            item.Cantidad - item.CantidadDevuelta
+                        );
+
+                    // Si se devolvió todo el producto,
+                    // no lo agregamos a la venta.
+                    if (cantidadActual <= 0)
+                        continue;
+
+                    // ====================================
+                    // SUBTOTAL REAL
+                    // ====================================
+
+                    decimal subtotalBruto =
+                        cantidadActual *
+                        item.PrecioUnitario;
+
+                    // Descuento del producto
+                    decimal descuentoDetalle =
+                        Math.Round(
+                            subtotalBruto *
+                            (item.DescuentoPorcentaje / 100m),
+                            2
+                        );
+
+                    decimal subtotalFinal =
+                        subtotalBruto -
+                        descuentoDetalle;
+
                     _context.VentaDetalles.Add(
                         new VentaDetalle
                         {
-                            VentaId = venta.Id,
+                            VentaId =
+                                venta.Id,
 
                             InventarioCodigo =
                                 item.InventarioCodigo,
@@ -983,14 +1321,15 @@ namespace FashionM.Controllers
                                 item.Talla,
 
                             Cantidad =
-                                item.Cantidad,
+                                cantidadActual,
 
                             PrecioUnitario =
                                 item.PrecioUnitario,
 
                             SubTotal =
-                                item.SubTotal
-                        });
+                                subtotalFinal
+                        }
+                    );
                 }
 
                 await _context.SaveChangesAsync();
@@ -1014,6 +1353,5 @@ namespace FashionM.Controllers
             }
         }
     }
-    
-    
 }
+

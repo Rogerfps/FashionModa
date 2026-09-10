@@ -105,6 +105,37 @@
                 </select>
             </div>
 
+            <div class="filter-group">
+                <label>🏢 Empresa</label>
+
+                <select name="empresaId"
+                        class="form-select"
+                        onchange="this.form.submit()">
+
+                    <option value="0"
+                            selected="@(ViewBag.EmpresaSeleccionada == 0)">
+                        Todas las empresas
+                    </option>
+
+                    @foreach (var empresa in ViewBag.EmpresasFiltro)
+                    {
+                        if (ViewBag.EmpresaSeleccionada == empresa.Id)
+                        {
+                            <option value="@empresa.Id" selected>
+                                @empresa.Nombre
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@empresa.Id">
+                                @empresa.Nombre
+                            </option>
+                        }
+                    }
+
+                </select>
+            </div>
+
 
             <div class="filter-group">
                 <label>📊 Mostrar</label>

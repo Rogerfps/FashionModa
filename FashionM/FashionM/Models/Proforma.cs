@@ -27,6 +27,9 @@ namespace FashionM.Models
 
         public int NumeroCajas { get; set; }
 
+        public decimal DescuentoPorcentaje { get; set; }
+        public decimal DescuentoMonto { get; set; }
+
         public string? Detalle { get; set; }
 
         public ICollection<ProformaDetalle> Detalles { get; set; } = new List<ProformaDetalle>();
