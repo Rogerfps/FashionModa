@@ -28,11 +28,24 @@ public class ProveedorCatalogoController : Controller
             .AsQueryable();
 
         // 🔍 BUSQUEDA
+        // 🔍 BUSQUEDA NORMALIZADA
         if (!string.IsNullOrWhiteSpace(busqueda))
         {
+            string busquedaNormalizada = busqueda
+                .ToLower()
+                .Replace("-", "")
+                .Replace(" ", "");
+
             query = query.Where(p =>
-                p.Codigo.Contains(busqueda) ||
-                p.Nombre.Contains(busqueda)
+                p.Codigo.ToLower()
+                    .Replace("-", "")
+                    .Replace(" ", "")
+                    .Contains(busquedaNormalizada) ||
+
+                p.Nombre.ToLower()
+                    .Replace("-", "")
+                    .Replace(" ", "")
+                    .Contains(busquedaNormalizada)
             );
         }
 

@@ -42,17 +42,28 @@ namespace FashionM.Controllers
                 .Include(i => i.Fotos)
                 .AsQueryable();
 
+            // 🔎 BÚSQUEDA NORMALIZADA
             if (!string.IsNullOrWhiteSpace(search))
             {
+                string searchNormalizado = search
+                    .ToLower()
+                    .Replace("-", "")
+                    .Replace(" ", "");
+
                 query = query.Where(i =>
-                    i.Codigo.Contains(search) ||
-                    i.Marca.Contains(search) ||
-                    i.SKU.Contains(search) ||
-                    i.Tallas.Any(t => t.Color.Contains(search)) ||
-                    i.Tallas.Any(t => t.Detalle.Contains(search))
+                    i.Codigo.ToLower().Replace("-", "").Replace(" ", "").Contains(searchNormalizado) ||
+                    i.Marca.ToLower().Replace("-", "").Replace(" ", "").Contains(searchNormalizado) ||
+                    i.SKU.ToLower().Replace("-", "").Replace(" ", "").Contains(searchNormalizado) ||
+                    i.Tallas.Any(t =>
+                        t.Color.ToLower().Replace("-", "").Replace(" ", "").Contains(searchNormalizado)
+                    ) ||
+                    i.Tallas.Any(t =>
+                        t.Detalle.ToLower().Replace("-", "").Replace(" ", "").Contains(searchNormalizado)
+                    )
                 );
             }
 
+            // 🏢 FILTRO POR EMPRESA
             if (!string.IsNullOrWhiteSpace(empresa))
             {
                 query = query.Where(i => i.Empresa == empresa);

@@ -33,16 +33,23 @@ namespace FashionM.Controllers
             var clientes = _context.Clientes.AsQueryable();
 
             // 🔍 BUSQUEDA GENERAL
+            // 🔍 BUSQUEDA GENERAL NORMALIZADA
             if (!string.IsNullOrWhiteSpace(buscar))
             {
+                string buscarNormalizado = buscar
+                    .ToLower()
+                    .Replace("-", "")
+                    .Replace(" ", "");
+
                 clientes = clientes.Where(c =>
-                    c.Codigo.Contains(buscar) ||
-                    c.Nombre.Contains(buscar) ||
-                    c.Apellidos.Contains(buscar) ||
-                    c.Agente.Contains(buscar) ||
-                    c.Empresa.Contains(buscar) || 
-                    c.Cedula.ToString().Contains(buscar) ||
-                    (c.Telefonos != null && c.Telefonos.Contains(buscar))
+                    c.Codigo.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    c.Nombre.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    c.Apellidos.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    c.Agente.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    c.Empresa.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    c.Cedula.ToString().Contains(buscarNormalizado) ||
+                    (c.Telefonos != null &&
+                     c.Telefonos.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado))
                 );
             }
 
