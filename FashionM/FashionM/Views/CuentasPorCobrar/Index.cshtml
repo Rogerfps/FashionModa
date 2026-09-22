@@ -8,30 +8,44 @@
 
 <div class="cxc-container">
 
-    <!-- HEADER -->
+    <!-- ========================================
+         HEADER
+    ======================================== -->
+
     <div class="page-header">
-
         <div>
-
             <h1 class="page-title">
-
-                <span>💰</span>
-
-                Cuentas por Cobrar
-
+                <span>💰</span> Cuentas por Cobrar
             </h1>
 
             <p class="page-subtitle">
-
                 Resumen general de clientes con saldo pendiente
-
             </p>
-
         </div>
 
+        <div class="page-header-actions">
+
+            <a asp-action="ExportarExcel"
+               asp-route-buscar="@ViewBag.Buscar"
+               asp-route-empresaId="@ViewBag.EmpresaId"
+               asp-route-estado="@ViewBag.Estado"
+               asp-route-antiguedad="@ViewBag.Antiguedad"
+               class="btn-exportar-excel">
+                📊 Descargar Excel
+            </a>
+
+            <a asp-action="ProximosVencimientos"
+               class="btn-proximos-vencimientos">
+                🔔 Próximos vencimientos
+            </a>
+
+        </div>
     </div>
 
-    <!-- ALERTAS -->
+
+    <!-- ========================================
+         ALERTAS
+    ======================================== -->
     @if (TempData["Success"] != null)
     {
         <div class="alert-success">
@@ -40,6 +54,7 @@
 
         </div>
     }
+
 
     @if (TempData["Error"] != null)
     {
@@ -50,27 +65,45 @@
         </div>
     }
 
-    <!-- FILTROS -->
+
+    <!-- ========================================
+         FILTROS
+    ======================================== -->
+
     <div class="filters-card">
 
-        <form method="get" class="filters-grid">
+        <form method="get"
+              class="filters-grid">
+
+            <!-- ========================================
+                 BUSCAR
+            ======================================== -->
 
             <div class="filter-group">
 
-                <label>🔍 Buscar</label>
+                <label>
+                    🔍 Buscar
+                </label>
 
                 <input type="text"
                        name="buscar"
                        value="@ViewBag.Buscar"
                        class="form-control"
-                       placeholder="Cliente, comercio..."
+                       placeholder="Código, cliente, comercio o cédula..."
                        oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.submit(), 2000);" />
 
             </div>
 
+
+            <!-- ========================================
+                 EMPRESA
+            ======================================== -->
+
             <div class="filter-group">
 
-                <label>🏢 Empresa</label>
+                <label>
+                    🏢 Empresa
+                </label>
 
                 <select name="empresaId"
                         class="form-control"
@@ -93,9 +126,16 @@
 
             </div>
 
+
+            <!-- ========================================
+                 ESTADO
+            ======================================== -->
+
             <div class="filter-group">
 
-                <label>Estado</label>
+                <label>
+                    Estado
+                </label>
 
                 <select name="estado"
                         class="form-control"
@@ -111,6 +151,11 @@
                         Pendientes
                     </option>
 
+                    <option value="Vencida"
+                            selected="@(ViewBag.Estado == "Vencida")">
+                        Vencidas
+                    </option>
+
                     <option value="Pagada"
                             selected="@(ViewBag.Estado == "Pagada")">
                         Pagadas
@@ -118,20 +163,78 @@
 
                 </select>
 
+            </div>
+
+
+            <!-- ========================================
+                 ANTIGÜEDAD
+            ======================================== -->
+
+            <div class="filter-group">
+
+                <label>
+                    ⏰ Antigüedad
+                </label>
+
+                <select name="antiguedad"
+                        class="form-control"
+                        onchange="this.form.submit()">
+
+                    <option value=""
+                            selected="@(string.IsNullOrEmpty(ViewBag.Antiguedad))">
+                        Todas
+                    </option>
+
+                    <option value="menos30"
+                            selected="@(ViewBag.Antiguedad == "menos30")">
+                        Menos de 30 días
+                    </option>
+
+                    <option value="30a60"
+                            selected="@(ViewBag.Antiguedad == "30a60")">
+                        30 a 60 días
+                    </option>
+
+                    <option value="61a89"
+                            selected="@(ViewBag.Antiguedad == "61a89")">
+                        61 a 89 días
+                    </option>
+
+                    <option value="90a199"
+                            selected="@(ViewBag.Antiguedad == "90a199")">
+                        90 a 199 días
+                    </option>
+
+                    <option value="200mas"
+                            selected="@(ViewBag.Antiguedad == "200mas")">
+                        200+ días
+                    </option>
+
+                </select>
 
             </div>
 
 
+            <!-- ========================================
+                 BOTONES
+            ======================================== -->
+
             <div class="filter-group d-flex align-items-end">
 
-                <button type="submit" class="btn btn-primary me-2">
+                <button type="submit"
+                        class="btn btn-primary me-2">
+
                     🔍 Buscar
+
                 </button>
+
 
                 <a asp-action="Index"
                    asp-route-empresaId="0"
                    class="btn btn-secondary">
+
                     ✖ Limpiar
+
                 </a>
 
             </div>
@@ -140,7 +243,11 @@
 
     </div>
 
-    <!-- TABLA -->
+
+    <!-- ========================================
+         TABLA
+    ======================================== -->
+
     <div class="table-card">
 
         <div class="table-responsive">
@@ -152,27 +259,65 @@
 
                     <tr>
 
-                        <th>Cliente</th>
+                        <!-- CODIGO -->
 
-                        <th>Empresa</th>
+                        <th>
+                            Código
+                        </th>
 
-                        <th>Cédula</th>
+
+                        <!-- CLIENTE -->
+
+                        <th>
+                            Cliente
+                        </th>
+
+
+                        <!-- EMPRESA -->
+
+                        <th>
+                            Empresa
+                        </th>
+
+
+                        <!-- CEDULA -->
+
+                        <th>
+                            Cédula
+                        </th>
+
+
+                        <!-- FACTURAS -->
+
+                        <th class="text-center">
+                            Facturas
+                        </th>
+
+
+                        <!-- SALDO -->
 
                         <th class="text-right">
                             Saldo Total
                         </th>
 
+
+                        <!-- ESTADO -->
+
                         <th>
                             Estado
                         </th>
 
+
+                        <!-- DETAILS -->
+
                         <th class="text-center">
-                            Acciones
+                            Details
                         </th>
 
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
@@ -180,12 +325,40 @@
                     {
                         <tr>
 
-                            <!-- CLIENTE -->
-                            <td class="cliente-nombre">
+                            <!-- ========================================
+                                 CODIGO CLIENTE
+                            ======================================== -->
 
-                                @item.Nombre
+                            <td class="cliente-codigo">
+
+                                @item.CodigoCliente
 
                             </td>
+
+
+                            <!-- ========================================
+                                 CLIENTE
+                            ======================================== -->
+
+                            <td class="cliente-nombre">
+
+                                <strong>
+                                    @item.Nombre
+                                </strong>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Comercio))
+                                {
+                                    <div class="cliente-comercio">
+                                        @item.Comercio
+                                    </div>
+                                }
+
+                            </td>
+
+
+                            <!-- ========================================
+                                 EMPRESA
+                            ======================================== -->
 
                             <td class="empresa">
 
@@ -193,29 +366,90 @@
 
                             </td>
 
-                            <!-- CEDULA -->
+
+                            <!-- ========================================
+                                 CEDULA
+                            ======================================== -->
+
                             <td class="cliente-cedula">
 
                                 @item.ClienteCedula
 
                             </td>
 
-                            <!-- SALDO -->
-                            <td class="text-right saldo-total">
 
-                                ₡ @(((decimal)item.Saldo)
-                                                                    .ToString("N2"))
+                            <!-- ========================================
+                                 CANTIDAD FACTURAS
+                            ======================================== -->
+
+                            <td class="text-center">
+
+                                <span class="facturas-count">
+
+                                    @item.CantidadFacturas
+
+                                </span>
 
                             </td>
 
-                            <!-- ESTADO -->
+
+                            <!-- ========================================
+                                 SALDO
+                            ======================================== -->
+
+                            <td class="text-right saldo-total">
+
+                                ₡ @(((decimal)item.Saldo).ToString("N2"))
+
+                                @if ((decimal)item.SaldoVencido > 0)
+                                {
+                                    <div class="saldo-vencido">
+
+                                        Vencido:
+                                        ₡ @(((decimal)item.SaldoVencido).ToString("N2"))
+
+                                    </div>
+                                }
+
+                            </td>
+
+
+                            <!-- ========================================
+                                 ESTADO
+                            ======================================== -->
+
                             <td>
 
-                                @if ((decimal)item.Saldo <= 0)
+                                @if (item.Estado == "Pagada")
                                 {
                                     <span class="badge-success">
 
-                                        PAGADA
+                                        ✓ PAGADA
+
+                                    </span>
+                                }
+                                else if (item.Estado == "Vencida")
+                                {
+                                    <span class="badge-danger">
+
+                                        ⚠ VENCIDA
+
+                                    </span>
+
+                                    @if ((int)item.DiasVencidos > 0)
+                                    {
+                                        <div class="dias-vencidos">
+
+                                            @item.DiasVencidos días
+
+                                        </div>
+                                    }
+                                }
+                                else if (item.Estado == "Pago parcial")
+                                {
+                                    <span class="badge-info">
+
+                                        ◐ PAGO PARCIAL
 
                                     </span>
                                 }
@@ -223,14 +457,18 @@
                                 {
                                     <span class="badge-warning">
 
-                                        PENDIENTE
+                                        ⏳ PENDIENTE
 
                                     </span>
                                 }
 
                             </td>
 
-                            <!-- ACCIONES -->
+
+                            <!-- ========================================
+                                 DETAILS
+                            ======================================== -->
+
                             <td class="text-center">
 
                                 <div class="actions-group">
@@ -260,4 +498,3 @@
     </div>
 
 </div>
-

@@ -1,0 +1,925 @@
+﻿@{
+    ViewData["Title"] = "Próximos vencimientos";
+
+    var cuentasProximasAVencer =
+        ViewBag.CuentasProximasAVencer as IEnumerable<dynamic>
+        ?? Enumerable.Empty<dynamic>();
+
+    int cantidadProximasAVencer =
+        ViewBag.CantidadProximasAVencer != null
+            ? (int)ViewBag.CantidadProximasAVencer
+            : 0;
+
+    int diasAvisoVencimiento =
+        ViewBag.DiasAvisoVencimiento != null
+            ? (int)ViewBag.DiasAvisoVencimiento
+            : 7;
+
+    string buscar =
+        ViewBag.Buscar as string ?? "";
+
+    int empresaSeleccionada =
+        ViewBag.EmpresaId != null
+            ? (int)ViewBag.EmpresaId
+            : 0;
+}
+
+<style>
+
+    :root {
+        --deep-blue: #0B2447;
+        --ocean-blue: #19376D;
+        --electric-blue: #576CBC;
+        --light-bg: #F5F9FF;
+        --pure-white: #FFFFFF;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --text-gray: #64748b;
+        --border-light: #e2e8f0;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .vencimientos-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+
+    /* ========================================
+       HEADER
+    ======================================== */
+
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(
+            135deg,
+            var(--deep-blue) 0%,
+            var(--electric-blue) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-subtitle {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        margin-top: 0.4rem;
+    }
+
+
+    /* ========================================
+       BOTÓN VOLVER
+    ======================================== */
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0.65rem 1rem;
+        border-radius: 999px;
+        background: white;
+        border: 1px solid var(--border-light);
+        color: var(--ocean-blue);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-back:hover {
+        background: var(--ocean-blue);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+
+    /* ========================================
+       RESUMEN
+    ======================================== */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 18px;
+        padding: 1.2rem 1.3rem;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .summary-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    .summary-icon.red {
+        background: rgba(239, 68, 68, 0.12);
+    }
+
+    .summary-icon.orange {
+        background: rgba(245, 158, 11, 0.12);
+    }
+
+    .summary-icon.blue {
+        background: rgba(59, 130, 246, 0.10);
+    }
+
+    .summary-label {
+        color: var(--text-gray);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .summary-number {
+        color: var(--deep-blue);
+        font-size: 1.35rem;
+        font-weight: 700;
+    }
+
+
+    /* ========================================
+       FILTROS
+    ======================================== */
+
+    .filters-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-group label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--deep-blue);
+        letter-spacing: 0.4px;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 2px solid var(--border-light);
+        border-radius: 14px;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        transition: 0.2s ease;
+        background: #fafcff;
+    }
+
+    .form-control:focus {
+        border-color: var(--electric-blue);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(87, 108, 188, 0.12);
+    }
+
+    .btn-clear {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 44px;
+        padding: 0 1.1rem;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: var(--text-gray);
+        border: none;
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+    .btn-clear:hover {
+        background: var(--border-light);
+        color: var(--deep-blue);
+    }
+
+
+    /* ========================================
+       TABLA
+    ======================================== */
+
+    .table-card {
+        background: white;
+        border-radius: 22px;
+        padding: 1.5rem;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .table-title {
+        margin: 0;
+        color: var(--deep-blue);
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .table-subtitle {
+        margin: 4px 0 0;
+        color: var(--text-gray);
+        font-size: 0.75rem;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .vencimientos-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 1050px;
+    }
+
+    .vencimientos-table thead th {
+        background: var(--deep-blue);
+        color: white;
+        padding: 1rem;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .vencimientos-table thead th:first-child {
+        border-radius: 16px 0 0 16px;
+    }
+
+    .vencimientos-table thead th:last-child {
+        border-radius: 0 16px 16px 0;
+    }
+
+    .vencimientos-table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+        background: white;
+    }
+
+    .vencimientos-table tbody tr:hover td {
+        background: rgba(87, 108, 188, 0.03);
+    }
+
+
+    /* ========================================
+       CLIENTE
+    ======================================== */
+
+    .cliente-nombre {
+        color: var(--deep-blue);
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .cliente-comercio {
+        color: var(--text-gray);
+        font-size: 0.75rem;
+        margin-top: 3px;
+    }
+
+    .cliente-codigo {
+        color: var(--ocean-blue);
+        font-family: monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-top: 3px;
+    }
+
+
+    /* ========================================
+       EMPRESA
+    ======================================== */
+
+    .empresa {
+        color: var(--ocean-blue);
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+
+    /* ========================================
+       FACTURA
+    ======================================== */
+
+    .factura {
+        color: var(--text-gray);
+        font-family: monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+
+    /* ========================================
+       SALDO
+    ======================================== */
+
+    .saldo {
+        color: var(--deep-blue);
+        font-size: 0.95rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================
+       FECHA
+    ======================================== */
+
+    .fecha {
+        color: var(--text-gray);
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================
+       DÍAS
+    ======================================== */
+
+    .dias-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dias-hoy {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger);
+    }
+
+    .dias-pronto {
+        background: rgba(245, 158, 11, 0.14);
+        color: #c2410c;
+    }
+
+    .dias-normal {
+        background: rgba(59, 130, 246, 0.10);
+        color: var(--info);
+    }
+
+
+    /* ========================================
+       ACCIÓN
+    ======================================== */
+
+    .btn-details {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        background: #e6f0fa;
+        color: var(--info);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: 0.2s ease;
+    }
+
+    .btn-details:hover {
+        background: var(--info);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+
+    /* ========================================
+       VACÍO
+    ======================================== */
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-title {
+        color: var(--deep-blue);
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    .empty-text {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+    }
+
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+
+    @@media (max-width: 1000px) {
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .filters-grid .clear-button {
+            grid-column: span 2;
+        }
+    }
+
+
+    @@media (max-width: 768px) {
+
+        .vencimientos-container {
+            padding: 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-grid .clear-button {
+            grid-column: auto;
+        }
+
+        .table-card {
+            padding: 1rem;
+        }
+
+        .vencimientos-table {
+            min-width: 1000px;
+        }
+    }
+
+</style>
+
+
+<div class="vencimientos-container">
+
+    <!-- ========================================
+         HEADER
+    ======================================== -->
+
+    <div class="page-header">
+
+        <div>
+            <h1 class="page-title">
+                🔔 Próximos vencimientos
+            </h1>
+
+            <p class="page-subtitle">
+                Cuentas por cobrar que requieren seguimiento antes de su vencimiento.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn-back">
+            ← Cuentas por cobrar
+        </a>
+
+    </div>
+
+
+    <!-- ========================================
+         RESUMEN
+    ======================================== -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon red">
+                🔴
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Vencen hoy
+                </div>
+
+                <div class="summary-number">
+                    @cuentasProximasAVencer.Count(x => x.DiasParaVencer == 0)
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon orange">
+                🟠
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Próximos 3 días
+                </div>
+
+                <div class="summary-number">
+                    @cuentasProximasAVencer.Count(x =>
+                        x.DiasParaVencer >= 1 &&
+                        x.DiasParaVencer <= 3)
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon blue">
+                🔵
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Próximos @diasAvisoVencimiento días
+                </div>
+
+                <div class="summary-number">
+                    @cantidadProximasAVencer
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         FILTROS
+    ======================================== -->
+
+    <div class="filters-card">
+
+        <form asp-action="ProximosVencimientos"
+              method="get">
+
+            <div class="filters-grid">
+
+                <div class="filter-group">
+
+                    <label>
+                        Buscar cliente
+                    </label>
+
+                    <input type="text"
+                           name="buscar"
+                           value="@buscar"
+                           class="form-control"
+                           placeholder="Nombre, cédula, código o comercio..." />
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>
+                        Empresa
+                    </label>
+
+                    <select name="empresaId"
+                            class="form-control"
+                            onchange="this.form.submit()">
+
+                        <option value="0">
+                            Todas las empresas
+                        </option>
+
+                        @if (ViewBag.Empresas != null)
+                        {
+                            foreach (var empresa in ViewBag.Empresas)
+                            {
+                                if (empresa.Id == empresaSeleccionada)
+                                {
+                                    <option value="@empresa.Id" selected>
+                                        @empresa.Nombre
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@empresa.Id">
+                                        @empresa.Nombre
+                                    </option>
+                                }
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <div class="clear-button">
+
+                    <a asp-action="ProximosVencimientos"
+                       class="btn-clear">
+                        ↻ Limpiar
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================================
+         TABLA
+    ======================================== -->
+
+    <div class="table-card">
+
+        <div class="table-header">
+
+            <div>
+
+                <h2 class="table-title">
+                    Cuentas pendientes de seguimiento
+                </h2>
+
+                <p class="table-subtitle">
+                    Se muestran cuentas con saldo pendiente que vencen dentro de los próximos
+                    @diasAvisoVencimiento días.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (cuentasProximasAVencer.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="vencimientos-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Cliente
+                            </th>
+
+                            <th>
+                                Empresa
+                            </th>
+
+                            <th>
+                                Factura
+                            </th>
+
+                            <th>
+                                Saldo
+                            </th>
+
+                            <th>
+                                Fecha vencimiento
+                            </th>
+
+                            <th>
+                                Tiempo restante
+                            </th>
+
+                            <th>
+                                Acción
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var cuenta in cuentasProximasAVencer)
+                        {
+                            string claseDias = "dias-normal";
+                            string textoDias = "";
+
+                            if (cuenta.DiasParaVencer == 0)
+                            {
+                                claseDias = "dias-hoy";
+                                textoDias = "Vence hoy";
+                            }
+                            else if (cuenta.DiasParaVencer <= 3)
+                            {
+                                claseDias = "dias-pronto";
+                                textoDias = $"En {cuenta.DiasParaVencer} días";
+                            }
+                            else
+                            {
+                                claseDias = "dias-normal";
+                                textoDias = $"En {cuenta.DiasParaVencer} días";
+                            }
+
+                            <tr>
+
+                                <!-- CLIENTE -->
+
+                                <td>
+
+                                    <div class="cliente-nombre">
+                                        @cuenta.Cliente
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(cuenta.Comercio))
+                                    {
+                                        <div class="cliente-comercio">
+                                            @cuenta.Comercio
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(cuenta.CodigoCliente))
+                                    {
+                                        <div class="cliente-codigo">
+                                            @cuenta.CodigoCliente
+                                        </div>
+                                    }
+
+                                </td>
+
+
+                                <!-- EMPRESA -->
+
+                                <td>
+
+                                    <div class="empresa">
+                                        @cuenta.Empresa
+                                    </div>
+
+                                </td>
+
+
+                                <!-- FACTURA -->
+
+                                <td>
+
+                                    <div class="factura">
+                                        #@cuenta.VentaId
+                                    </div>
+
+                                </td>
+
+
+                                <!-- SALDO -->
+
+                                <td>
+
+                                    <div class="saldo">
+                                        ₡ @cuenta.Saldo.ToString("N2")
+                                    </div>
+
+                                </td>
+
+
+                                <!-- FECHA -->
+
+                                <td>
+
+                                    <div class="fecha">
+
+                                        @cuenta.FechaVencimiento.ToString("dd/MM/yyyy")
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- DÍAS -->
+
+                                <td>
+
+                                    <span class="dias-badge @claseDias">
+                                        @textoDias
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ACCIÓN -->
+
+                                <td>
+
+                                    <a asp-action="Details"
+                                       asp-route-clienteCedula="@cuenta.ClienteCedula"
+                                       asp-route-empresaId="@cuenta.EmpresaId"
+                                       class="btn-details">
+
+                                        📄 Ver cuenta
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    ✅
+                </div>
+
+                <div class="empty-title">
+                    No hay cuentas próximas a vencer
+                </div>
+
+                <div class="empty-text">
+                    No existen cuentas pendientes con vencimiento dentro de los próximos
+                    @diasAvisoVencimiento días.
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

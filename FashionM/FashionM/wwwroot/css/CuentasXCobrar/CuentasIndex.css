@@ -23,11 +23,16 @@ body {
     padding: 2rem;
 }
 
+
 /* ========================================
-           HEADER
-        ======================================== */
+   HEADER
+======================================== */
 
 .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -47,11 +52,51 @@ body {
     color: var(--text-gray);
     font-size: 0.9rem;
     margin-top: 0.4rem;
+    margin-bottom: 0;
 }
 
+.page-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+
 /* ========================================
-           ALERTAS
-        ======================================== */
+   BOTÓN PRÓXIMOS VENCIMIENTOS
+======================================== */
+
+.btn-proximos-vencimientos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 0.65rem 1.1rem;
+    border-radius: 999px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #c2410c;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+    .btn-proximos-vencimientos:hover {
+        background: var(--warning);
+        border-color: var(--warning);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.18);
+    }
+
+
+/* ========================================
+   ALERTAS
+======================================== */
 
 .alert-success,
 .alert-error {
@@ -74,9 +119,10 @@ body {
     color: var(--danger);
 }
 
+
 /* ========================================
-           FILTROS
-        ======================================== */
+   FILTROS
+======================================== */
 
 .filters-card {
     background: var(--pure-white);
@@ -84,13 +130,34 @@ body {
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     border: 1px solid var(--border-light);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+
+/*
+   IMPORTANTE:
+   El Index tiene 5 elementos:
+   1. Buscar
+   2. Empresa
+   3. Estado
+   4. Antigüedad
+   5. Botones
+
+   Por eso usamos 5 columnas.
+*/
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 2fr) minmax(180px, 1fr) minmax(150px, 1fr) minmax(170px, 1.2fr) auto;
+    gap: 1rem;
+    align-items: end;
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
 }
 
     .filter-group label {
@@ -101,11 +168,18 @@ body {
         letter-spacing: 0.4px;
     }
 
+
+/* ========================================
+   INPUTS / SELECTS
+======================================== */
+
 .form-control {
     width: 100%;
-    border: 2px solid #e2e8f0;
+    min-height: 44px;
+    box-sizing: border-box;
+    border: 2px solid var(--border-light);
     border-radius: 14px;
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 1rem;
     font-size: 0.9rem;
     transition: 0.2s ease;
     background: #fafcff;
@@ -114,19 +188,40 @@ body {
     .form-control:focus {
         border-color: var(--electric-blue);
         outline: none;
-        box-shadow: 0 0 0 4px rgba(87,108,188,0.12);
+        box-shadow: 0 0 0 4px rgba(87, 108, 188, 0.12);
     }
 
+
 /* ========================================
-           TABLA
-        ======================================== */
+   BOTONES DE FILTROS
+======================================== */
+
+.filters-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 44px;
+}
+
+    .filters-buttons .btn {
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+
+/* ========================================
+   TABLA
+======================================== */
 
 .table-card {
     background: var(--pure-white);
     border-radius: 22px;
     padding: 1.5rem;
     border: 1px solid var(--border-light);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
 }
 
 .table-responsive {
@@ -137,7 +232,7 @@ body {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 900px;
+    min-width: 1100px;
 }
 
     .clientes-table thead th {
@@ -167,12 +262,26 @@ body {
     }
 
     .clientes-table tbody tr:hover td {
-        background: rgba(87,108,188,0.03);
+        background: rgba(87, 108, 188, 0.03);
     }
 
+
 /* ========================================
-           TEXTOS
-        ======================================== */
+   CODIGO CLIENTE
+======================================== */
+
+.cliente-codigo {
+    color: var(--ocean-blue);
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   CLIENTE
+======================================== */
 
 .cliente-nombre {
     font-weight: 700;
@@ -180,57 +289,135 @@ body {
     font-size: 1rem;
 }
 
+.cliente-comercio {
+    margin-top: 3px;
+    color: var(--text-gray);
+    font-size: 0.78rem;
+    font-weight: 400;
+}
+
+
+/* ========================================
+   EMPRESA
+======================================== */
+
+.empresa {
+    color: var(--ocean-blue);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   CEDULA
+======================================== */
+
 .cliente-cedula {
     color: var(--text-gray);
     font-family: monospace;
     font-size: 0.95rem;
 }
 
+
+/* ========================================
+   FACTURAS
+======================================== */
+
+.facturas-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 10px;
+    background: #eef4ff;
+    color: var(--ocean-blue);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   SALDOS
+======================================== */
+
 .saldo-total {
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--deep-blue);
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-center {
-    text-align: center;
-}
-
-/* ========================================
-           BADGES
-        ======================================== */
-
-.badge-success,
-.badge-warning {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem 1rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 700;
     white-space: nowrap;
 }
 
+.saldo-vencido {
+    margin-top: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--danger);
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   DIAS VENCIDOS
+======================================== */
+
+.dias-vencidos {
+    margin-top: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--danger);
+    text-align: center;
+}
+
+
+/* ========================================
+   BADGES
+======================================== */
+
+.badge-success,
+.badge-warning,
+.badge-danger,
+.badge-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
 .badge-success {
-    background: rgba(16,185,129,0.12);
+    background: rgba(16, 185, 129, 0.12);
     color: var(--success);
-    border: 1px solid rgba(16,185,129,0.2);
+    border-color: rgba(16, 185, 129, 0.20);
 }
 
 .badge-warning {
-    background: rgba(245,158,11,0.12);
+    background: rgba(245, 158, 11, 0.12);
     color: var(--warning);
-    border: 1px solid rgba(245,158,11,0.2);
+    border-color: rgba(245, 158, 11, 0.20);
 }
 
+.badge-danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.20);
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--info);
+    border-color: rgba(59, 130, 246, 0.20);
+}
+
+
 /* ========================================
-           BOTONES
-        ======================================== */
+   BOTONES
+======================================== */
 
 .actions-group {
     display: flex;
@@ -251,6 +438,7 @@ body {
     text-decoration: none;
     transition: 0.2s ease;
     border: none;
+    white-space: nowrap;
 }
 
 .btn-details {
@@ -261,13 +449,66 @@ body {
     .btn-details:hover {
         background: var(--info);
         color: white;
+        transform: translateY(-1px);
     }
 
+
 /* ========================================
-           RESPONSIVE
-        ======================================== */
+   ALINEACION
+======================================== */
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@@media (max-width: 1200px) {
+
+    .filters-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
+
+        .filters-grid .filter-group:nth-child(4) {
+            grid-column: span 1;
+        }
+
+        .filters-grid .filter-group:nth-child(5) {
+            grid-column: span 2;
+        }
+}
+
+
+@@media (max-width: 900px) {
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .page-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+        .filters-grid .filter-group:nth-child(5) {
+            grid-column: span 2;
+        }
+}
+
 
 @@media (max-width: 768px) {
+
     .cxc-container {
         padding: 1rem;
     }
@@ -276,8 +517,32 @@ body {
         font-size: 1.5rem;
     }
 
+    .page-header-actions {
+        width: 100%;
+    }
+
+    .btn-proximos-vencimientos {
+        width: 100%;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+        .filters-grid .filter-group:nth-child(5) {
+            grid-column: auto;
+        }
+
+    .filters-buttons {
+        width: 100%;
+    }
+
+        .filters-buttons .btn {
+            flex: 1;
+        }
+
     .clientes-table {
-        min-width: 700px;
+        min-width: 1000px;
     }
 
     .btn-action {
@@ -289,15 +554,26 @@ body {
     }
 }
 
-.filters-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
+.btn-exportar-excel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.65rem 1.1rem;
+    border-radius: 8px;
+    background: #15803d;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid #15803d;
+    transition: all 0.2s ease;
 }
 
-@@media(max-width:768px) {
-
-    .filters-grid {
-        grid-template-columns: 1fr;
+    .btn-exportar-excel:hover {
+        background: #166534;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
     }
-}

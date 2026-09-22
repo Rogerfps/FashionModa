@@ -341,7 +341,6 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compres
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\vyolgii9xh-{0}-rnrmiizf81-rnrmiizf81.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\nxclbg6b1j-{0}-fbbu4cb76j-fbbu4cb76j.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\tke1sjrpjb-{0}-v5nr4wpnpc-v5nr4wpnpc.gz
-C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\lzwuptx5c3-{0}-5o1r9i2tlz-5o1r9i2tlz.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\s8yqhf3zva-{0}-6pao2ospih-6pao2ospih.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\uhfsyscm5d-{0}-tco53e3to8-tco53e3to8.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\4taq5ekzkt-{0}-knjwlpwmhx-knjwlpwmhx.gz
@@ -350,3 +349,4 @@ C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compres
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\0b7xkf540t-{0}-dc5fifg9qj-dc5fifg9qj.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\w8lfe15dnb-{0}-7karg57rvu-7karg57rvu.gz
 C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\vfre74f3ah-{0}-pwjtqrmyg9-pwjtqrmyg9.gz
+C:\Proyectos\FashionModa\FashionModa\FashionM\FashionM\obj\Debug\net10.0\compressed\lzwuptx5c3-{0}-frjvp1qsn0-frjvp1qsn0.gz
