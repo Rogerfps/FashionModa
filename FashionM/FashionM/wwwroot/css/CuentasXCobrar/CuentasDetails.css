@@ -12,6 +12,11 @@
     --border-light: #e2e8f0;
 }
 
+
+/* ============================================================
+   GENERAL
+============================================================ */
+
 body {
     background: var(--light-bg);
     font-family: 'Inter', sans-serif;
@@ -22,6 +27,11 @@ body {
     margin: 0 auto;
     padding: 2rem;
 }
+
+
+/* ============================================================
+   HEADER
+============================================================ */
 
 .page-header {
     display: flex;
@@ -35,7 +45,7 @@ body {
 .page-title {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    background: linear-gradient( 135deg, var(--deep-blue) 0%, var(--electric-blue) 100% );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
@@ -50,6 +60,11 @@ body {
     margin-top: 0.3rem;
 }
 
+
+/* ============================================================
+   BOTON VOLVER
+============================================================ */
+
 .btn-back {
     background: #f1f5f9;
     color: var(--deep-blue);
@@ -61,7 +76,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
     .btn-back:hover {
@@ -69,6 +84,11 @@ body {
         color: white;
         transform: translateY(-2px);
     }
+
+
+/* ============================================================
+   ALERTAS
+============================================================ */
 
 .alert-success {
     background: #d1fae5;
@@ -96,6 +116,11 @@ body {
     gap: 8px;
 }
 
+
+/* ============================================================
+   RESUMEN
+============================================================ */
+
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -108,6 +133,7 @@ body {
     border-radius: 16px;
     padding: 1rem;
     border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 .summary-label {
@@ -123,6 +149,7 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--deep-blue);
+    word-break: break-word;
 }
 
 .summary-total {
@@ -131,11 +158,17 @@ body {
     color: var(--success);
 }
 
+
+/* ============================================================
+   TABLA PRINCIPAL
+============================================================ */
+
 .table-card {
     background: var(--pure-white);
     border-radius: 20px;
     padding: 1.2rem;
     border: 1px solid var(--border-light);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
 }
 
 .section-title {
@@ -153,13 +186,14 @@ body {
 .table-responsive {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .cxc-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.85rem;
-    min-width: 900px;
+    min-width: 1000px;
 }
 
     .cxc-table th {
@@ -170,6 +204,7 @@ body {
         text-transform: uppercase;
         padding: 0.8rem 0.5rem;
         white-space: nowrap;
+        letter-spacing: 0.2px;
     }
 
         .cxc-table th:first-child {
@@ -186,9 +221,18 @@ body {
         vertical-align: middle;
     }
 
-    .cxc-table tbody tr:hover {
-        background: rgba(87, 108, 188, 0.02);
+    .cxc-table tbody tr {
+        transition: background 0.15s ease;
     }
+
+        .cxc-table tbody tr:hover {
+            background: rgba(87, 108, 188, 0.025);
+        }
+
+
+/* ============================================================
+   ALINEACION
+============================================================ */
 
 .text-right {
     text-align: right;
@@ -197,6 +241,11 @@ body {
 .text-center {
     text-align: center;
 }
+
+
+/* ============================================================
+   COLORES
+============================================================ */
 
 .text-danger {
     color: var(--danger);
@@ -211,38 +260,76 @@ body {
     color: var(--deep-blue);
 }
 
-.badge-success {
-    display: inline-block;
-    padding: 0.2rem 0.8rem;
-    border-radius: 30px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-}
 
-.badge-danger {
-    display: inline-block;
-    padding: 0.2rem 0.8rem;
-    border-radius: 30px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
+/* ============================================================
+   BADGES
+============================================================ */
 
+.badge-success,
+.badge-danger,
 .badge-warning {
     display: inline-block;
     padding: 0.2rem 0.8rem;
     border-radius: 30px;
     font-size: 0.7rem;
     font-weight: 600;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge-warning {
     background: rgba(245, 158, 11, 0.1);
     color: var(--warning);
     border: 1px solid rgba(245, 158, 11, 0.2);
 }
+
+
+/* ============================================================
+   DIAS DE MORA
+============================================================ */
+
+.dias-mora-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 0.3rem 0.65rem;
+    border-radius: 30px;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.dias-mora-cero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 0.3rem 0.65rem;
+    border-radius: 30px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   ACCIONES DE LA CUENTA
+============================================================ */
 
 .actions-group {
     display: flex;
@@ -252,17 +339,19 @@ body {
 }
 
 .btn-action {
-    padding: 0.3rem 0.8rem;
+    padding: 0.35rem 0.8rem;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: 500;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     border: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .btn-sale {
@@ -273,6 +362,7 @@ body {
     .btn-sale:hover {
         background: var(--deep-blue);
         color: white;
+        transform: translateY(-1px);
     }
 
 .btn-pay {
@@ -283,52 +373,144 @@ body {
     .btn-pay:hover {
         background: var(--success);
         color: white;
+        transform: translateY(-1px);
     }
+
+
+/* ============================================================
+   HISTORIAL DE PAGOS
+============================================================ */
 
 .payments-row {
     background: #f8fafc;
 }
 
+    .payments-row:hover {
+        background: #f8fafc !important;
+    }
+
 .payments-box {
     padding: 1rem;
+    border-left: 3px solid var(--electric-blue);
+    background: #f8fafc;
+    border-radius: 8px;
 }
 
 .payments-title {
     font-weight: 600;
     color: var(--deep-blue);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.7rem;
     font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .payments-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.75rem;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
     .payments-table th {
         background: #e2e8f0;
         color: var(--deep-blue);
-        padding: 0.4rem;
+        padding: 0.55rem 0.6rem;
         text-align: left;
+        font-weight: 600;
+        white-space: nowrap;
     }
 
     .payments-table td {
-        padding: 0.4rem;
+        padding: 0.55rem 0.6rem;
         border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
     }
+
+    .payments-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payments-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+
+/* ============================================================
+   ACCIONES DE LOS PAGOS
+============================================================ */
+
+.payment-actions {
+    white-space: nowrap;
+    text-align: center;
+    width: 100px;
+}
+
+.btn-payment-edit,
+.btn-payment-delete {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-payment-edit {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+    .btn-payment-edit:hover {
+        background: #bfdbfe;
+        color: #1e40af;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(29, 78, 216, 0.15);
+    }
+
+.btn-payment-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+    .btn-payment-delete:hover {
+        background: #fecaca;
+        color: #991b1b;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(185, 28, 28, 0.15);
+    }
+
+.payment-delete-form {
+    display: inline;
+    margin: 0;
+}
+
+
+/* ============================================================
+   MODALES
+============================================================ */
 
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    padding: 1rem;
 }
 
 .modal-content {
@@ -336,9 +518,23 @@ body {
     border-radius: 20px;
     padding: 1.5rem;
     max-width: 500px;
-    width: 90%;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+    animation: modalAppear 0.2s ease;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-header {
@@ -346,7 +542,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.7rem;
     border-bottom: 1px solid var(--border-light);
 }
 
@@ -362,11 +558,25 @@ body {
     color: var(--danger);
     border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
     font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
+
+    .modal-close:hover {
+        background: #fecaca;
+        transform: rotate(90deg);
+    }
+
+
+/* ============================================================
+   FORMULARIOS
+============================================================ */
 
 .form-group {
     margin-bottom: 1rem;
@@ -378,8 +588,61 @@ body {
         text-transform: uppercase;
         font-weight: 600;
         color: var(--deep-blue);
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.35rem;
     }
+
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .form-control:focus {
+        border-color: var(--electric-blue);
+        box-shadow: 0 0 0 3px rgba(87, 108, 188, 0.12);
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 85px;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   CAMPOS NUMERICOS
+============================================================ */
+
+input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+
+/* ============================================================
+   BOTONES DEL MODAL
+============================================================ */
 
 .modal-actions {
     display: flex;
@@ -396,25 +659,71 @@ body {
     padding: 0.6rem 1.5rem;
     font-size: 0.85rem;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+    .btn-cancel:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+    }
+
 .btn-save {
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--electric-blue) 100%);
+    background: linear-gradient( 135deg, var(--deep-blue) 0%, var(--electric-blue) 100% );
     color: white;
     border: none;
     border-radius: 30px;
     padding: 0.6rem 1.5rem;
     font-size: 0.85rem;
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-@@media (max-width: 768px) {
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(11, 36, 71, 0.2);
+    }
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1200px) {
+
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cxc-details-container {
+        padding: 1.5rem;
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .page-header {
+        align-items: flex-start;
+    }
+
+    .cxc-table {
+        min-width: 950px;
+    }
+}
+
+
+@media (max-width: 768px) {
+
     .cxc-details-container {
         padding: 1rem;
     }
 
     .page-title {
         font-size: 1.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.8rem;
     }
 
     .summary-grid {
@@ -430,6 +739,13 @@ body {
         justify-content: center;
     }
 
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        padding: 1.2rem;
+        border-radius: 16px;
+    }
+
     .modal-actions {
         flex-direction: column;
     }
@@ -439,4 +755,57 @@ body {
         width: 100%;
         justify-content: center;
     }
+
+    .payments-box {
+        padding: 0.7rem;
+    }
+
+    .payments-table {
+        min-width: 600px;
+    }
+
+    .payment-actions {
+        width: 90px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .cxc-details-container {
+        padding: 0.7rem;
+    }
+
+    .table-card {
+        padding: 0.7rem;
+        border-radius: 15px;
+    }
+
+    .summary-card {
+        padding: 0.85rem;
+    }
+
+    .page-title {
+        font-size: 1.3rem;
+    }
+
+    .modal-content {
+        padding: 1rem;
+    }
+}
+
+/* ============================================================
+   VALORES MONETARIOS
+============================================================ */
+
+.cxc-table .text-right {
+    white-space: nowrap;
+}
+
+.summary-total {
+    white-space: nowrap;
+}
+
+.payments-table td {
+    white-space: nowrap;
 }

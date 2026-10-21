@@ -24,10 +24,11 @@ namespace FashionM.Controllers
         // ========================================
 
         public async Task<IActionResult> Index(
-    string buscar,
-    int? empresaId,
-    string estado,
-    string antiguedad)
+            string buscar,
+            int? empresaId,
+            string estado,
+            string antiguedad,
+            int page = 1)
         {
             // ========================================
             // EMPRESA SELECCIONADA
@@ -90,6 +91,19 @@ namespace FashionM.Controllers
             // ========================================
 
             var cuentas = await query.ToListAsync();
+
+            // ========================================
+            // CARGAR PROFORMAS
+            // ========================================
+
+            var proformas = await _context.Proformas
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Numero,
+                    p.Fecha
+                })
+                .ToDictionaryAsync(p => p.Id);
 
             // ========================================
             // FECHA ACTUAL
@@ -188,6 +202,36 @@ namespace FashionM.Controllers
                             }
 
                             // ========================================
+                            // FECHA REAL DE FACTURA
+                            // ========================================
+
+                            DateTime fechaFactura = c.Fecha;
+
+                            if (
+                                c.Venta != null &&
+                                c.Venta.TipoDocumento == "PROFORMA" &&
+                                proformas.TryGetValue(
+                                    c.Venta.DocumentoId,
+                                    out var proforma))
+                            {
+                                fechaFactura = proforma.Fecha;
+                            }
+
+                            // ========================================
+                            // DIAS DE MORA
+                            // ========================================
+
+                            int diasMora = 0;
+
+                            if (saldo > 0)
+                            {
+                                diasMora = Math.Max(
+                                    0,
+                                    (hoy - fechaFactura.Date).Days
+                                );
+                            }
+
+                            // ========================================
                             // DÍAS VENCIDOS
                             // ========================================
 
@@ -219,8 +263,11 @@ namespace FashionM.Controllers
                                 Saldo = saldo,
 
                                 FechaDeuda = fechaDeuda,
+                                FechaFactura = fechaFactura,
 
                                 DiasDeuda = diasDeuda,
+
+                                DiasMora = diasMora,
 
                                 DiasVencidos = diasVencidos
                             };
@@ -289,6 +336,23 @@ namespace FashionM.Controllers
                     {
                         diasDeuda =
                             cuentaPendienteMasAntigua.DiasDeuda;
+                    }
+
+                    // ========================================
+                    // DIAS DE MORA DE LA CUENTA MAS ANTIGUA
+                    // ========================================
+
+                    int diasMora = 0;
+
+                    var cuentaFacturaMasAntigua =
+                        cuentasPendientes
+                            .OrderBy(x => x.FechaFactura)
+                            .FirstOrDefault();
+
+                    if (cuentaFacturaMasAntigua != null)
+                    {
+                        diasMora =
+                            cuentaFacturaMasAntigua.DiasMora;
                     }
 
                     // ========================================
@@ -369,6 +433,9 @@ namespace FashionM.Controllers
                         DiasDeuda =
                             diasDeuda,
 
+                        DiasMora =
+                            diasMora,
+
                         DiasVencidos =
                             diasVencidos,
 
@@ -394,6 +461,10 @@ namespace FashionM.Controllers
 
             // ========================================
             // FILTRO POR ANTIGÜEDAD
+            //
+            // La antigüedad corresponde a los
+            // DÍAS DE MORA, calculados desde
+            // la fecha de facturación.
             // ========================================
 
             if (!string.IsNullOrWhiteSpace(antiguedad))
@@ -401,41 +472,41 @@ namespace FashionM.Controllers
                 if (antiguedad == "menos30")
                 {
                     modelo = modelo
-                        .Where(x => x.DiasDeuda < 30)
+                        .Where(x => x.DiasMora < 30)
                         .ToList();
                 }
                 else if (antiguedad == "30a60")
                 {
                     modelo = modelo
                         .Where(x =>
-                            x.DiasDeuda >= 30 &&
-                            x.DiasDeuda <= 60)
+                            x.DiasMora >= 30 &&
+                            x.DiasMora <= 60)
                         .ToList();
                 }
                 else if (antiguedad == "61a89")
                 {
                     modelo = modelo
                         .Where(x =>
-                            x.DiasDeuda >= 61 &&
-                            x.DiasDeuda <= 89)
+                            x.DiasMora >= 61 &&
+                            x.DiasMora <= 89)
                         .ToList();
                 }
                 else if (antiguedad == "90a199")
                 {
                     modelo = modelo
                         .Where(x =>
-                            x.DiasDeuda >= 90 &&
-                            x.DiasDeuda <= 199)
+                            x.DiasMora >= 90 &&
+                            x.DiasMora <= 199)
                         .ToList();
                 }
                 else if (antiguedad == "200mas")
                 {
                     modelo = modelo
-                        .Where(x =>
-                            x.DiasDeuda >= 200)
+                        .Where(x => x.DiasMora >= 200)
                         .ToList();
                 }
             }
+
 
             // ========================================
             // ORDEN
@@ -447,35 +518,63 @@ namespace FashionM.Controllers
                 .ToList();
 
             // ========================================
+            // PAGINACIÓN
+            // ========================================
+
+            int pageSize = 50;
+
+            int totalRegistros = modelo.Count;
+
+            int totalPaginas = (int)Math.Ceiling(
+                totalRegistros / (double)pageSize);
+
+            // Siempre debe existir al menos una página.
+            int paginasMostrar = Math.Max(1, totalPaginas);
+
+            // Evitar páginas inválidas.
+            if (page < 1)
+                page = 1;
+
+            if (page > paginasMostrar)
+                page = paginasMostrar;
+
+            // ========================================
             // EMPRESAS
             // ========================================
 
-            ViewBag.Empresas =
-                await _context.Empresas
-                    .OrderBy(x => x.Nombre)
-                    .ToListAsync();
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(x => x.Nombre)
+                .ToListAsync();
 
             // ========================================
-            // VALORES DE LOS FILTROS
+            // CONSERVAR VALORES DE LOS FILTROS
             // ========================================
 
-            ViewBag.Estado =
-                estado;
-
-            ViewBag.Buscar =
-                buscar;
-
-            ViewBag.EmpresaId =
-                empresaId;
-
-            ViewBag.Antiguedad =
-                antiguedad;
+            ViewBag.Estado = estado;
+            ViewBag.Buscar = buscar;
+            ViewBag.EmpresaId = empresaId;
+            ViewBag.Antiguedad = antiguedad;
 
             // ========================================
-            // RETURN
+            // DATOS PARA LA PAGINACIÓN
             // ========================================
+
+            ViewBag.PaginaActual = page;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.TotalRegistros = totalRegistros;
+            ViewBag.PageSize = pageSize;
+
+            // ========================================
+            // OBTENER SOLO LOS REGISTROS DE LA PÁGINA
+            // ========================================
+
+            modelo = modelo
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
             return View(modelo);
+
         }
 
         public async Task<IActionResult> ProximosVencimientos(
@@ -775,6 +874,13 @@ namespace FashionM.Controllers
 
                     .ToListAsync();
 
+
+            var proformas = await _context.Proformas
+                .Where(p => p.EmpresaId == empresaId)
+                .ToDictionaryAsync(p => p.Id);
+
+            ViewBag.Proformas = proformas;
+
             if (!cuentas.Any())
                 return NotFound();
 
@@ -886,6 +992,7 @@ namespace FashionM.Controllers
         // REGISTRAR PAGO
         // ========================================
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegistrarPago(
@@ -894,15 +1001,11 @@ namespace FashionM.Controllers
             string metodoPago,
             string observacion)
         {
-            var cuenta =
-                await _context.CuentasPorCobrar
-
-                    .Include(c => c.Pagos)
-
-                    .Include(c => c.Venta)
-                        .ThenInclude(v => v!.NotasCredito)
-
-                    .FirstOrDefaultAsync(c => c.Id == cuentaId);
+            var cuenta = await _context.CuentasPorCobrar
+                .Include(c => c.Pagos)
+                .Include(c => c.Venta)
+                    .ThenInclude(v => v!.NotasCredito)
+                .FirstOrDefaultAsync(c => c.Id == cuentaId);
 
             if (cuenta == null)
                 return NotFound();
@@ -915,16 +1018,14 @@ namespace FashionM.Controllers
                 cuenta.Pagos.Sum(x => x.Monto);
 
             // ========================================
-            // TOTAL NOTAS
+            // TOTAL NOTAS DE CRÉDITO
             // ========================================
 
             decimal totalNotas =
-                cuenta.Venta!.NotasCredito.Sum(x => x.TotalDevuelto);
-
-
+                cuenta.Venta?.NotasCredito.Sum(x => x.TotalDevuelto) ?? 0;
 
             // ========================================
-            // SALDO
+            // SALDO ACTUAL
             // ========================================
 
             decimal saldo =
@@ -933,61 +1034,10 @@ namespace FashionM.Controllers
                 - totalNotas
                 - cuenta.DescuentoAplicado;
 
-            // ========================================
-            // DESCUENTO AUTOMÁTICO
-            // ========================================
-
-            bool puedeAplicarDescuento =
-
-                !cuenta.DescuentoOtorgado
-
-                &&
-
-                DateTime.UtcNow <=
-                    cuenta.Fecha.AddDays(60);
-            // ========================================
-            // MONTO BASE PARA DESCUENTO
-            // (YA CON NOTAS DE CRÉDITO)
-            // ========================================
-
-            decimal montoBase =
-
-                cuenta.MontoOriginal
-                - totalNotas;
-
-            // ========================================
-            // DESCUENTO (10%)
-            // ========================================
-
-            decimal montoDescuento =
-
-                Math.Round(
-                    montoBase * 0.10m,
-                    0,
-                    MidpointRounding.AwayFromZero);
-
-            // ========================================
-            // TOTAL NECESARIO PARA
-            // OBTENER EL DESCUENTO
-            // ========================================
-
-            decimal montoConDescuento =
-
-                montoBase
-                - montoDescuento;
-
-            // Total pagado después de este pago
-            decimal totalPagadoConEstePago =
-
-                totalPagado + monto;
-
-            // ¿Obtiene el descuento?
-            bool aplicarDescuento =
-                puedeAplicarDescuento
-                &&
-                totalPagadoConEstePago == montoConDescuento;
-
             if (saldo < 1)
+                saldo = 0;
+
+            if (saldo == 0)
             {
                 TempData["Success"] =
                     "La cuenta ya se considera pagada.";
@@ -1001,15 +1051,13 @@ namespace FashionM.Controllers
                     });
             }
 
-
             // ========================================
             // VALIDAR MONTO
             // ========================================
 
             if (monto <= 0)
             {
-                TempData["Error"] =
-                    "El monto debe ser mayor a 0.";
+                TempData["Error"] = "El monto debe ser mayor a 0.";
 
                 return RedirectToAction(
                     nameof(Details),
@@ -1019,8 +1067,6 @@ namespace FashionM.Controllers
                         empresaId = cuenta.EmpresaId
                     });
             }
-
-            
 
             if (monto > saldo)
             {
@@ -1037,21 +1083,47 @@ namespace FashionM.Controllers
             }
 
             // ========================================
+            // DESCUENTO AUTOMÁTICO
+            // ========================================
+
+            bool puedeAplicarDescuento =
+                !cuenta.DescuentoOtorgado &&
+                DateTime.UtcNow <= cuenta.Fecha.AddDays(60);
+
+            decimal montoBase =
+                cuenta.MontoOriginal - totalNotas;
+
+            decimal montoDescuento = Math.Round(
+                montoBase * 0.10m,
+                0,
+                MidpointRounding.AwayFromZero);
+
+            decimal montoConDescuento =
+                montoBase - montoDescuento;
+
+            decimal totalPagadoConEstePago =
+                totalPagado + monto;
+
+            bool aplicarDescuento =
+                puedeAplicarDescuento &&
+                totalPagadoConEstePago == montoConDescuento;
+
+            // ========================================
             // REGISTRAR PAGO
             // ========================================
 
             var pago = new CuentaPorCobrarPago
             {
                 CuentaPorCobrarId = cuenta.Id,
-
                 Monto = monto,
-
                 Fecha = DateTime.UtcNow,
-
-                MetodoPago = metodoPago,
-
+                MetodoPago = string.IsNullOrWhiteSpace(metodoPago)
+                    ? "EFECTIVO"
+                    : metodoPago,
                 Observacion = observacion ?? string.Empty
             };
+
+            _context.CuentasPorCobrarPagos.Add(pago);
 
             // ========================================
             // APLICAR DESCUENTO
@@ -1059,17 +1131,72 @@ namespace FashionM.Controllers
 
             if (aplicarDescuento)
             {
-                cuenta.DescuentoAplicado =
-                    montoDescuento;
-
-                cuenta.DescuentoOtorgado =
-                    true;
-
-                cuenta.FechaDescuento =
-                    DateTime.UtcNow;
+                cuenta.DescuentoAplicado = montoDescuento;
+                cuenta.DescuentoOtorgado = true;
+                cuenta.FechaDescuento = DateTime.UtcNow;
             }
 
-            _context.CuentasPorCobrarPagos.Add(pago);
+            // ========================================
+            // CALCULAR SALDO FINAL
+            // ========================================
+
+            decimal nuevoDescuentoAplicado =
+                aplicarDescuento
+                    ? montoDescuento
+                    : cuenta.DescuentoAplicado;
+
+            decimal saldoFinal =
+                cuenta.MontoOriginal
+                - totalPagadoConEstePago
+                - totalNotas
+                - nuevoDescuentoAplicado;
+
+            if (saldoFinal < 1)
+                saldoFinal = 0;
+
+            // ========================================
+            // SI SE CANCELA LA CUENTA,
+            // GUARDAR LOS DÍAS DE MORA HISTÓRICOS
+            // ========================================
+
+            if (saldoFinal == 0)
+            {
+                DateTime fechaFactura = cuenta.Fecha;
+
+                if (cuenta.Venta != null)
+                {
+                    if (cuenta.Venta.TipoDocumento == "PROFORMA")
+                    {
+                        var proforma = await _context.Proformas
+                            .FirstOrDefaultAsync(p =>
+                                p.Id == cuenta.Venta.DocumentoId);
+
+                        if (proforma != null)
+                            fechaFactura = proforma.Fecha;
+                    }
+                    else if (
+                        cuenta.Venta.TipoDocumento == "FACTURA_ELECTRONICA")
+                    {
+                        // Utiliza la fecha de la venta como alternativa
+                        // hasta que el modelo tenga la fecha real
+                        // de la factura electrónica.
+                        fechaFactura = cuenta.Venta.Fecha;
+                    }
+                }
+
+                DateTime fechaCancelacionUtc = pago.Fecha;
+
+                cuenta.DiasMoraFinal = Math.Max(
+                    0,
+                    (fechaCancelacionUtc.Date - fechaFactura.Date).Days
+                );
+
+                cuenta.FechaCancelacion = fechaCancelacionUtc;
+            }
+
+            // ========================================
+            // GUARDAR CAMBIOS
+            // ========================================
 
             await _context.SaveChangesAsync();
 
@@ -1077,6 +1204,11 @@ namespace FashionM.Controllers
             {
                 TempData["Success"] =
                     $"Pago registrado. Se aplicó automáticamente un descuento de ₡{montoDescuento:N0}.";
+            }
+            else if (saldoFinal == 0)
+            {
+                TempData["Success"] =
+                    $"Cuenta cancelada. Se guardaron {cuenta.DiasMoraFinal} días de mora históricos.";
             }
             else
             {
@@ -1092,6 +1224,7 @@ namespace FashionM.Controllers
                     empresaId = cuenta.EmpresaId
                 });
         }
+
 
         // ========================================
         // CREATE
@@ -2226,6 +2359,307 @@ namespace FashionM.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 nombreArchivo
             );
+
+        }
+
+
+        // ========================================
+        // EDITAR PAGO
+        // ========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarPago(
+            int pagoId,
+            string monto,
+            DateTime fecha,
+            string metodoPago,
+            string observacion)
+        {
+            var pago = await _context.CuentasPorCobrarPagos
+                .Include(p => p.CuentaPorCobrar)
+                    .ThenInclude(c => c!.Venta)
+                .FirstOrDefaultAsync(p => p.Id == pagoId);
+
+            if (pago == null)
+                return NotFound();
+
+            var cuenta = pago.CuentaPorCobrar;
+
+            if (cuenta == null)
+                return NotFound();
+
+            // =========================================================
+            // CONVERTIR MONTO
+            // =========================================================
+
+            decimal montoDecimal;
+
+            if (string.IsNullOrWhiteSpace(monto))
+            {
+                TempData["Error"] = "Debe ingresar un monto válido.";
+
+                return RedirectToAction(nameof(Details), new
+                {
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
+                });
+            }
+
+            string montoLimpio = monto.Trim().Replace(" ", "");
+
+            if (montoLimpio.Contains(",") && montoLimpio.Contains("."))
+            {
+                int posicionComa = montoLimpio.LastIndexOf(',');
+                int posicionPunto = montoLimpio.LastIndexOf('.');
+
+                if (posicionComa > posicionPunto)
+                {
+                    // Formato: 15.000,00
+                    montoLimpio = montoLimpio
+                        .Replace(".", "")
+                        .Replace(",", ".");
+                }
+                else
+                {
+                    // Formato: 15,000.00
+                    montoLimpio = montoLimpio.Replace(",", "");
+                }
+            }
+            else if (montoLimpio.Contains(","))
+            {
+                montoLimpio = montoLimpio.Replace(",", ".");
+            }
+
+            if (!decimal.TryParse(
+                montoLimpio,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out montoDecimal))
+            {
+                TempData["Error"] =
+                    "El monto ingresado no tiene un formato válido.";
+
+                return RedirectToAction(nameof(Details), new
+                {
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
+                });
+            }
+
+            if (montoDecimal <= 0)
+            {
+                TempData["Error"] = "El monto debe ser mayor a 0.";
+
+                return RedirectToAction(nameof(Details), new
+                {
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
+                });
+            }
+
+            // =========================================================
+            // NOTAS DE CRÉDITO
+            // =========================================================
+
+            var venta = await _context.Ventas
+                .Include(v => v.NotasCredito)
+                .FirstOrDefaultAsync(v => v.Id == cuenta.VentaId);
+
+            decimal totalNotas = venta?.NotasCredito
+                .Sum(x => x.TotalDevuelto) ?? 0;
+
+            // =========================================================
+            // OTROS PAGOS
+            // =========================================================
+
+            decimal otrosPagos = await _context.CuentasPorCobrarPagos
+                .Where(p =>
+                    p.CuentaPorCobrarId == cuenta.Id &&
+                    p.Id != pagoId)
+                .SumAsync(p => p.Monto);
+
+            // =========================================================
+            // VALIDAR SALDO DISPONIBLE
+            // =========================================================
+
+            decimal saldoDisponible =
+                cuenta.MontoOriginal
+                - otrosPagos
+                - totalNotas
+                - cuenta.DescuentoAplicado;
+
+            if (saldoDisponible < 0)
+                saldoDisponible = 0;
+
+            if (montoDecimal > saldoDisponible)
+            {
+                TempData["Error"] =
+                    $"El monto ingresado supera el saldo disponible de ₡{saldoDisponible:N2}.";
+
+                return RedirectToAction(nameof(Details), new
+                {
+                    clienteCedula = cuenta.ClienteCedula,
+                    empresaId = cuenta.EmpresaId
+                });
+            }
+
+            // =========================================================
+            // CONVERTIR FECHA DE COSTA RICA A UTC
+            // =========================================================
+
+            var zonaCostaRica =
+                TimeZoneInfo.FindSystemTimeZoneById(
+                    "Central America Standard Time");
+
+            fecha = DateTime.SpecifyKind(
+                fecha,
+                DateTimeKind.Unspecified);
+
+            DateTime fechaUtc =
+                TimeZoneInfo.ConvertTimeToUtc(
+                    fecha,
+                    zonaCostaRica);
+
+            // =========================================================
+            // ACTUALIZAR PAGO
+            // =========================================================
+
+            pago.Monto = montoDecimal;
+            pago.Fecha = fechaUtc;
+
+            pago.MetodoPago =
+                string.IsNullOrWhiteSpace(metodoPago)
+                    ? "EFECTIVO"
+                    : metodoPago;
+
+            pago.Observacion = observacion ?? string.Empty;
+
+            await _context.SaveChangesAsync();
+
+            // =========================================================
+            // RECALCULAR SALDO REAL DE LA CUENTA
+            // =========================================================
+
+            decimal totalPagado = await _context.CuentasPorCobrarPagos
+                .Where(p => p.CuentaPorCobrarId == cuenta.Id)
+                .SumAsync(p => p.Monto);
+
+            decimal saldoFinal =
+                cuenta.MontoOriginal
+                - totalPagado
+                - totalNotas
+                - cuenta.DescuentoAplicado;
+
+            if (saldoFinal < 1)
+                saldoFinal = 0;
+
+            // =========================================================
+            // ACTUALIZAR HISTORIAL DE MORA
+            // =========================================================
+
+            if (saldoFinal == 0)
+            {
+                // Obtener la fecha de factura que corresponde.
+                DateTime fechaFactura = cuenta.Fecha;
+
+                if (venta != null &&
+                    venta.TipoDocumento == "PROFORMA")
+                {
+                    var proforma = await _context.Proformas
+                        .FirstOrDefaultAsync(
+                            p => p.Id == venta.DocumentoId);
+
+                    if (proforma != null)
+                        fechaFactura = proforma.Fecha;
+                }
+                else if (venta != null &&
+                         venta.TipoDocumento == "FACTURA_ELECTRONICA")
+                {
+                    fechaFactura = venta.Fecha;
+                }
+
+                // Se toma la fecha del pago más reciente registrado.
+                // Si la cuenta se cancela únicamente mediante notas
+                // de crédito/descuentos, se usa la fecha actual.
+                DateTime? ultimoPago = await _context.CuentasPorCobrarPagos
+                    .Where(p => p.CuentaPorCobrarId == cuenta.Id)
+                    .Select(p => (DateTime?)p.Fecha)
+                    .MaxAsync();
+
+                DateTime fechaCancelacion =
+                    ultimoPago ?? DateTime.UtcNow;
+
+                cuenta.DiasMoraFinal = Math.Max(
+                    0,
+                    (fechaCancelacion.Date - fechaFactura.Date).Days);
+
+                cuenta.FechaCancelacion = fechaCancelacion;
+            }
+            else
+            {
+                // La cuenta volvió a tener saldo pendiente.
+                // Se elimina la mora final hasta que vuelva a cancelarse.
+                cuenta.DiasMoraFinal = null;
+                cuenta.FechaCancelacion = null;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Pago actualizado correctamente. Se recalculó el saldo y el historial de mora.";
+
+            return RedirectToAction(nameof(Details), new
+            {
+                clienteCedula = cuenta.ClienteCedula,
+                empresaId = cuenta.EmpresaId
+            });
+        }
+
+
+        // ========================================
+        // ELIMINAR PAGO
+        // ========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarPago(
+            int pagoId)
+        {
+            var pago = await _context.CuentasPorCobrarPagos
+                .Include(p => p.CuentaPorCobrar)
+                .FirstOrDefaultAsync(p => p.Id == pagoId);
+
+            if (pago == null)
+                return NotFound();
+
+            if (pago.CuentaPorCobrar == null)
+                return NotFound();
+
+            int clienteCedula =
+                pago.CuentaPorCobrar.ClienteCedula;
+
+            int empresaId =
+                pago.CuentaPorCobrar.EmpresaId;
+
+            // ========================================
+            // ELIMINAR
+            // ========================================
+
+            _context.CuentasPorCobrarPagos.Remove(pago);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Pago eliminado correctamente.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new
+                {
+                    clienteCedula = clienteCedula,
+                    empresaId = empresaId
+                });
         }
     }
 }

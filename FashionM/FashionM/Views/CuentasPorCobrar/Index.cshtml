@@ -2,29 +2,41 @@
 
 @{
     ViewData["Title"] = "Cuentas por Cobrar";
+
+    int paginaActual = ViewBag.PaginaActual != null
+        ? (int)ViewBag.PaginaActual : 1;
+
+    int totalPaginas = ViewBag.TotalPaginas != null
+        ? (int)ViewBag.TotalPaginas : 0;
+
+    int totalRegistros = ViewBag.TotalRegistros != null
+        ? (int)ViewBag.TotalRegistros : Model.Count();
+
+    int pageSize = ViewBag.PageSize != null
+        ? (int)ViewBag.PageSize : 10;
+
+    int desde = totalRegistros == 0
+        ? 0 : ((paginaActual - 1) * pageSize) + 1;
+
+    int hasta = Math.Min(paginaActual * pageSize, totalRegistros);
 }
 
 <link rel="stylesheet" href="~/css/CuentasXCobrar/CuentasIndex.css" />
 
 <div class="cxc-container">
 
-    <!-- ========================================
-         HEADER
-    ======================================== -->
-
+    <!-- HEADER -->
     <div class="page-header">
         <div>
             <h1 class="page-title">
                 <span>💰</span> Cuentas por Cobrar
             </h1>
-
             <p class="page-subtitle">
                 Resumen general de clientes con saldo pendiente
             </p>
         </div>
 
         <div class="page-header-actions">
-
             <a asp-action="ExportarExcel"
                asp-route-buscar="@ViewBag.Buscar"
                asp-route-empresaId="@ViewBag.EmpresaId"
@@ -38,77 +50,43 @@
                class="btn-proximos-vencimientos">
                 🔔 Próximos vencimientos
             </a>
-
         </div>
     </div>
 
-
-    <!-- ========================================
-         ALERTAS
-    ======================================== -->
+    <!-- ALERTAS -->
     @if (TempData["Success"] != null)
     {
         <div class="alert-success">
-
             ✅ @TempData["Success"]
-
         </div>
     }
-
 
     @if (TempData["Error"] != null)
     {
         <div class="alert-error">
-
             ⚠️ @TempData["Error"]
-
         </div>
     }
 
-
-    <!-- ========================================
-         FILTROS
-    ======================================== -->
-
+    <!-- FILTROS -->
     <div class="filters-card">
-
-        <form method="get"
-              class="filters-grid">
-
-            <!-- ========================================
-                 BUSCAR
-            ======================================== -->
+        <form method="get" asp-action="Index" class="filters-grid">
 
             <div class="filter-group">
-
-                <label>
-                    🔍 Buscar
-                </label>
-
+                <label>🔍 Buscar</label>
                 <input type="text"
                        name="buscar"
                        value="@ViewBag.Buscar"
                        class="form-control"
                        placeholder="Código, cliente, comercio o cédula..."
-                       oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.submit(), 2000);" />
-
+                       oninput="clearTimeout(window.t); window.t = setTimeout(() => this.form.requestSubmit(), 2000);" />
             </div>
 
-
-            <!-- ========================================
-                 EMPRESA
-            ======================================== -->
-
             <div class="filter-group">
-
-                <label>
-                    🏢 Empresa
-                </label>
-
+                <label>🏢 Empresa</label>
                 <select name="empresaId"
                         class="form-control"
-                        onchange="this.form.submit()">
-
+                        onchange="this.form.requestSubmit()">
                     <option value="0"
                             selected="@(ViewBag.EmpresaId != null && (int)ViewBag.EmpresaId == 0)">
                         Todas las empresas
@@ -121,380 +99,275 @@
                             @empresa.Nombre
                         </option>
                     }
-
                 </select>
-
             </div>
 
-
-            <!-- ========================================
-                 ESTADO
-            ======================================== -->
-
             <div class="filter-group">
-
-                <label>
-                    Estado
-                </label>
-
+                <label>Estado</label>
                 <select name="estado"
                         class="form-control"
-                        onchange="this.form.submit()">
-
-                    <option value=""
-                            selected="@(string.IsNullOrEmpty(ViewBag.Estado))">
+                        onchange="this.form.requestSubmit()">
+                    <option value="" selected="@(string.IsNullOrEmpty(ViewBag.Estado))">
                         Todos
                     </option>
-
-                    <option value="Pendiente"
-                            selected="@(ViewBag.Estado == "Pendiente")">
+                    <option value="Pendiente" selected="@(ViewBag.Estado == "Pendiente")">
                         Pendientes
                     </option>
-
-                    <option value="Vencida"
-                            selected="@(ViewBag.Estado == "Vencida")">
+                    <option value="Vencida" selected="@(ViewBag.Estado == "Vencida")">
                         Vencidas
                     </option>
-
-                    <option value="Pagada"
-                            selected="@(ViewBag.Estado == "Pagada")">
+                    <option value="Pagada" selected="@(ViewBag.Estado == "Pagada")">
                         Pagadas
                     </option>
-
                 </select>
-
             </div>
-
-
-            <!-- ========================================
-                 ANTIGÜEDAD
-            ======================================== -->
 
             <div class="filter-group">
-
-                <label>
-                    ⏰ Antigüedad
-                </label>
-
+                <label>⏰ Antigüedad</label>
                 <select name="antiguedad"
                         class="form-control"
-                        onchange="this.form.submit()">
-
-                    <option value=""
-                            selected="@(string.IsNullOrEmpty(ViewBag.Antiguedad))">
+                        onchange="this.form.requestSubmit()">
+                    <option value="" selected="@(string.IsNullOrEmpty(ViewBag.Antiguedad))">
                         Todas
                     </option>
-
-                    <option value="menos30"
-                            selected="@(ViewBag.Antiguedad == "menos30")">
+                    <option value="menos30" selected="@(ViewBag.Antiguedad == "menos30")">
                         Menos de 30 días
                     </option>
-
-                    <option value="30a60"
-                            selected="@(ViewBag.Antiguedad == "30a60")">
+                    <option value="30a60" selected="@(ViewBag.Antiguedad == "30a60")">
                         30 a 60 días
                     </option>
-
-                    <option value="61a89"
-                            selected="@(ViewBag.Antiguedad == "61a89")">
+                    <option value="61a89" selected="@(ViewBag.Antiguedad == "61a89")">
                         61 a 89 días
                     </option>
-
-                    <option value="90a199"
-                            selected="@(ViewBag.Antiguedad == "90a199")">
+                    <option value="90a199" selected="@(ViewBag.Antiguedad == "90a199")">
                         90 a 199 días
                     </option>
-
-                    <option value="200mas"
-                            selected="@(ViewBag.Antiguedad == "200mas")">
+                    <option value="200mas" selected="@(ViewBag.Antiguedad == "200mas")">
                         200+ días
                     </option>
-
                 </select>
-
             </div>
 
-
-            <!-- ========================================
-                 BOTONES
-            ======================================== -->
-
-            <div class="filter-group d-flex align-items-end">
-
-                <button type="submit"
-                        class="btn btn-primary me-2">
-
+            <div class="filters-buttons">
+                <button type="submit" class="btn btn-primary">
                     🔍 Buscar
-
                 </button>
-
 
                 <a asp-action="Index"
                    asp-route-empresaId="0"
                    class="btn btn-secondary">
-
                     ✖ Limpiar
-
                 </a>
-
             </div>
-
         </form>
-
     </div>
 
-
-    <!-- ========================================
-         TABLA
-    ======================================== -->
-
+    <!-- TABLA -->
     <div class="table-card">
-
         <div class="table-responsive">
-
-            <table class="clientes-table"
-                   id="clientesTable">
-
+            <table class="clientes-table" id="clientesTable">
                 <thead>
-
                     <tr>
-
-                        <!-- CODIGO -->
-
-                        <th>
-                            Código
-                        </th>
-
-
-                        <!-- CLIENTE -->
-
-                        <th>
-                            Cliente
-                        </th>
-
-
-                        <!-- EMPRESA -->
-
-                        <th>
-                            Empresa
-                        </th>
-
-
-                        <!-- CEDULA -->
-
-                        <th>
-                            Cédula
-                        </th>
-
-
-                        <!-- FACTURAS -->
-
-                        <th class="text-center">
-                            Facturas
-                        </th>
-
-
-                        <!-- SALDO -->
-
-                        <th class="text-right">
-                            Saldo Total
-                        </th>
-
-
-                        <!-- ESTADO -->
-
-                        <th>
-                            Estado
-                        </th>
-
-
-                        <!-- DETAILS -->
-
-                        <th class="text-center">
-                            Details
-                        </th>
-
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Empresa</th>
+                        <th>Cédula</th>
+                        <th class="text-center">Facturas</th>
+                        <th class="text-right">Saldo Total</th>
+                        <th class="text-center">Días de Mora</th>
+                        <th>Estado</th>
+                        <th class="text-center">Details</th>
                     </tr>
-
                 </thead>
 
-
                 <tbody>
-
                     @foreach (var item in Model)
                     {
                         <tr>
-
-                            <!-- ========================================
-                                 CODIGO CLIENTE
-                            ======================================== -->
-
                             <td class="cliente-codigo">
-
                                 @item.CodigoCliente
-
                             </td>
 
-
-                            <!-- ========================================
-                                 CLIENTE
-                            ======================================== -->
-
                             <td class="cliente-nombre">
+                                <strong>@item.Nombre</strong>
 
-                                <strong>
-                                    @item.Nombre
-                                </strong>
-
-                                @if (!string.IsNullOrWhiteSpace(item.Comercio))
+                                @if (!string.IsNullOrWhiteSpace((string?)item.Comercio))
                                 {
                                     <div class="cliente-comercio">
                                         @item.Comercio
                                     </div>
                                 }
-
                             </td>
 
+                            <td class="empresa">@item.Empresa</td>
 
-                            <!-- ========================================
-                                 EMPRESA
-                            ======================================== -->
-
-                            <td class="empresa">
-
-                                @item.Empresa
-
-                            </td>
-
-
-                            <!-- ========================================
-                                 CEDULA
-                            ======================================== -->
-
-                            <td class="cliente-cedula">
-
-                                @item.ClienteCedula
-
-                            </td>
-
-
-                            <!-- ========================================
-                                 CANTIDAD FACTURAS
-                            ======================================== -->
+                            <td class="cliente-cedula">@item.ClienteCedula</td>
 
                             <td class="text-center">
-
                                 <span class="facturas-count">
-
                                     @item.CantidadFacturas
-
                                 </span>
-
                             </td>
 
-
-                            <!-- ========================================
-                                 SALDO
-                            ======================================== -->
-
                             <td class="text-right saldo-total">
-
                                 ₡ @(((decimal)item.Saldo).ToString("N2"))
 
                                 @if ((decimal)item.SaldoVencido > 0)
                                 {
                                     <div class="saldo-vencido">
-
                                         Vencido:
                                         ₡ @(((decimal)item.SaldoVencido).ToString("N2"))
-
                                     </div>
                                 }
-
                             </td>
 
-
-                            <!-- ========================================
-                                 ESTADO
-                            ======================================== -->
+                            <td class="text-center">
+                                @if ((int)item.DiasMora > 0)
+                                {
+                                    <span class="dias-mora-badge">
+                                        @item.DiasMora días
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="dias-mora-cero">0 días</span>
+                                }
+                            </td>
 
                             <td>
-
                                 @if (item.Estado == "Pagada")
                                 {
-                                    <span class="badge-success">
-
-                                        ✓ PAGADA
-
-                                    </span>
+                                    <span class="badge-success">✓ PAGADA</span>
                                 }
                                 else if (item.Estado == "Vencida")
                                 {
-                                    <span class="badge-danger">
-
-                                        ⚠ VENCIDA
-
-                                    </span>
+                                    <span class="badge-danger">⚠ VENCIDA</span>
 
                                     @if ((int)item.DiasVencidos > 0)
                                     {
                                         <div class="dias-vencidos">
-
                                             @item.DiasVencidos días
-
                                         </div>
                                     }
                                 }
                                 else if (item.Estado == "Pago parcial")
                                 {
-                                    <span class="badge-info">
-
-                                        ◐ PAGO PARCIAL
-
-                                    </span>
+                                    <span class="badge-info">◐ PAGO PARCIAL</span>
                                 }
                                 else
                                 {
-                                    <span class="badge-warning">
-
-                                        ⏳ PENDIENTE
-
-                                    </span>
+                                    <span class="badge-warning">⏳ PENDIENTE</span>
                                 }
-
                             </td>
 
-
-                            <!-- ========================================
-                                 DETAILS
-                            ======================================== -->
-
                             <td class="text-center">
-
                                 <div class="actions-group">
-
                                     <a asp-action="Details"
                                        asp-route-clienteCedula="@item.ClienteCedula"
                                        asp-route-empresaId="@item.EmpresaId"
                                        class="btn-action btn-details">
-
                                         📄 Details
-
                                     </a>
-
                                 </div>
-
                             </td>
-
                         </tr>
                     }
 
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No se encontraron cuentas con los filtros seleccionados.
+                            </td>
+                        </tr>
+                    }
                 </tbody>
-
             </table>
+        </div>
+    </div>
 
+    <!-- PAGINACIÓN -->
+    <div class="pagination-container">
+        <div class="pagination-info">
+            Mostrando <strong>@desde–@hasta</strong>
+            de <strong>@totalRegistros</strong> clientes
         </div>
 
+        @if (totalPaginas > 1)
+        {
+            <nav aria-label="Paginación de cuentas por cobrar">
+                <ul class="pagination">
+
+                    <li class="page-item @(paginaActual <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-buscar="@ViewBag.Buscar"
+                           asp-route-empresaId="@ViewBag.EmpresaId"
+                           asp-route-estado="@ViewBag.Estado"
+                           asp-route-antiguedad="@ViewBag.Antiguedad">
+                            «
+                        </a>
+                    </li>
+
+                    <li class="page-item @(paginaActual <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(paginaActual - 1)"
+                           asp-route-buscar="@ViewBag.Buscar"
+                           asp-route-empresaId="@ViewBag.EmpresaId"
+                           asp-route-estado="@ViewBag.Estado"
+                           asp-route-antiguedad="@ViewBag.Antiguedad">
+                            Anterior
+                        </a>
+                    </li>
+
+                    @{
+                        int inicio = Math.Max(1, paginaActual - 2);
+                        int fin = Math.Min(totalPaginas, paginaActual + 2);
+                    }
+
+                    @for (int i = inicio; i <= fin; i++)
+                    {
+                        <li class="page-item @(i == paginaActual ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-buscar="@ViewBag.Buscar"
+                               asp-route-empresaId="@ViewBag.EmpresaId"
+                               asp-route-estado="@ViewBag.Estado"
+                               asp-route-antiguedad="@ViewBag.Antiguedad">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(paginaActual >= totalPaginas ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(paginaActual + 1)"
+                           asp-route-buscar="@ViewBag.Buscar"
+                           asp-route-empresaId="@ViewBag.EmpresaId"
+                           asp-route-estado="@ViewBag.Estado"
+                           asp-route-antiguedad="@ViewBag.Antiguedad">
+                            Siguiente
+                        </a>
+                    </li>
+
+                    <li class="page-item @(paginaActual >= totalPaginas ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@totalPaginas"
+                           asp-route-buscar="@ViewBag.Buscar"
+                           asp-route-empresaId="@ViewBag.EmpresaId"
+                           asp-route-estado="@ViewBag.Estado"
+                           asp-route-antiguedad="@ViewBag.Antiguedad">
+                            »
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
     </div>
 
 </div>

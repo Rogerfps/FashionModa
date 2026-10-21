@@ -41,6 +41,9 @@ namespace FashionM.Models
         public DateTime? FechaVencimiento { get; set; }
         public int DiasCredito { get; set; }
 
+        public int? DiasMoraFinal { get; set; }
+        public DateTime? FechaCancelacion { get; set; }
+
         [StringLength(50)]
         public string Estado { get; set; }
             = "PENDIENTE";

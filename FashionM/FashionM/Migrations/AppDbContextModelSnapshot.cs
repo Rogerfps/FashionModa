@@ -234,6 +234,9 @@ namespace FashionM.Migrations
                     b.Property<int>("DiasCredito")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DiasMoraFinal")
+                        .HasColumnType("integer");
+
                     b.Property<int>("EmpresaId")
                         .HasColumnType("integer");
 
@@ -243,6 +246,9 @@ namespace FashionM.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaCancelacion")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("FechaDescuento")

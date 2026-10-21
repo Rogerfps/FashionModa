@@ -6,28 +6,50 @@
     var cliente = Model.FirstOrDefault()?.Cliente;
     var empresa = Model.FirstOrDefault()?.Empresa;
 
+    // ============================================================
+    // PROFORMAS
+    // ============================================================
+
+    var proformas =
+        ViewBag.Proformas as Dictionary<int, Proforma>
+        ?? new Dictionary<int, Proforma>();
+
+    // ============================================================
+    // SALDO TOTAL
+    // ============================================================
+
     decimal totalGeneral = Model.Sum(item =>
-{
-    decimal pagado = item.Pagos.Sum(x => x.Monto);
-    decimal notas = item.Venta?.NotasCredito.Sum(x => x.TotalDevuelto) ?? 0;
+    {
+        decimal pagado =
+            item.Pagos.Sum(x => x.Monto);
 
-    decimal saldo =
-    item.MontoOriginal
-    - pagado
-    - notas
-    - item.DescuentoAplicado;
+        decimal notas =
+            item.Venta?.NotasCredito
+                .Sum(x => x.TotalDevuelto) ?? 0;
 
-    return saldo < 1 ? 0 : saldo;
-});
+        decimal saldo =
+            item.MontoOriginal
+            - pagado
+            - notas
+            - item.DescuentoAplicado;
+
+        return saldo < 1 ? 0 : saldo;
+    });
 }
 
-<link rel="stylesheet" href="~/css/CuentasXCobrar/CuentasDetails.css" />
+<link rel="stylesheet"
+      href="~/css/CuentasXCobrar/CuentasDetails.css" />
 
 <div class="cxc-details-container">
 
-    <!-- HEADER -->
+    <!-- ============================================================
+         HEADER
+    ============================================================ -->
+
     <div class="page-header">
+
         <div>
+
             <h1 class="page-title">
                 <span>💳</span> Estado de Cuenta
             </h1>
@@ -41,113 +63,211 @@
                 🏢 @(empresa?.Nombre)
 
             </p>
+
         </div>
 
         <div class="header-actions">
-            <a asp-action="Index" class="btn-back">
+
+            <a asp-action="Index"
+               class="btn-back">
+
                 ← Volver
+
             </a>
+
         </div>
+
     </div>
 
-    <!-- ALERTAS -->
+
+    <!-- ============================================================
+         ALERTAS
+    ============================================================ -->
+
     @if (TempData["Success"] != null)
     {
         <div class="alert-success">
+
             ✅ @TempData["Success"]
+
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
         <div class="alert-error">
+
             ⚠️ @TempData["Error"]
+
         </div>
     }
 
-    <!-- RESUMEN -->
+
+    <!-- ============================================================
+         RESUMEN
+    ============================================================ -->
+
     <div class="summary-grid">
-
-        <div class="summary-card">
-            <div class="summary-label">Cliente</div>
-            <div class="summary-value">
-                @(cliente?.Nombre) @(cliente?.Apellidos)
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <div class="summary-label">Cédula</div>
-            <div class="summary-value">
-                @(cliente?.Cedula)
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <div class="summary-label">Comercio</div>
-            <div class="summary-value">
-                @(cliente?.Comercio)
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <div class="summary-label">Saldo Total</div>
-            <div class="summary-total">
-                ₡ @totalGeneral.ToString("N2")
-            </div>
-        </div>
 
         <div class="summary-card">
 
             <div class="summary-label">
-
-                Empresa
-
+                Cliente
             </div>
 
             <div class="summary-value">
+                @(cliente?.Nombre) @(cliente?.Apellidos)
+            </div>
 
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Cédula
+            </div>
+
+            <div class="summary-value">
+                @(cliente?.Cedula)
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Comercio
+            </div>
+
+            <div class="summary-value">
+                @(cliente?.Comercio)
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Saldo Total
+            </div>
+
+            <div class="summary-total">
+                ₡ @(totalGeneral.ToString("N2"))
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-label">
+                Empresa
+            </div>
+
+            <div class="summary-value">
                 @(empresa?.Nombre)
-
             </div>
 
         </div>
 
     </div>
 
-    <!-- TABLA -->
+
+    <!-- ============================================================
+         TABLA DE CUENTAS
+    ============================================================ -->
+
     <div class="table-card">
 
         <div class="section-title">
             <span>📋</span> Cuentas del Cliente
         </div>
 
+
         <div class="table-responsive">
 
             <table class="cxc-table">
 
                 <thead>
+
                     <tr>
-                        <th>Factura</th>
-                        <th>Fecha</th>
-                        <th>Vence</th>
-                        <th class="text-right">Total</th>
-                        <th class="text-right">Notas Crédito</th>
-                        <th class="text-right">Pagado</th>
-                        <th class="text-right">Saldo</th>
-                        <th>Descuento</th>
-                        <th>Estado</th>
-                        <th class="text-center">Acciones</th>
+
+                        <th>
+                            Proforma
+                        </th>
+
+                        <th>
+                            Fecha factura
+                        </th>
+
+                        <th>
+                            Vence
+                        </th>
+
+                        <th class="text-right">
+                            Total
+                        </th>
+
+                        <th class="text-right">
+                            Notas Crédito
+                        </th>
+
+                        <th class="text-right">
+                            Pagado
+                        </th>
+
+                        <th class="text-right">
+                            Saldo
+                        </th>
+
+                        <th class="text-center">
+                            Días de Mora
+                        </th>
+
+                        <th>
+                            Descuento
+                        </th>
+
+                        <th>
+                            Estado
+                        </th>
+
+                        <th class="text-center">
+                            Acciones
+                        </th>
+
                     </tr>
+
                 </thead>
+
 
                 <tbody>
 
                     @foreach (var item in Model)
                     {
-                        decimal totalPagado = item.Pagos.Sum(x => x.Monto);
+                        // ====================================================
+                        // PAGOS
+                        // ====================================================
+
+                        decimal totalPagado =
+                            item.Pagos.Sum(x => x.Monto);
+
+
+                        // ====================================================
+                        // NOTAS DE CREDITO
+                        // ====================================================
 
                         decimal totalNotas =
-                            item.Venta?.NotasCredito.Sum(x => x.TotalDevuelto) ?? 0;
+                            item.Venta?.NotasCredito
+                                .Sum(x => x.TotalDevuelto) ?? 0;
+
+
+                        // ====================================================
+                        // SALDO
+                        // ====================================================
 
                         decimal saldo =
                             item.MontoOriginal
@@ -160,76 +280,252 @@
                             saldo = 0;
                         }
 
-                        bool pagada = saldo <= 0;
+
+                        // ====================================================
+                        // PROFORMA
+                        // ====================================================
+
+                        Proforma? proforma = null;
+
+                        if (
+                            item.Venta != null &&
+                            item.Venta.TipoDocumento == "PROFORMA"
+                        )
+                        {
+                            proformas.TryGetValue(
+                                item.Venta.DocumentoId,
+                                out proforma
+                            );
+                        }
+
+
+                        // ====================================================
+                        // FECHA FACTURA
+                        // ====================================================
+
+                        DateTime fechaFactura =
+                            proforma?.Fecha ?? item.Fecha;
+
+
+                        // ====================================================
+                        // DOCUMENTO
+                        // ====================================================
+
+                        string codigoDocumento = "";
+
+                        if (proforma != null)
+                        {
+                            codigoDocumento =
+                                $"P{proforma.Numero}";
+                        }
+                        else if (
+                            item.Venta != null &&
+                            item.Venta.TipoDocumento ==
+                                "FACTURA_ELECTRONICA")
+                        {
+                            codigoDocumento =
+                                item.Venta.DocumentoId.ToString();
+                        }
+                        else
+                        {
+                            codigoDocumento =
+                                $"#{item.VentaId}";
+                        }
+
+
+                        // ====================================================
+                        // ESTADO
+                        // ====================================================
+
+                        bool pagada =
+                            saldo <= 0;
+
 
                         bool vencida =
                             !pagada &&
                             item.FechaVencimiento.HasValue &&
-                            item.FechaVencimiento.Value < DateTime.UtcNow;
+                            item.FechaVencimiento.Value.Date
+                                < DateTime.UtcNow.Date;
+
+
+                        
+                        /* ====================================================
+                           DIAS DE MORA
+                        ==================================================== */
+
+                        int diasMora;
+
+                        if (saldo > 0)
+                        {
+                            // Cuenta pendiente: mora actual desde la fecha de factura.
+                            diasMora = Math.Max(
+                                0,
+                                (DateTime.UtcNow.Date - fechaFactura.Date).Days
+                            );
+                        }
+                        else
+                        {
+                            // Cuenta pagada: conservar la mora histórica registrada.
+                            diasMora = item.DiasMoraFinal ?? 0;
+                        }
+
+
+
+                        // ====================================================
+                        // DESCUENTO
+                        // ====================================================
+
+                        decimal montoBase =
+                            item.MontoOriginal
+                            - totalNotas;
+
+                        decimal descuento = 0;
+
+                        decimal montoConDescuento = 0;
+
+                        decimal falta = 0;
+
+                        if (montoBase > 0)
+                        {
+                            descuento =
+                                Math.Round(
+                                    montoBase * 0.10m,
+                                    0,
+                                    MidpointRounding.AwayFromZero
+                                );
+
+                            montoConDescuento =
+                                montoBase - descuento;
+
+                            falta =
+                                montoConDescuento
+                                - totalPagado;
+
+                            if (falta < 0)
+                            {
+                                falta = 0;
+                            }
+                        }
+
+
+                        // ====================================================
+                        // FECHA LIMITE DESCUENTO
+                        // ====================================================
+
+                        DateTime fechaLimiteDescuento =
+                            fechaFactura.AddDays(60);
+
 
                         <tr>
 
-                            <td>
-                                <strong>#@item.VentaId</strong>
-                            </td>
+                            <!-- PROFORMA -->
 
                             <td>
-                                @item.Fecha.ToString("dd/MM/yyyy")
+
+                                <strong>
+                                    @codigoDocumento
+                                </strong>
+
                             </td>
 
+
+                            <!-- FECHA -->
+
                             <td>
-                                @(item.FechaVencimiento?.ToString("dd/MM/yyyy") ?? "-")
+
+                                @(fechaFactura.ToString(
+                                    "dd/MM/yyyy"
+                                ))
+
                             </td>
+
+
+                            <!-- VENCE -->
+
+                            <td>
+
+                                @(item.FechaVencimiento?
+                                    .ToString("dd/MM/yyyy")
+                                    ?? "-")
+
+                            </td>
+
+
+                            <!-- TOTAL -->
 
                             <td class="text-right">
-                                ₡ @item.MontoOriginal.ToString("N2")
+
+                                ₡ @(item.MontoOriginal
+                                    .ToString("N2"))
+
                             </td>
+
+
+                            <!-- NOTAS -->
 
                             <td class="text-right text-danger">
-                                ₡ @totalNotas.ToString("N2")
+
+                                ₡ @(totalNotas.ToString("N2"))
+
                             </td>
+
+
+                            <!-- PAGADO -->
 
                             <td class="text-right text-success">
-                                ₡ @totalPagado.ToString("N2")
+
+                                ₡ @(totalPagado.ToString("N2"))
+
                             </td>
+
+
+                            <!-- SALDO -->
 
                             <td class="text-right saldo-value">
-                                ₡ @saldo.ToString("N2")
+
+                                ₡ @(saldo.ToString("N2"))
+
                             </td>
 
-                            <td>
 
-                                @{
-                                    decimal montoBase =
-                                        item.MontoOriginal
-                                        - totalNotas;
+                            
+                            <!-- DIAS MORA -->
 
-                                    decimal descuento = 0;
+                            <td class="text-center">
 
-                                    decimal montoConDescuento = 0;
+                                @if (pagada && item.DiasMoraFinal.HasValue)
+                                {
+                                    <span class="@(diasMora > 0
+                                        ? "dias-mora-badge"
+                                        : "dias-mora-cero")"
+                                        title="Días de mora al cancelar la cuenta">
 
-                                    decimal falta = 0;
+                                        @diasMora días
+                                    </span>
 
-                                    if (montoBase > 0)
-                                    {
-                                        descuento =
-                                            Math.Round(
-                                                montoBase * 0.10m,
-                                                0,
-                                                MidpointRounding.AwayFromZero);
-
-                                        montoConDescuento =
-                                            montoBase - descuento;
-
-                                        falta =
-                                            montoConDescuento - totalPagado;
-
-                                        if (falta < 0)
-                                        {
-                                            falta = 0;
-                                        }
-                                    }
+                                    <br />
+                                    <small>Al cancelar</small>
                                 }
+                                else if (diasMora > 0)
+                                {
+                                    <span class="dias-mora-badge">
+                                        @diasMora días
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="dias-mora-cero">
+                                        0 días
+                                    </span>
+                                }
+
+                            </td>
+
+
+
+                            <!-- DESCUENTO -->
+
+                            <td>
 
                                 @if (item.DescuentoOtorgado)
                                 {
@@ -243,7 +539,8 @@
 
                                     <small>
 
-                                        ₡ @item.DescuentoAplicado.ToString("N0")
+                                        ₡ @(item.DescuentoAplicado
+                                            .ToString("N0"))
 
                                     </small>
                                 }
@@ -255,7 +552,10 @@
 
                                     </span>
                                 }
-                                else if (DateTime.UtcNow <= item.Fecha.AddDays(60))
+                                else if (
+                                    DateTime.UtcNow.Date
+                                    <= fechaLimiteDescuento.Date
+                                )
                                 {
                                     <span class="badge-warning">
 
@@ -265,7 +565,7 @@
 
                                         <strong>
 
-                                            ₡ @falta.ToString("N0")
+                                            ₡ @(falta.ToString("N0"))
 
                                         </strong>
 
@@ -290,7 +590,8 @@
 
                             </td>
 
-                            
+
+                            <!-- ESTADO -->
 
                             <td>
 
@@ -314,6 +615,9 @@
                                 }
 
                             </td>
+
+
+                            <!-- ACCIONES -->
 
                             <td class="text-center">
 
@@ -345,11 +649,16 @@
 
                         </tr>
 
+
+                        <!-- =================================================
+                             HISTORIAL DE PAGOS
+                        ================================================== -->
+
                         @if (item.Pagos.Any())
                         {
                             <tr class="payments-row">
 
-                                <td colspan="10">
+                                <td colspan="11">
 
                                     <div class="payments-box">
 
@@ -357,45 +666,129 @@
                                             💰 Historial de Pagos
                                         </div>
 
-                                        <table class="payments-table">
 
-                                            <thead>
-                                                <tr>
-                                                    <th>Fecha</th>
-                                                    <th>Monto</th>
-                                                    <th>Método</th>
-                                                    <th>Observación</th>
-                                                </tr>
-                                            </thead>
+                                        <div class="table-responsive">
 
-                                            <tbody>
+                                            <table class="payments-table">
 
-                                                @foreach (var pago in item.Pagos.OrderByDescending(x => x.Fecha))
-                                                {
+                                                <thead>
+
                                                     <tr>
 
-                                                        <td>
-                                                            @pago.Fecha.ToString("dd/MM/yyyy")
-                                                        </td>
+                                                        <th>
+                                                            Fecha
+                                                        </th>
 
-                                                        <td>
-                                                            ₡ @pago.Monto.ToString("N2")
-                                                        </td>
+                                                        <th>
+                                                            Monto
+                                                        </th>
 
-                                                        <td>
-                                                            @pago.MetodoPago
-                                                        </td>
+                                                        <th>
+                                                            Método
+                                                        </th>
 
-                                                        <td>
-                                                            @pago.Observacion
-                                                        </td>
+                                                        <th>
+                                                            Observación
+                                                        </th>
+
+                                                        <th>
+                                                            Acciones
+                                                        </th>
 
                                                     </tr>
-                                                }
 
-                                            </tbody>
+                                                </thead>
 
-                                        </table>
+
+                                                <tbody>
+
+                                                    @foreach (
+                                                        var pago in item.Pagos
+                                                            .OrderByDescending(
+                                                                x => x.Fecha))
+                                                    {
+                                                        <tr>
+
+                                                            <td>
+                                                                @(pago.Fecha
+                                                                    .ToString(
+                                                                        "dd/MM/yyyy"
+                                                                    ))
+                                                            </td>
+
+
+                                                            <td>
+                                                                ₡ @(pago.Monto
+                                                                    .ToString(
+                                                                        "N2"
+                                                                    ))
+                                                            </td>
+
+
+                                                            <td>
+                                                                @pago.MetodoPago
+                                                            </td>
+
+
+                                                            <td>
+                                                                @pago.Observacion
+                                                            </td>
+
+
+                                                            <!-- ACCIONES PAGO -->
+
+                                                            <td class="payment-actions">
+
+                                                                <!-- EDITAR -->
+
+                                                                <button type="button"
+                                                                        class="btn-payment-edit"
+
+                                                                        data-id="@pago.Id"
+                                                                        data-monto="@pago.Monto.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                                                        data-fecha="@pago.Fecha.ToString("yyyy-MM-ddTHH:mm")"
+                                                                        data-metodo="@pago.MetodoPago"
+                                                                        data-observacion="@pago.Observacion"
+
+                                                                        onclick="abrirEditarPago(this)">
+
+                                                                    ✏️
+
+                                                                </button>
+
+
+                                                                <!-- ELIMINAR -->
+
+                                                                <form asp-action="EliminarPago"
+                                                                      method="post"
+                                                                      class="payment-delete-form"
+                                                                      onsubmit="return confirmarEliminarPago();">
+
+                                                                    @Html.AntiForgeryToken()
+
+                                                                    <input type="hidden"
+                                                                           name="pagoId"
+                                                                           value="@pago.Id" />
+
+                                                                    <button type="submit"
+                                                                            class="btn-payment-delete">
+
+                                                                        🗑️
+
+                                                                    </button>
+
+                                                                </form>
+
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
 
                                     </div>
 
@@ -403,6 +796,7 @@
 
                             </tr>
                         }
+
                     }
 
                 </tbody>
@@ -415,32 +809,48 @@
 
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="paymentModal">
+
+<!-- ============================================================
+     MODAL REGISTRAR PAGO
+============================================================ -->
+
+<div class="modal-overlay"
+     id="paymentModal">
 
     <div class="modal-content">
 
         <div class="modal-header">
 
-            <h3>💵 Registrar Pago</h3>
+            <h3>
+                💵 Registrar Pago
+            </h3>
 
             <button type="button"
                     class="modal-close"
                     onclick="cerrarPago()">
+
                 ✕
+
             </button>
 
         </div>
 
-        <form asp-action="RegistrarPago" method="post">
+
+        <form asp-action="RegistrarPago"
+              method="post">
+
+            @Html.AntiForgeryToken()
 
             <input type="hidden"
                    name="cuentaId"
                    id="cuentaIdInput" />
 
+
             <div class="form-group">
 
-                <label>Monto</label>
+                <label>
+                    Monto
+                </label>
 
                 <input type="number"
                        step="0.01"
@@ -451,31 +861,53 @@
 
             </div>
 
+
             <div class="form-group">
 
-                <label>Método Pago</label>
+                <label>
+                    Método Pago
+                </label>
 
                 <select name="metodoPago"
                         class="form-control">
 
-                    <option value="EFECTIVO">EFECTIVO</option>
-                    <option value="SINPE">SINPE</option>
-                    <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                    <option value="TARJETA">TARJETA</option>
+                    <option value="EFECTIVO">
+                        EFECTIVO
+                    </option>
+
+                    <option value="SINPE">
+                        SINPE
+                    </option>
+
+                    <option value="TRANSFERENCIA">
+                        TRANSFERENCIA
+                    </option>
+
+                    <option value="TARJETA">
+                        TARJETA
+                    </option>
+
+                    <option value="CHEQUE">
+                        CHEQUE
+                    </option>
 
                 </select>
 
             </div>
 
+
             <div class="form-group">
 
-                <label>Observación</label>
+                <label>
+                    Observación
+                </label>
 
                 <textarea name="observacion"
                           rows="3"
                           class="form-control"></textarea>
 
             </div>
+
 
             <div class="modal-actions">
 
@@ -503,28 +935,273 @@
 </div>
 
 
+<!-- ============================================================
+     MODAL EDITAR PAGO
+============================================================ -->
+
+<div class="modal-overlay"
+     id="editPaymentModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h3>
+                ✏️ Editar Pago
+            </h3>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="cerrarEditarPago()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <form asp-action="EditarPago"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="pagoId"
+                   id="editarPagoId" />
+
+
+            <!-- MONTO -->
+
+            <div class="form-group">
+
+                <label>
+                    Monto
+                </label>
+
+                <input type="number"
+                       step="0.01"
+                       min="0.01"
+                       name="monto"
+                       id="editarPagoMonto"
+                       class="form-control"
+                       required />
+
+            </div>
+
+
+            <!-- FECHA -->
+
+            <div class="form-group">
+
+                <label>
+                    Fecha
+                </label>
+
+                <input type="datetime-local"
+                       name="fecha"
+                       id="editarPagoFecha"
+                       class="form-control"
+                       required />
+
+            </div>
+
+
+            <!-- METODO -->
+
+            <div class="form-group">
+
+                <label>
+                    Método Pago
+                </label>
+
+                <select name="metodoPago"
+                        id="editarPagoMetodo"
+                        class="form-control">
+
+                    <option value="EFECTIVO">
+                        EFECTIVO
+                    </option>
+
+                    <option value="SINPE">
+                        SINPE
+                    </option>
+
+                    <option value="TRANSFERENCIA">
+                        TRANSFERENCIA
+                    </option>
+
+                    <option value="TARJETA">
+                        TARJETA
+                    </option>
+
+                    <option value="CHEQUE">
+                        CHEQUE
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- OBSERVACION -->
+
+            <div class="form-group">
+
+                <label>
+                    Observación
+                </label>
+
+                <textarea name="observacion"
+                          id="editarPagoObservacion"
+                          rows="3"
+                          class="form-control"></textarea>
+
+            </div>
+
+
+            <!-- ACCIONES -->
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="cerrarEditarPago()">
+
+                    Cancelar
+
+                </button>
+
+                <button type="submit"
+                        class="btn-save">
+
+                    💾 Guardar cambios
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
 
 <script>
-    let cuentaActual = 0;
 
-function abrirPago(id)
+    // ============================================================
+    // REGISTRAR PAGO
+    // ============================================================
+
+    function abrirPago(id)
+    {
+        document.getElementById(
+            "cuentaIdInput"
+        ).value = id;
+
+        document.getElementById(
+            "paymentModal"
+        ).style.display = "flex";
+    }
+
+
+    function cerrarPago()
+    {
+        document.getElementById(
+            "paymentModal"
+        ).style.display = "none";
+    }
+
+
+    // ============================================================
+    // EDITAR PAGO
+    // ============================================================
+
+    function abrirEditarPago(button)
 {
-    cuentaActual = id;
+    document.getElementById("editarPagoId").value =
+        button.dataset.id;
 
-    document.getElementById(
-        "cuentaIdInput"
-    ).value = id;
+    let monto = button.dataset.monto || "";
 
-    document.getElementById(
-        "paymentModal"
-    ).style.display = "flex";
+    // Normalizar decimal
+    monto = monto.replace(",", ".");
+
+    document.getElementById("editarPagoMonto").value =
+        parseFloat(monto) || 0;
+
+    document.getElementById("editarPagoFecha").value =
+        button.dataset.fecha;
+
+    document.getElementById("editarPagoMetodo").value =
+        button.dataset.metodo;
+
+    document.getElementById("editarPagoObservacion").value =
+        button.dataset.observacion || "";
+
+    document.getElementById("editPaymentModal").style.display =
+        "flex";
 }
 
-function cerrarPago()
-{
-    document.getElementById(
-        "paymentModal"
-    ).style.display = "none";
-}
+
+    function cerrarEditarPago()
+    {
+        document.getElementById(
+            "editPaymentModal"
+        ).style.display = "none";
+    }
+
+
+    // ============================================================
+    // CONFIRMAR ELIMINACION
+    // ============================================================
+
+    function confirmarEliminarPago()
+    {
+        return confirm(
+            "¿Está seguro de eliminar este pago?\n\n" +
+            "El saldo de la cuenta será recalculado."
+        );
+    }
+
+
+    // ============================================================
+    // CERRAR MODALES AL HACER CLICK AFUERA
+    // ============================================================
+
+    document.addEventListener(
+        "click",
+        function(event)
+        {
+            const paymentModal =
+                document.getElementById(
+                    "paymentModal"
+                );
+
+            const editModal =
+                document.getElementById(
+                    "editPaymentModal"
+                );
+
+            if (
+                event.target === paymentModal
+            )
+            {
+                cerrarPago();
+            }
+
+            if (
+                event.target === editModal
+            )
+            {
+                cerrarEditarPago();
+            }
+        }
+    );
 
 </script>
