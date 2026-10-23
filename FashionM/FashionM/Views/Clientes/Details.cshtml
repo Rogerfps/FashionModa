@@ -1,18 +1,31 @@
-﻿@model Clientes
+﻿
+@model FashionM.Models.Clientes
+
+@using FashionM.Models
 
 @{
     ViewData["Title"] = "Detalle del Cliente";
+
+    var empresas = ViewBag.Empresas as List<Empresa>
+        ?? new List<Empresa>();
+
+    var creditos = ViewBag.CreditosPorEmpresa
+        as List<ClienteCreditoEmpresa>
+        ?? new List<ClienteCreditoEmpresa>();
 }
 
 <link rel="stylesheet" href="~/css/Cliente/ClienteDetails.css" />
 
-<!-- HEADER MINIMALISTA  -->
+<!-- ENCABEZADO -->
 <div class="neo-header">
     <div class="title-container d-flex justify-content-between align-items-center">
         <div>
             <h1 class="title-glow">Detalle del Cliente</h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Información completa del cliente</p>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                Información completa del cliente
+            </p>
         </div>
+
         <a asp-action="Index" class="back-link">
             <span>←</span> Volver al listado
         </a>
@@ -21,82 +34,131 @@
 
 <div class="container-fluid px-4" style="max-width: 1400px; margin: 0 auto;">
     <div class="detail-card">
-        <!-- Encabezado del cliente con avatar -->
+
+        <!-- ENCABEZADO DEL CLIENTE -->
         <div class="client-header">
             <div class="client-avatar">
-                @Model.Nombre.Substring(0, 1)@Model.Apellidos.Substring(0, 1)
+                @(string.IsNullOrWhiteSpace(Model.Nombre) ? "" : Model.Nombre.Substring(0, 1))
+                @(string.IsNullOrWhiteSpace(Model.Apellidos) ? "" : Model.Apellidos.Substring(0, 1))
             </div>
+
             <div class="client-title">
-                <div class="client-name">@Model.Nombre @Model.Apellidos</div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="client-code">Código: @Model.Codigo</span>
-                    <span class="client-code">Cédula: @Model.Cedula</span>
+                <div class="client-name">
+                    @Model.Nombre @Model.Apellidos
+                </div>
+
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="client-code">
+                        Código: @Model.Codigo
+                    </span>
+
+                    <span class="client-code">
+                        Cédula: @Model.Cedula
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Alias))
+                    {
+                        <span class="client-code"
+                              style="background: #e8f2ff;
+                                     color: #2457a7;
+                                     padding: 5px 12px;
+                                     border-radius: 20px;
+                                     font-weight: 600;">
+                            Grupo: @Model.Alias
+                        </span>
+                    }
                 </div>
             </div>
+
             <div class="status-badge-large @(Model.Estado ? "active" : "inactive")">
                 @(Model.Estado ? "Activo" : "Inactivo")
             </div>
         </div>
 
-        <!-- Grid de información -->
+        <!-- INFORMACIÓN GENERAL -->
         <div class="info-grid">
-            <!-- Columna 1: Información Personal -->
+
+            <!-- INFORMACIÓN PERSONAL -->
             <div class="info-section">
                 <div class="section-title">
                     <span>👤</span> Información Personal
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Tipo ID:</div>
                     <div class="info-value">@Model.IDTipo</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Correo:</div>
                     <div class="info-value">@Model.Correo</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Teléfonos:</div>
                     <div class="info-value">@Model.Telefonos</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Dirección:</div>
                     <div class="info-value">@Model.Direccion</div>
                 </div>
             </div>
 
-            <!-- Columna 2: Informacion Comercial -->
+            <!-- INFORMACIÓN COMERCIAL -->
             <div class="info-section">
                 <div class="section-title">
                     <span>🏢</span> Información Comercial
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Comercio:</div>
                     <div class="info-value">@Model.Comercio</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Actividad Económica:</div>
                     <div class="info-value">@Model.ActividadEconomica</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Agente:</div>
                     <div class="info-value">
                         <span class="agente-tag">@Model.Agente</span>
                     </div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Transporte:</div>
                     <div class="info-value">@Model.Transporte</div>
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Empresa:</div>
                     <div class="info-value">@Model.Empresa</div>
                 </div>
+
+                <div class="info-row">
+                    <div class="info-label">Alias:</div>
+                    <div class="info-value">
+                        @if (!string.IsNullOrWhiteSpace(Model.Alias))
+                        {
+                            @Model.Alias
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin alias asignado</span>
+                        }
+                    </div>
+                </div>
             </div>
 
-            <!-- Columna 3: Ubicacion (se extiende a 2 columnas si es necesario) -->
+            <!-- UBICACIÓN -->
             <div class="info-section">
                 <div class="section-title">
                     <span>📍</span> Ubicación y Zona
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Zona:</div>
                     <div class="info-value">
@@ -105,127 +167,175 @@
                 </div>
             </div>
 
-            <!-- Columna 4: Credito -->
+            <!-- LÍMITE DE CRÉDITO COMPARTIDO -->
             <div class="info-section">
                 <div class="section-title">
                     <span>💳</span> Límite de Crédito
                 </div>
+
                 <div class="info-row">
                     <div class="info-label">Monto:</div>
                     <div class="info-value highlight">
                         ₡ @Model.LimiteCredito.ToString("N2")
                     </div>
                 </div>
+
+                <small class="text-muted">
+                    El límite mostrado corresponde al cliente.
+                    El estado del crédito se administra por empresa.
+                </small>
             </div>
+
+        </div>
+
+        <!-- ESTADO DEL CRÉDITO POR EMPRESA -->
+        <div class="info-section mt-4">
+            <div class="section-title">
+                <span>🏢</span> Estado del Crédito por Empresa
+            </div>
+
+            @if (empresas.Any())
+            {
+                @foreach (var empresa in empresas)
+                {
+                    var credito = creditos.FirstOrDefault(
+                        c => c.EmpresaId == empresa.Id);
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            @empresa.Nombre:
+                        </div>
+
+                        <div class="info-value">
+                            @if (credito == null)
+                            {
+                                <span class="badge bg-secondary">
+                                    Sin configurar
+                                </span>
+                            }
+                            else if (credito.CreditoAbierto)
+                            {
+                                <span class="badge bg-success">
+                                    Crédito abierto
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Crédito cerrado
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No hay empresas registradas en el sistema.
+                </p>
+            }
         </div>
 
         <!-- CRM DEL CLIENTE -->
         <div class="info-section mt-4">
-
             <div class="section-title">
                 <span>📈</span> CRM del Cliente
             </div>
 
-            <!-- Calificación -->
+            <!-- CALIFICACIÓN -->
             <div class="info-row">
                 <div class="info-label">Calificación:</div>
 
                 <div class="info-value">
-
-                    <div id="estrellas" style="font-size:30px;">
-
+                    <div id="estrellas" style="font-size: 30px;">
                         @for (int i = 1; i <= 5; i++)
                         {
                             <span class="estrella"
                                   data-valor="@i"
-                                  style="cursor:pointer;color:@(i <= Model.Calificacion ? "#ffc107" : "#d6d6d6")">
+                                  style="cursor: pointer; color: @(i <= Model.Calificacion ? "#ffc107" : "#d6d6d6")">
                                 ★
                             </span>
                         }
-
                     </div>
-
                 </div>
             </div>
 
-            <!-- Última visita -->
+            <!-- ÚLTIMA VISITA -->
             <div class="info-row">
                 <div class="info-label">Última visita:</div>
 
-                <div class="info-value d-flex align-items-center gap-3">
-
+                <div class="info-value d-flex align-items-center gap-3 flex-wrap">
                     <input type="date"
                            id="ultimaVisita"
                            class="form-control"
-                           style="max-width:220px;"
+                           style="max-width: 220px;"
                            value="@(Model.UltimaVisita?.ToString("yyyy-MM-dd"))" />
 
-                    <button id="guardarFecha"
+                    <button type="button"
+                            id="guardarFecha"
                             class="btn btn-success btn-sm">
                         Guardar
                     </button>
-
                 </div>
             </div>
 
-            <!-- Alerta -->
+            <!-- ALERTA -->
             <div class="info-row">
-
-                <div class="info-label">
-                    Alerta:
-                </div>
+                <div class="info-label">Alerta:</div>
 
                 <div class="info-value">
-
-                    <button id="btnAlerta"
+                    <button type="button"
+                            id="btnAlerta"
                             class="btn @(Model.Alerta ? "btn-danger" : "btn-secondary")">
-
                         @(Model.Alerta ? "🔔 Activada" : "🔕 Desactivada")
-
                     </button>
-
                 </div>
-
             </div>
-
         </div>
 
-        <!-- Botones de accion -->
+        <!-- BOTONES DE ACCIÓN -->
         <div class="action-buttons">
             <a asp-action="Index" class="btn-neo-outline">
                 <span>←</span> Volver
             </a>
-            <a asp-action="Edit" asp-route-id="@Model.Cedula" class="btn-warning-neo">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Cedula"
+               class="btn-warning-neo">
                 <span>✏️</span> Editar Cliente
             </a>
-            <a asp-action="Delete" asp-route-id="@Model.Cedula" class="btn-neo" style="background: #e74c3c;">
+
+            <a asp-action="Delete"
+               asp-route-id="@Model.Cedula"
+               class="btn-neo"
+               style="background: #e74c3c;">
                 <span>🗑️</span> Eliminar
             </a>
         </div>
 
-        <a asp-controller="ClienteSemana"
-           asp-action="Index"
-           asp-route-clienteCedula="@Model.Cedula"
-           class="btn btn-primary">
-            📝 Historial de Visitas
-        </a>
+        <!-- HISTORIAL DE VISITAS -->
+        <div class="mt-3">
+            <a asp-controller="ClienteSemana"
+               asp-action="Index"
+               asp-route-clienteCedula="@Model.Cedula"
+               class="btn btn-primary">
+                📝 Historial de Visitas
+            </a>
+        </div>
 
     </div>
 </div>
 
 <script>
-
     const cedula = @Model.Cedula;
 
-    //=====================
-    // ESTRELLAS
-    //=====================
-
+    // =====================
+    // CALIFICACIÓN
+    // =====================
     document.querySelectorAll(".estrella").forEach(e => {
-
         e.addEventListener("click", function () {
-
-            let valor = this.dataset.valor;
+            const valor = this.dataset.valor;
 
             const datos = new URLSearchParams();
             datos.append("cedula", cedula);
@@ -236,40 +346,37 @@
                 body: datos
             })
             .then(response => {
-                if (!response.ok)
+                if (!response.ok) {
                     throw new Error("Error al guardar la calificación.");
+                }
 
                 return response.json();
             })
             .then(() => {
-
                 document.querySelectorAll(".estrella").forEach(s => {
-
-                    if (parseInt(s.dataset.valor) <= parseInt(valor)) {
-                        s.style.color = "#ffc107";
-                    } else {
-                        s.style.color = "#d6d6d6";
-                    }
-
+                    s.style.color =
+                        parseInt(s.dataset.valor) <= parseInt(valor)
+                            ? "#ffc107"
+                            : "#d6d6d6";
                 });
-
             })
             .catch(error => {
                 console.error(error);
                 alert("No se pudo guardar la calificación.");
             });
-
         });
-
     });
 
-    //=====================
-    // FECHA
-    //=====================
-
+    // =====================
+    // ÚLTIMA VISITA
+    // =====================
     document.getElementById("guardarFecha").addEventListener("click", () => {
-
         const fecha = document.getElementById("ultimaVisita").value;
+
+        if (!fecha) {
+            alert("Selecciona una fecha antes de guardar.");
+            return;
+        }
 
         const datos = new URLSearchParams();
         datos.append("cedula", cedula);
@@ -280,33 +387,25 @@
             body: datos
         })
         .then(response => {
-
-            if (!response.ok)
+            if (!response.ok) {
                 throw new Error("Error al guardar la fecha.");
+            }
 
             return response.json();
-
         })
         .then(() => {
-
             alert("Última visita actualizada.");
-
         })
         .catch(error => {
-
             console.error(error);
             alert("No se pudo guardar la fecha.");
-
         });
-
     });
 
-    //=====================
+    // =====================
     // ALERTA
-    //=====================
-
+    // =====================
     document.getElementById("btnAlerta").addEventListener("click", () => {
-
         const datos = new URLSearchParams();
         datos.append("cedula", cedula);
 
@@ -315,46 +414,32 @@
             body: datos
         })
         .then(response => {
-
-            if (!response.ok)
+            if (!response.ok) {
                 throw new Error("Error al cambiar la alerta.");
+            }
 
             return response.json();
-
         })
         .then(r => {
-
-            let b = document.getElementById("btnAlerta");
+            const boton = document.getElementById("btnAlerta");
 
             if (r.alerta) {
-
-                b.classList.remove("btn-secondary");
-                b.classList.add("btn-danger");
-
-                b.innerHTML = "🔔 Activada";
+                boton.classList.remove("btn-secondary");
+                boton.classList.add("btn-danger");
+                boton.innerHTML = "🔔 Activada";
 
                 try {
                     new Audio("/sounds/alert.mp3").play();
                 } catch { }
-
+            } else {
+                boton.classList.remove("btn-danger");
+                boton.classList.add("btn-secondary");
+                boton.innerHTML = "🔕 Desactivada";
             }
-            else {
-
-                b.classList.remove("btn-danger");
-                b.classList.add("btn-secondary");
-
-                b.innerHTML = "🔕 Desactivada";
-
-            }
-
         })
         .catch(error => {
-
             console.error(error);
             alert("No se pudo cambiar la alerta.");
-
         });
-
     });
-
 </script>

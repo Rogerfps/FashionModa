@@ -1,4 +1,5 @@
-﻿@model Proforma
+﻿
+@model Proforma
 
 @{
     ViewData["Title"] = "Nueva Proforma";
@@ -11,6 +12,7 @@
     <h1 class="page-title">
         <span>📄</span> Nueva Proforma
     </h1>
+
     <a asp-action="Index" class="back-link">
         <span>←</span> Volver
     </a>
@@ -18,7 +20,12 @@
 
 <!-- Formulario -->
 <div class="form-card">
-    <form asp-action="Create">
+    <form asp-action="Create" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="validation-error mb-3"></div>
 
         <div class="section-title">
             <span>📋</span> Información de la Proforma
@@ -35,10 +42,7 @@
                         asp-items="ViewBag.Empresas"
                         id="EmpresaId">
 
-                    <option value="">
-                        Seleccione una empresa
-                    </option>
-
+                    <option value="">Seleccione una empresa</option>
                 </select>
 
                 <span asp-validation-for="EmpresaId"
@@ -55,10 +59,7 @@
                         class="form-select"
                         id="agenteSelect">
 
-                    <option value="">
-                        Seleccione un agente
-                    </option>
-
+                    <option value="">Seleccione un agente</option>
                 </select>
 
                 <span asp-validation-for="AgenteVenta"
@@ -67,32 +68,41 @@
 
             <!-- Cliente -->
             <div class="form-group position-relative">
-                <label class="form-label">Cliente</label>
+                <label class="form-label" for="clienteBuscar">
+                    Cliente
+                </label>
 
-                <!-- Input de búsqueda -->
                 <input type="text"
                        id="clienteBuscar"
                        class="form-control"
-                       placeholder="Buscar por cédula, nombre o comercio..."
+                       placeholder="Buscar por cédula, nombre, comercio o alias..."
                        autocomplete="off" />
 
-                <!-- Valor real que se guarda -->
+                <!-- Cédula del cliente seleccionado -->
                 <input type="hidden"
                        asp-for="ClienteCedula"
                        id="ClienteCedula" />
 
-                <!-- Lista dinámica -->
-                <div id="listaClientes" class="list-group"></div>
+                <!-- Resultados de búsqueda -->
+                <div id="listaClientes"
+                     class="list-group"
+                     style="position:absolute; z-index:1050; width:100%; max-height:300px; overflow-y:auto;">
+                </div>
 
                 <span asp-validation-for="ClienteCedula"
                       class="validation-error"></span>
+
+                <small class="text-muted">
+                    Puedes buscar un alias compartido por varias tiendas.
+                    Selecciona el comercio correcto.
+                </small>
             </div>
 
             <!-- Facturado por -->
             <div class="form-group">
-
-                <label asp-for="FacturadoPor"
-                       class="form-label"></label>
+                <label asp-for="FacturadoPor" class="form-label">
+                    Facturado por
+                </label>
 
                 <div class="radio-group">
 
@@ -135,13 +145,11 @@
 
                 <span asp-validation-for="FacturadoPor"
                       class="validation-error"></span>
-
             </div>
 
             <!-- Número de cajas -->
             <div class="form-group">
-                <label asp-for="NumeroCajas"
-                       class="form-label"></label>
+                <label asp-for="NumeroCajas" class="form-label"></label>
 
                 <input asp-for="NumeroCajas"
                        class="form-control"
@@ -157,9 +165,7 @@
 
         <!-- Detalle -->
         <div class="form-group mb-4">
-
-            <label asp-for="Detalle"
-                   class="form-label"></label>
+            <label asp-for="Detalle" class="form-label"></label>
 
             <textarea asp-for="Detalle"
                       class="form-control"
@@ -168,12 +174,10 @@
 
             <span asp-validation-for="Detalle"
                   class="validation-error"></span>
-
         </div>
 
         <!-- Fecha -->
         <div class="form-group mb-4">
-
             <label class="form-label">Fecha</label>
 
             <input type="text"
@@ -181,19 +185,16 @@
                    value="@DateTime.Now.ToString("dd/MM/yyyy")"
                    disabled
                    readonly />
-
         </div>
 
         <!-- Botones -->
         <div class="action-buttons">
 
-            <a asp-action="Index"
-                   class="btn-back">
+            <a asp-action="Index" class="btn-back">
                 ← Cancelar
             </a>
 
-            <button type="submit"
-                    class="btn-save">
+            <button type="submit" class="btn-save">
                 💾 Guardar y agregar productos
             </button>
 
@@ -209,138 +210,190 @@
     }
 
     <script>
+        // =========================================
+        // BÚSQUEDA DE CLIENTES POR NOMBRE, CÉDULA,
+        // COMERCIO O ALIAS
+        // =========================================
 
-        let timeout = null;
+        let timeoutBusqueda = null;
 
-        const input = document.getElementById("clienteBuscar");
-        const lista = document.getElementById("listaClientes");
-        const hidden = document.getElementById("ClienteCedula");
+        const inputCliente = document.getElementById("clienteBuscar");
+        const listaClientes = document.getElementById("listaClientes");
+        const cedulaCliente = document.getElementById("ClienteCedula");
 
-        // 🔥 Limpia cédula si el usuario escribe manualmente
-        input.addEventListener("input", function() {
-            hidden.value = "";
-        });
+        inputCliente.addEventListener("input", function () {
+            // Si cambia el texto, hay que volver a seleccionar al cliente.
+            cedulaCliente.value = "";
 
-        input.addEventListener("keyup", function() {
+            clearTimeout(timeoutBusqueda);
 
-            clearTimeout(timeout);
+            const termino = this.value.trim();
 
-            let term = this.value;
+            if (termino.length === 0) {
+                listaClientes.innerHTML = "";
+                return;
+            }
 
-            timeout = setTimeout(() => {
+            timeoutBusqueda = setTimeout(async () => {
+                listaClientes.innerHTML = `
+                    <div class="list-group-item">
+                        Buscando clientes...
+                    </div>`;
 
-                if (term.length < 1) {
-                    lista.innerHTML = "";
-                    return;
-                }
+                try {
+                    const respuesta = await fetch(
+                        `/Proformas/BuscarClientes?term=${encodeURIComponent(termino)}`
+                    );
 
-                fetch(`/Proformas/BuscarClientes?term=${term}`)
-                    .then(res => res.json())
-                    .then(data => {
+                    if (!respuesta.ok) {
+                        throw new Error("No se pudo consultar la lista de clientes.");
+                    }
 
-                        lista.innerHTML = "";
+                    const clientes = await respuesta.json();
 
-                        if (data.length === 0) {
+                    listaClientes.innerHTML = "";
 
-                            lista.innerHTML =
-                                `<div class="list-group-item">
-                                    Sin resultados
-                                </div>`;
+                    if (!clientes || clientes.length === 0) {
+                        listaClientes.innerHTML = `
+                            <div class="list-group-item">
+                                No se encontraron clientes.
+                            </div>`;
+                        return;
+                    }
 
-                            return;
+                    clientes.forEach(cliente => {
+                        const opcion = document.createElement("button");
+
+                        opcion.type = "button";
+                        opcion.className =
+                            "list-group-item list-group-item-action text-start";
+
+                        const nombre = document.createElement("strong");
+                        nombre.textContent = cliente.nombre || "Sin nombre";
+
+                        const informacion = document.createElement("small");
+                        informacion.className = "d-block text-muted";
+
+                        informacion.textContent =
+                            `Cédula: ${cliente.cedula}` +
+                            ` | Comercio: ${cliente.comercio || "Sin comercio"}`;
+
+                        opcion.appendChild(nombre);
+                        opcion.appendChild(informacion);
+
+                        if (cliente.alias) {
+                            const alias = document.createElement("small");
+                            alias.className = "d-block";
+
+                            alias.textContent = `Alias: ${cliente.alias}`;
+
+                            opcion.appendChild(alias);
                         }
 
-                        data.forEach(cliente => {
+                        opcion.addEventListener("click", function () {
+                            inputCliente.value =
+                                `${cliente.nombre} - ${cliente.cedula}` +
+                                (cliente.alias ? ` (${cliente.alias})` : "");
 
-                            let item = document.createElement("a");
+                            cedulaCliente.value = cliente.cedula;
 
-                            item.className =
-                                "list-group-item list-group-item-action";
-
-                            item.innerHTML = `
-                                <strong>${cliente.nombre}</strong><br>
-                                <small>
-                                    ${cliente.cedula}
-                                    -
-                                    ${cliente.comercio ?? ''}
-                                </small>
-                            `;
-
-                            item.onclick = () => {
-
-                                input.value =
-                                    `${cliente.nombre} - ${cliente.cedula}`;
-
-                                hidden.value = cliente.cedula;
-
-                                lista.innerHTML = "";
-                            };
-
-                            lista.appendChild(item);
-
+                            listaClientes.innerHTML = "";
                         });
 
+                        listaClientes.appendChild(opcion);
                     });
 
-            }, 300);
+                } catch (error) {
+                    console.error("Error al buscar clientes:", error);
 
+                    listaClientes.innerHTML = `
+                        <div class="list-group-item text-danger">
+                            Ocurrió un error al buscar clientes.
+                        </div>`;
+                }
+            }, 300);
         });
 
+        // Cerrar los resultados al hacer clic fuera de la búsqueda.
+        document.addEventListener("click", function (evento) {
+            if (!inputCliente.contains(evento.target) &&
+                !listaClientes.contains(evento.target)) {
+                listaClientes.innerHTML = "";
+            }
+        });
 
-        // 🔥 CARGAR AGENTES SEGÚN EMPRESA
+        // =========================================
+        // CARGAR AGENTES SEGÚN EMPRESA
+        // =========================================
 
         const empresaSelect = document.getElementById("EmpresaId");
         const agenteSelect = document.getElementById("agenteSelect");
 
-        empresaSelect.addEventListener("change", function() {
-
-            const empresaId = this.value;
-
+        async function cargarAgentes(empresaId) {
             agenteSelect.innerHTML =
-                `<option value="">Cargando...</option>`;
+                '<option value="">Cargando agentes...</option>';
 
             if (!empresaId) {
-
                 agenteSelect.innerHTML =
-                    `<option value="">
-                        Seleccione un agente
-                    </option>`;
-
+                    '<option value="">Seleccione un agente</option>';
                 return;
             }
 
-            fetch(`/Proformas/ObtenerAgentes?empresaId=${empresaId}`)
-                .then(res => res.json())
-                .then(data => {
+            try {
+                const respuesta = await fetch(
+                    `/Proformas/ObtenerAgentes?empresaId=${encodeURIComponent(empresaId)}`
+                );
 
-                    agenteSelect.innerHTML =
-                        `<option value="">
-                            Seleccione un agente
-                        </option>`;
+                if (!respuesta.ok) {
+                    throw new Error("No se pudieron cargar los agentes.");
+                }
 
-                    data.forEach(agente => {
+                const agentes = await respuesta.json();
 
-                        agenteSelect.innerHTML += `
-                            <option value="${agente}">
-                                ${agente}
-                            </option>
-                        `;
+                agenteSelect.innerHTML =
+                    '<option value="">Seleccione un agente</option>';
 
-                    });
+                agentes.forEach(agente => {
+                    const opcion = document.createElement("option");
 
-                })
-                .catch(error => {
+                    opcion.value = agente;
+                    opcion.textContent = agente;
 
-                    console.error(error);
-
-                    agenteSelect.innerHTML =
-                        `<option value="">
-                            Error cargando agentes
-                        </option>`;
-
+                    agenteSelect.appendChild(opcion);
                 });
 
+            } catch (error) {
+                console.error("Error al cargar agentes:", error);
+
+                agenteSelect.innerHTML =
+                    '<option value="">Error cargando agentes</option>';
+            }
+        }
+
+        empresaSelect.addEventListener("change", function () {
+            cargarAgentes(this.value);
         });
 
+        // Si ya hay una empresa seleccionada al abrir el formulario,
+        // cargar también sus agentes.
+        if (empresaSelect.value) {
+            cargarAgentes(empresaSelect.value);
+        }
+
+        // =========================================
+        // VALIDAR QUE SE HAYA SELECCIONADO UN CLIENTE
+        // =========================================
+
+        const formulario = document.querySelector('form[asp-action="Create"]');
+
+        formulario.addEventListener("submit", function (evento) {
+            if (!cedulaCliente.value) {
+                evento.preventDefault();
+
+                alert("Debes buscar y seleccionar un cliente antes de guardar la proforma.");
+
+                inputCliente.focus();
+            }
+        });
     </script>
 }

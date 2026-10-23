@@ -55,6 +55,9 @@ namespace FashionM.Models
         [StringLength(50)]
         public string Zona { get; set; } = string.Empty;
 
+        [StringLength(100)]
+        public string Alias { get; set; } = string.Empty;
+
         [StringLength(50)]
         public string Empresa { get; set; } = string.Empty;
 

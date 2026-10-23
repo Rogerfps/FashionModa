@@ -16,6 +16,8 @@ namespace FashionM.Data
         public DbSet<Foto> Fotos { get; set; }
         public DbSet<TallaInventario> TallasInventario { get; set; }
         public DbSet<Clientes> Clientes { get; set; }
+
+        public DbSet<ClienteCreditoEmpresa> ClienteCreditoEmpresa { get; set; } = null!;
         public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<Zapato> Zapatos { get; set; }
 
@@ -285,6 +287,22 @@ namespace FashionM.Data
                 .WithMany(c => c.Pagos)
                 .HasForeignKey(p => p.CuentaPorCobrarId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClienteCreditoEmpresa>()
+                .HasIndex(x => new { x.ClienteCedula, x.EmpresaId })
+                .IsUnique();
+
+            modelBuilder.Entity<ClienteCreditoEmpresa>()
+                .HasOne(x => x.Cliente)
+                .WithMany()
+                .HasForeignKey(x => x.ClienteCedula)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ClienteCreditoEmpresa>()
+                .HasOne(x => x.Empresa)
+                .WithMany()
+                .HasForeignKey(x => x.EmpresaId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

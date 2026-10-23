@@ -33,7 +33,7 @@ namespace FashionM.Controllers
             int pageSize = 25;
             var clientes = _context.Clientes.AsQueryable();
 
-            // 🔍 BUSQUEDA GENERAL
+            
             // 🔍 BUSQUEDA GENERAL NORMALIZADA
             if (!string.IsNullOrWhiteSpace(buscar))
             {
@@ -46,6 +46,7 @@ namespace FashionM.Controllers
                     c.Codigo.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
                     c.Nombre.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
                     c.Apellidos.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
+                    (c.Alias != null && c.Alias.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado)) ||
                     c.Agente.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
                     c.Empresa.ToLower().Replace("-", "").Replace(" ", "").Contains(buscarNormalizado) ||
                     c.Cedula.ToString().Contains(buscarNormalizado) ||
@@ -119,24 +120,42 @@ namespace FashionM.Controllers
         public IActionResult Create()
         {
             CargarTiposIdentificacion();
+
+            ViewBag.Empresas = _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToList();
+
             return View();
         }
+
 
         // ===============================
         // CREATE (POST)
         // ===============================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Clientes cliente)
+        public async Task<IActionResult> Create(
+            Clientes cliente,
+            int[] empresasCreditoCerrado)
         {
             CargarTiposIdentificacion();
 
+            // Cargar empresas para volver a mostrar el formulario si hay errores
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
+            ViewBag.EmpresasCreditoCerrado = empresasCreditoCerrado;
+
+            // Verificar si la cédula ya existe
             bool existeCedula = await _context.Clientes
                 .AnyAsync(c => c.Cedula == cliente.Cedula);
 
             if (existeCedula)
             {
-                ModelState.AddModelError("Cedula", "La cédula ya existe.");
+                ModelState.AddModelError(
+                    "Cedula",
+                    "La cédula ya existe.");
             }
 
             if (!ModelState.IsValid)
@@ -144,8 +163,38 @@ namespace FashionM.Controllers
                 return View(cliente);
             }
 
+            // Guardar el cliente
             _context.Clientes.Add(cliente);
+
             await _context.SaveChangesAsync();
+
+            // Obtener todas las empresas existentes
+            var empresas = await _context.Empresas
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            // Guardar el estado del crédito para cada empresa
+            foreach (var empresaId in empresas)
+            {
+                bool creditoCerrado =
+                    empresasCreditoCerrado != null &&
+                    empresasCreditoCerrado.Contains(empresaId);
+
+                var credito = new ClienteCreditoEmpresa
+                {
+                    ClienteCedula = cliente.Cedula,
+                    EmpresaId = empresaId,
+                    CreditoAbierto = !creditoCerrado,
+                    FechaActualizacion = DateTime.UtcNow
+                };
+
+                _context.ClienteCreditoEmpresa.Add(credito);
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] =
+                "Cliente creado correctamente y crédito configurado por empresa.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -163,6 +212,16 @@ namespace FashionM.Controllers
 
             if (cliente == null)
                 return NotFound();
+
+            // Cargar todas las empresas
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
+            // Cargar el estado del crédito de este cliente por empresa
+            ViewBag.CreditosPorEmpresa = await _context.ClienteCreditoEmpresa
+                .Where(c => c.ClienteCedula == cliente.Cedula)
+                .ToListAsync();
 
             return View(cliente);
         }
@@ -182,35 +241,137 @@ namespace FashionM.Controllers
                 return NotFound();
 
             CargarTiposIdentificacion();
+
+            // Cargar todas las empresas
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
+            // Cargar las empresas donde el crédito está cerrado
+            ViewBag.EmpresasCreditoCerrado = await _context.ClienteCreditoEmpresa
+                .Where(c => c.ClienteCedula == cliente.Cedula
+                            && !c.CreditoAbierto)
+                .Select(c => c.EmpresaId)
+                .ToArrayAsync();
+
             return View(cliente);
         }
+
 
         // ===============================
         // EDIT (POST)
         // ===============================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Clientes cliente)
+        public async Task<IActionResult> Edit(
+            Clientes cliente,
+            int[] empresasCreditoCerrado)
         {
             CargarTiposIdentificacion();
+
+            // Preparar los datos necesarios para volver a mostrar la vista
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
+            ViewBag.EmpresasCreditoCerrado = empresasCreditoCerrado
+                ?? Array.Empty<int>();
 
             if (!ModelState.IsValid)
                 return View(cliente);
 
+            var clienteExistente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.Cedula == cliente.Cedula);
+
+            if (clienteExistente == null)
+                return NotFound();
+
+            // Comprobar que las empresas seleccionadas existan
+            var empresasExistentes = await _context.Empresas
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            var seleccionadas = empresasCreditoCerrado
+                ?? Array.Empty<int>();
+
+            if (seleccionadas.Except(empresasExistentes).Any())
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Una de las empresas seleccionadas no existe.");
+
+                return View(cliente);
+            }
+
+            // Actualizar los datos del cliente sin reemplazar
+            // sus relaciones ni sus colecciones de navegación.
+            clienteExistente.Codigo = cliente.Codigo;
+            clienteExistente.Nombre = cliente.Nombre;
+            clienteExistente.Apellidos = cliente.Apellidos;
+            clienteExistente.Alias = cliente.Alias;
+            clienteExistente.IDTipo = cliente.IDTipo;
+            clienteExistente.Correo = cliente.Correo;
+            clienteExistente.Telefonos = cliente.Telefonos;
+            clienteExistente.Estado = cliente.Estado;
+            clienteExistente.Comercio = cliente.Comercio;
+            clienteExistente.Direccion = cliente.Direccion;
+            clienteExistente.Agente = cliente.Agente;
+            clienteExistente.Transporte = cliente.Transporte;
+            clienteExistente.ActividadEconomica = cliente.ActividadEconomica;
+            clienteExistente.LimiteCredito = cliente.LimiteCredito;
+            clienteExistente.Zona = cliente.Zona;
+            clienteExistente.Empresa = cliente.Empresa;
+
+            // Actualizar los créditos por empresa en una transacción
+            await using var transaccion =
+                await _context.Database.BeginTransactionAsync();
+
             try
             {
-                _context.Update(cliente);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Clientes.Any(c => c.Cedula == cliente.Cedula))
-                    return NotFound();
+                foreach (var empresaId in empresasExistentes)
+                {
+                    var credito = await _context.ClienteCreditoEmpresa
+                        .FirstOrDefaultAsync(c =>
+                            c.ClienteCedula == clienteExistente.Cedula &&
+                            c.EmpresaId == empresaId);
 
+                    bool debeEstarCerrado = seleccionadas.Contains(empresaId);
+
+                    if (credito == null)
+                    {
+                        // Crear el registro si todavía no existe
+                        credito = new ClienteCreditoEmpresa
+                        {
+                            ClienteCedula = clienteExistente.Cedula,
+                            EmpresaId = empresaId,
+                            CreditoAbierto = !debeEstarCerrado,
+                            FechaActualizacion = DateTime.UtcNow
+                        };
+
+                        _context.ClienteCreditoEmpresa.Add(credito);
+                    }
+                    else
+                    {
+                        credito.CreditoAbierto = !debeEstarCerrado;
+                        credito.FechaActualizacion = DateTime.UtcNow;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaccion.CommitAsync();
+
+                TempData["Mensaje"] = "Cliente actualizado correctamente.";
+
+                return RedirectToAction(nameof(Details), new
+                {
+                    id = clienteExistente.Cedula
+                });
+            }
+            catch
+            {
+                await transaccion.RollbackAsync();
                 throw;
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
         // ===============================

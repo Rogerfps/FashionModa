@@ -76,14 +76,20 @@ namespace FashionM.Controllers
             // Filtro por fecha inicial
             if (fechaInicio.HasValue)
             {
-                var inicio = fechaInicio.Value.Date;
+                var inicio = DateTime.SpecifyKind(
+                    fechaInicio.Value.Date,
+                    DateTimeKind.Utc);
+
                 query = query.Where(p => p.Fecha >= inicio);
             }
 
             // Filtro por fecha final, incluyendo todo ese día
             if (fechaFin.HasValue)
             {
-                var finExclusivo = fechaFin.Value.Date.AddDays(1);
+                var finExclusivo = DateTime.SpecifyKind(
+                    fechaFin.Value.Date.AddDays(1),
+                    DateTimeKind.Utc);
+
                 query = query.Where(p => p.Fecha < finExclusivo);
             }
 
@@ -1275,31 +1281,34 @@ namespace FashionM.Controllers
         }
 
         // ==========================
-        // BUSQUEDAS
+        // BUSQUEDA DE CLIENTES
         // ==========================
         [HttpGet]
-        public IActionResult BuscarClientes(string term)
+        public async Task<IActionResult> BuscarClientes(string term)
         {
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
-            term = term.ToLower();
+            term = term.Trim();
 
-            var clientes = _context.Clientes
-                .AsEnumerable()
+            var clientes = await _context.Clientes
                 .Where(c =>
                     c.Cedula.ToString().Contains(term) ||
-                    (c.Nombre + " " + c.Apellidos).ToLower().Contains(term) ||
-                    (c.Comercio ?? "").ToLower().Contains(term)
+                    (c.Nombre + " " + c.Apellidos).Contains(term) ||
+                    (c.Comercio ?? "").Contains(term) ||
+                    (c.Alias ?? "").Contains(term)
                 )
-                .Take(10)
+                .OrderBy(c => c.Alias)
+                .ThenBy(c => c.Nombre)
+                .Take(50)
                 .Select(c => new
                 {
                     cedula = c.Cedula,
                     nombre = c.Nombre + " " + c.Apellidos,
-                    comercio = c.Comercio
+                    comercio = c.Comercio,
+                    alias = c.Alias
                 })
-                .ToList();
+                .ToListAsync();
 
             return Json(clientes);
         }

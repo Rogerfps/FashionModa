@@ -1,7 +1,17 @@
-﻿@model Clientes
+﻿
+@model FashionM.Models.Clientes
+
+@using FashionM.Models
+@using System.Linq
 
 @{
     ViewData["Title"] = "Editar Cliente";
+
+    var empresas = ViewBag.Empresas as List<Empresa>
+        ?? new List<Empresa>();
+
+    var empresasCreditoCerrado = ViewBag.EmpresasCreditoCerrado as int[]
+        ?? Array.Empty<int>();
 }
 
 <link rel="stylesheet" href="~/css/Cliente/ClienteEdit.css" />
@@ -11,9 +21,14 @@
     <div class="title-container d-flex justify-content-between align-items-center">
         <div>
             <h1 class="title-glow">Editar Cliente</h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Modifica la información del cliente</p>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                Modifica la información del cliente
+            </p>
         </div>
-        <a asp-action="Details" asp-route-id="@Model.Cedula" class="back-link">
+
+        <a asp-action="Details"
+           asp-route-id="@Model.Cedula"
+           class="back-link">
             <span>←</span> Ver detalles
         </a>
     </div>
@@ -21,26 +36,43 @@
 
 <div class="container-fluid px-4" style="max-width: 1200px; margin: 0 auto;">
     <div class="form-card">
-        <!-- Encabezado con información del cliente -->
+
+        <!-- ENCABEZADO DEL CLIENTE -->
         <div class="edit-header">
             <div class="edit-avatar">
-                @Model.Nombre.Substring(0, 1)@Model.Apellidos.Substring(0, 1)
+                @(string.IsNullOrWhiteSpace(Model.Nombre) ? "" : Model.Nombre.Substring(0, 1))
+                @(string.IsNullOrWhiteSpace(Model.Apellidos) ? "" : Model.Apellidos.Substring(0, 1))
             </div>
+
             <div class="edit-title">
                 <h3>@Model.Nombre @Model.Apellidos</h3>
+
                 <div class="edit-subtitle">
                     <span class="edit-badge">Código: @Model.Codigo</span>
                     <span class="edit-badge">Cédula: @Model.Cedula</span>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Alias))
+                    {
+                        <span class="edit-badge">
+                            Alias: @Model.Alias
+                        </span>
+                    }
                 </div>
             </div>
         </div>
 
         <form asp-action="Edit" method="post">
             @Html.AntiForgeryToken()
+
             <input type="hidden" asp-for="Cedula" />
 
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert"></div>
+
             <div class="form-grid">
-                <!-- SECCIÓN 1: Información Personal -->
+
+                <!-- SECCIÓN 1: INFORMACIÓN PERSONAL -->
                 <div class="form-section">
                     <div class="section-title">
                         <span>👤</span> Información Personal
@@ -48,20 +80,29 @@
 
                     <div class="form-group-modern">
                         <label asp-for="Codigo">Código</label>
-                        <input asp-for="Codigo" class="form-control-modern" placeholder="Ej: CLT001" />
-                        <span asp-validation-for="Codigo" class="validation-message"></span>
+                        <input asp-for="Codigo"
+                               class="form-control-modern"
+                               placeholder="Ej: CLT001" />
+                        <span asp-validation-for="Codigo"
+                              class="validation-message"></span>
                     </div>
 
                     <div class="form-group-modern">
                         <label asp-for="Nombre">Nombre</label>
-                        <input asp-for="Nombre" class="form-control-modern" placeholder="Nombre completo" />
-                        <span asp-validation-for="Nombre" class="validation-message"></span>
+                        <input asp-for="Nombre"
+                               class="form-control-modern"
+                               placeholder="Nombre completo" />
+                        <span asp-validation-for="Nombre"
+                              class="validation-message"></span>
                     </div>
 
                     <div class="form-group-modern">
                         <label asp-for="Apellidos">Apellidos</label>
-                        <input asp-for="Apellidos" class="form-control-modern" placeholder="Apellidos completos" />
-                        <span asp-validation-for="Apellidos" class="validation-message"></span>
+                        <input asp-for="Apellidos"
+                               class="form-control-modern"
+                               placeholder="Apellidos completos" />
+                        <span asp-validation-for="Apellidos"
+                              class="validation-message"></span>
                     </div>
 
                     <div class="form-group-modern">
@@ -71,11 +112,26 @@
                                 class="form-control-modern">
                             <option value="">-- Seleccione tipo --</option>
                         </select>
-                        <span asp-validation-for="IDTipo" class="validation-message"></span>
+                        <span asp-validation-for="IDTipo"
+                              class="validation-message"></span>
+                    </div>
+
+                    <!-- NUEVO: ALIAS -->
+                    <div class="form-group-modern">
+                        <label asp-for="Alias">Alias / Grupo empresarial</label>
+                        <input asp-for="Alias"
+                               class="form-control-modern"
+                               placeholder="Ej: Grupo Pérez" />
+                        <span asp-validation-for="Alias"
+                              class="validation-message"></span>
+
+                        <small class="text-muted">
+                            Permite identificar clientes relacionados con el mismo dueño.
+                        </small>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: Contacto -->
+                <!-- SECCIÓN 2: CONTACTO -->
                 <div class="form-section">
                     <div class="section-title">
                         <span>📞</span> Contacto
@@ -83,94 +139,204 @@
 
                     <div class="form-group-modern">
                         <label asp-for="Correo">Correo Electrónico</label>
-                        <input asp-for="Correo" class="form-control-modern" type="email" placeholder="cliente@email.com" />
-                        <span asp-validation-for="Correo" class="validation-message"></span>
+                        <input asp-for="Correo"
+                               class="form-control-modern"
+                               type="email"
+                               placeholder="cliente@email.com" />
+                        <span asp-validation-for="Correo"
+                              class="validation-message"></span>
                     </div>
 
                     <div class="form-group-modern">
                         <label asp-for="Telefonos">Teléfonos</label>
-                        <input asp-for="Telefonos" class="form-control-modern" placeholder="8888-8888 / 2222-2222" />
-                        <span asp-validation-for="Telefonos" class="validation-message"></span>
+                        <input asp-for="Telefonos"
+                               class="form-control-modern"
+                               placeholder="8888-8888 / 2222-2222" />
+                        <span asp-validation-for="Telefonos"
+                              class="validation-message"></span>
                     </div>
 
                     <div class="form-group-modern">
                         <label asp-for="Direccion">Dirección</label>
-                        <input asp-for="Direccion" class="form-control-modern" placeholder="Dirección exacta" />
-                        <span asp-validation-for="Direccion" class="validation-message"></span>
+                        <input asp-for="Direccion"
+                               class="form-control-modern"
+                               placeholder="Dirección exacta" />
+                        <span asp-validation-for="Direccion"
+                              class="validation-message"></span>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 3: Información Comercial (full width) -->
+                <!-- SECCIÓN 3: INFORMACIÓN COMERCIAL -->
                 <div class="form-section full-width">
                     <div class="section-title">
                         <span>🏢</span> Información Comercial
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem;">
+
                         <div class="form-group-modern">
                             <label asp-for="Comercio">Comercio</label>
-                            <input asp-for="Comercio" class="form-control-modern" placeholder="Nombre del comercio" />
-                            <span asp-validation-for="Comercio" class="validation-message"></span>
+                            <input asp-for="Comercio"
+                                   class="form-control-modern"
+                                   placeholder="Nombre del comercio" />
+                            <span asp-validation-for="Comercio"
+                                  class="validation-message"></span>
                         </div>
 
                         <div class="form-group-modern">
                             <label asp-for="ActividadEconomica">Actividad Económica</label>
-                            <input asp-for="ActividadEconomica" class="form-control-modern" placeholder="Actividad" />
-                            <span asp-validation-for="ActividadEconomica" class="validation-message"></span>
+                            <input asp-for="ActividadEconomica"
+                                   class="form-control-modern"
+                                   type="number"
+                                   step="0.01" />
+                            <span asp-validation-for="ActividadEconomica"
+                                  class="validation-message"></span>
                         </div>
 
                         <div class="form-group-modern">
                             <label asp-for="Agente">Agente</label>
-                            <input asp-for="Agente" class="form-control-modern" placeholder="Agente asignado" />
-                            <span asp-validation-for="Agente" class="validation-message"></span>
+                            <input asp-for="Agente"
+                                   class="form-control-modern"
+                                   placeholder="Agente asignado" />
+                            <span asp-validation-for="Agente"
+                                  class="validation-message"></span>
                         </div>
 
                         <div class="form-group-modern">
                             <label asp-for="Transporte">Transporte</label>
-                            <input asp-for="Transporte" class="form-control-modern" placeholder="Transporte" />
-                            <span asp-validation-for="Transporte" class="validation-message"></span>
+                            <input asp-for="Transporte"
+                                   class="form-control-modern"
+                                   placeholder="Transporte" />
+                            <span asp-validation-for="Transporte"
+                                  class="validation-message"></span>
                         </div>
 
                         <div class="form-group-modern">
                             <label asp-for="Zona">Zona</label>
-                            <input asp-for="Zona" class="form-control-modern" placeholder="Zona geográfica" />
-                            <span asp-validation-for="Zona" class="validation-message"></span>
+                            <input asp-for="Zona"
+                                   class="form-control-modern"
+                                   placeholder="Zona geográfica" />
+                            <span asp-validation-for="Zona"
+                                  class="validation-message"></span>
                         </div>
 
                         <div class="form-group-modern">
                             <label asp-for="LimiteCredito">Límite de Crédito (₡)</label>
-                            <input asp-for="LimiteCredito" class="form-control-modern" step="0.01" placeholder="0.00" />
-                            <span asp-validation-for="LimiteCredito" class="validation-message"></span>
+                            <input asp-for="LimiteCredito"
+                                   class="form-control-modern"
+                                   type="number"
+                                   step="0.01"
+                                   placeholder="0.00" />
+                            <span asp-validation-for="LimiteCredito"
+                                  class="validation-message"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Empresa" class="form-label"></label>
-                            <input asp-for="Empresa" class="form-control" />
-                            <span asp-validation-for="Empresa" class="text-danger"></span>
+                        <div class="form-group-modern">
+                            <label asp-for="Empresa">Empresa (texto)</label>
+                            <input asp-for="Empresa"
+                                   class="form-control-modern" />
+                            <span asp-validation-for="Empresa"
+                                  class="validation-message"></span>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- SECCIÓN 4: Estado -->
+                <!-- SECCIÓN 4: CRÉDITO POR EMPRESA -->
                 <div class="form-section full-width">
+                    <div class="section-title">
+                        <span>💳</span> Estado del Crédito por Empresa
+                    </div>
+
+                    <div class="alert alert-info">
+                        Marca las empresas donde el crédito debe permanecer
+                        <strong>cerrado</strong>. Las empresas sin marcar
+                        quedarán con el crédito abierto.
+                        El límite de crédito sigue siendo el mismo para todas.
+                    </div>
+
+                    @if (empresas.Any())
+                    {
+                        <div class="row g-3">
+                            @foreach (var empresa in empresas)
+                            {
+                                var cerrado = empresasCreditoCerrado.Contains(empresa.Id);
+
+                                <div class="col-12 col-md-6 col-lg-4" key="@empresa.Id">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="empresasCreditoCerrado"
+                                                       value="@empresa.Id"
+                                                       id="empresa_@empresa.Id"
+                                                       checked="@cerrado" />
+
+                                                <label class="form-check-label"
+                                                       for="empresa_@empresa.Id">
+                                                    <strong>@empresa.Nombre</strong>
+                                                </label>
+                                            </div>
+
+                                            <div class="mt-2">
+                                                @if (cerrado)
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        Crédito cerrado
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        Crédito abierto
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            No hay empresas registradas para configurar el crédito.
+                        </p>
+                    }
+                </div>
+
+                <!-- SECCIÓN 5: ESTADO DEL CLIENTE -->
+                <div class="form-section full-width">
+                    <div class="section-title">
+                        <span>⚙️</span> Estado del Cliente
+                    </div>
+
                     <div class="checkbox-wrapper">
-                        <input asp-for="Estado" class="checkbox-modern" type="checkbox" />
+                        <input asp-for="Estado"
+                               class="checkbox-modern"
+                               type="checkbox" />
+
                         <label asp-for="Estado" class="checkbox-label">
                             Cliente Activo
-                            <small class="d-block text-muted" style="font-size: 0.75rem; font-weight: normal;">
-                                Los clientes inactivos no aparecerán en búsquedas por defecto
+
+                            <small class="d-block text-muted"
+                                   style="font-size: 0.75rem; font-weight: normal;">
+                                Los clientes inactivos no aparecerán en búsquedas por defecto.
                             </small>
                         </label>
                     </div>
                 </div>
+
             </div>
 
-            <!-- Botones de acción -->
+            <!-- BOTONES DE ACCIÓN -->
             <div class="action-buttons">
                 <a asp-action="Index" class="btn-neo-outline">
                     <span>←</span> Cancelar
                 </a>
+
                 <button type="submit" class="btn-save">
                     <span>💾</span> Guardar Cambios
                 </button>
@@ -178,3 +344,9 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

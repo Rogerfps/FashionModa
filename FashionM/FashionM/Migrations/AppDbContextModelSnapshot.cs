@@ -90,6 +90,36 @@ namespace FashionM.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FashionM.Models.ClienteCreditoEmpresa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteCedula")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("CreditoAbierto")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("ClienteCedula", "EmpresaId")
+                        .IsUnique();
+
+                    b.ToTable("ClienteCreditoEmpresa");
+                });
+
             modelBuilder.Entity("FashionM.Models.ClienteSemana", b =>
                 {
                     b.Property<int>("Id")
@@ -146,6 +176,11 @@ namespace FashionM.Migrations
 
                     b.Property<bool>("Alerta")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Apellidos")
                         .IsRequired()
@@ -1574,6 +1609,25 @@ namespace FashionM.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("FashionM.Models.ClienteCreditoEmpresa", b =>
+                {
+                    b.HasOne("FashionM.Models.Clientes", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteCedula")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FashionM.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Empresa");
                 });
 
             modelBuilder.Entity("FashionM.Models.ClienteSemana", b =>
