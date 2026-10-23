@@ -28,10 +28,15 @@ namespace FashionM.Controllers
         // ==========================
         // LISTADO
         // ==========================
-        public async Task<IActionResult> Index(string buscar, int? empresaId)
+     
+        public async Task<IActionResult> Index(
+            string? buscar,
+            int? empresaId,
+            DateTime? fechaInicio,
+            DateTime? fechaFin,
+            string? estado)
         {
-
-            // Si no viene el parámetro empresa, usar la empresa seleccionada
+            // Mantener la selección de empresa del sistema
             if (!Request.Query.ContainsKey("empresaId"))
             {
                 empresaId = HttpContext.Session.GetInt32("EmpresaId");
@@ -47,33 +52,84 @@ namespace FashionM.Controllers
                 .Include(p => p.Cliente)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(buscar))
+            // Búsqueda por número de proforma o cliente
+            if (!string.IsNullOrWhiteSpace(buscar))
             {
-                buscar = buscar.ToLower();
+                buscar = buscar.Trim().ToLower();
 
                 query = query.Where(p =>
-                    p.Numero.ToString().Contains(buscar) 
-                    || p.Cliente.Nombre.ToLower().Contains(buscar)
-                    || p.Cliente.Apellidos.ToLower().Contains(buscar)
-                    || p.Cliente.Codigo.ToLower().Contains(buscar)
-                );
+                    p.Numero.ToString().Contains(buscar) ||
+                    (p.Cliente != null &&
+                     (
+                         p.Cliente.Nombre.ToLower().Contains(buscar) ||
+                         p.Cliente.Apellidos.ToLower().Contains(buscar) ||
+                         p.Cliente.Codigo.ToLower().Contains(buscar)
+                     )));
             }
 
+            // Filtro por empresa
             if (empresaId.HasValue && empresaId.Value != 0)
             {
                 query = query.Where(p => p.EmpresaId == empresaId.Value);
+            }
+
+            // Filtro por fecha inicial
+            if (fechaInicio.HasValue)
+            {
+                var inicio = fechaInicio.Value.Date;
+                query = query.Where(p => p.Fecha >= inicio);
+            }
+
+            // Filtro por fecha final, incluyendo todo ese día
+            if (fechaFin.HasValue)
+            {
+                var finExclusivo = fechaFin.Value.Date.AddDays(1);
+                query = query.Where(p => p.Fecha < finExclusivo);
+            }
+
+            // Filtro por estado
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                estado = estado.Trim();
+
+                if (estado.Equals("Pendiente", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(p =>
+                        p.Estado != null &&
+                        p.Estado.Trim().ToLower() == "pendiente");
+                }
+                else if (estado.Equals("Confirmado", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(p =>
+                        p.Estado != null &&
+                        p.Estado.Trim().ToLower() == "confirmado");
+                }
+                else if (estado.Equals("Nulo", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(p =>
+                        p.Estado != null &&
+                        p.Estado.Trim().ToLower() == "nulo");
+                }
             }
 
             var proformas = await query
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
 
-            ViewBag.Empresas = await _context.Empresas.ToListAsync();
+            // Datos para los filtros
+            ViewBag.Empresas = await _context.Empresas
+                .OrderBy(e => e.Nombre)
+                .ToListAsync();
+
             ViewBag.Buscar = buscar;
             ViewBag.EmpresaId = empresaId;
+            ViewBag.FechaInicio = fechaInicio?.ToString("yyyy-MM-dd");
+            ViewBag.FechaFin = fechaFin?.ToString("yyyy-MM-dd");
+            ViewBag.Estado = estado;
 
             return View(proformas);
         }
+
 
         // ==========================
         // CREATE GET
@@ -104,6 +160,7 @@ namespace FashionM.Controllers
 
             proforma.Numero = ultimoNumero + 1;
             proforma.Fecha = DateTime.UtcNow;
+            proforma.Estado = "Pendiente";
 
             _context.Add(proforma);
             await _context.SaveChangesAsync();
@@ -118,6 +175,7 @@ namespace FashionM.Controllers
         {
             var proforma = await _context.Proformas
                 .Include(p => p.Detalles)
+                .Include(p => p.CostosAdicionales)
                 .Include(p => p.Cliente)
                 .Include(p => p.Empresa)
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -266,10 +324,109 @@ namespace FashionM.Controllers
             }
         }
 
+        // ==========================
+        // AGREGAR COSTO ADICIONAL
+        // ==========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarCostoAdicional(
+            int proformaId,
+            string descripcion,
+            decimal monto)
+        {
+            if (string.IsNullOrWhiteSpace(descripcion))
+            {
+                TempData["Error"] =
+                    "Debe ingresar la descripción del costo.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = proformaId });
+            }
+
+            descripcion = descripcion.Trim();
+
+            if (descripcion.Length > 150)
+            {
+                TempData["Error"] =
+                    "La descripción no puede superar los 150 caracteres.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = proformaId });
+            }
+
+            if (monto <= 0)
+            {
+                TempData["Error"] =
+                    "El monto del costo debe ser mayor que cero.";
+
+                return RedirectToAction(
+                    nameof(AgregarProducto),
+                    new { id = proformaId });
+            }
+
+            var proforma = await _context.Proformas
+                .FirstOrDefaultAsync(p => p.Id == proformaId);
+
+            if (proforma == null)
+                return NotFound();
+
+            var costo = new ProformaCostoAdicional
+            {
+                ProformaId = proformaId,
+                Descripcion = descripcion,
+                Monto = monto
+            };
+
+            _context.ProformaCostosAdicionales.Add(costo);
+
+            await _context.SaveChangesAsync();
+
+            await RecalcularTotalesProforma(proformaId);
+
+            TempData["Success"] =
+                "El costo adicional se agregó correctamente.";
+
+            return RedirectToAction(
+                nameof(AgregarProducto),
+                new { id = proformaId });
+        }
+
+        // ==========================
+        // ELIMINAR COSTO ADICIONAL
+        // ==========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarCostoAdicional(int id)
+        {
+            var costo = await _context.ProformaCostosAdicionales
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (costo == null)
+                return NotFound();
+
+            int proformaId = costo.ProformaId;
+
+            _context.ProformaCostosAdicionales.Remove(costo);
+
+            await _context.SaveChangesAsync();
+
+            await RecalcularTotalesProforma(proformaId);
+
+            TempData["Success"] =
+                "El costo adicional se eliminó correctamente.";
+
+            return RedirectToAction(
+                nameof(AgregarProducto),
+                new { id = proformaId });
+        }
+
         private async Task RecalcularTotalesProforma(int proformaId)
         {
             var proforma = await _context.Proformas
                 .Include(p => p.Detalles)
+                .Include(p => p.CostosAdicionales)
                 .FirstOrDefaultAsync(p => p.Id == proformaId);
 
             if (proforma == null)
@@ -277,22 +434,22 @@ namespace FashionM.Controllers
 
             decimal subtotalProforma = 0;
 
+            // =====================================
+            // 1. RECALCULAR PRODUCTOS Y DESCUENTOS
+            // =====================================
             foreach (var detalle in proforma.Detalles)
             {
-                int cantidadActual =
-                    detalle.Cantidad - detalle.CantidadDevuelta;
-
-                if (cantidadActual < 0)
-                    cantidadActual = 0;
+                int cantidadActual = Math.Max(
+                    0,
+                    detalle.Cantidad - detalle.CantidadDevuelta);
 
                 decimal subtotalBruto =
                     cantidadActual * detalle.PrecioUnitario;
 
-                decimal descuentoDetalle =
-                    Math.Round(
-                        subtotalBruto *
-                        (detalle.DescuentoPorcentaje / 100m),
-                        2);
+                decimal descuentoDetalle = Math.Round(
+                    subtotalBruto *
+                    (detalle.DescuentoPorcentaje / 100m),
+                    2);
 
                 detalle.DescuentoMonto = descuentoDetalle;
 
@@ -302,17 +459,28 @@ namespace FashionM.Controllers
                 subtotalProforma += detalle.SubTotal;
             }
 
-            // Descuento general aplicado DESPUÉS
-            // del descuento individual
-            proforma.DescuentoMonto =
-                Math.Round(
-                    subtotalProforma *
-                    (proforma.DescuentoPorcentaje / 100m),
-                    2);
+            // =====================================
+            // 2. DESCUENTO GENERAL SOLO A PRODUCTOS
+            // =====================================
+            proforma.DescuentoMonto = Math.Round(
+                subtotalProforma *
+                (proforma.DescuentoPorcentaje / 100m),
+                2);
 
+            decimal subtotalConDescuento =
+                subtotalProforma - proforma.DescuentoMonto;
+
+            // =====================================
+            // 3. SUMAR COSTOS ADICIONALES
+            // =====================================
+            decimal totalCostosAdicionales =
+                proforma.CostosAdicionales.Sum(c => c.Monto);
+
+            // =====================================
+            // 4. TOTAL FINAL
+            // =====================================
             proforma.Total =
-                subtotalProforma -
-                proforma.DescuentoMonto;
+                subtotalConDescuento + totalCostosAdicionales;
 
             await _context.SaveChangesAsync();
         }
@@ -320,8 +488,8 @@ namespace FashionM.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AplicarDescuentoGeneral(
-    int proformaId,
-    decimal descuentoPorcentaje)
+            int proformaId,
+            decimal descuentoPorcentaje)
         {
             var proforma = await _context.Proformas
                 .FirstOrDefaultAsync(p => p.Id == proformaId);
@@ -539,7 +707,6 @@ namespace FashionM.Controllers
         }
 
 
-
         // ==========================
         // DETALLE
         // ==========================
@@ -549,6 +716,7 @@ namespace FashionM.Controllers
                 .Include(p => p.Empresa)
                 .Include(p => p.Cliente)
                 .Include(p => p.Detalles)
+                .Include(p => p.CostosAdicionales)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (proforma == null)
@@ -561,6 +729,7 @@ namespace FashionM.Controllers
         // DELETE
         // ==========================
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
@@ -679,6 +848,7 @@ namespace FashionM.Controllers
                 .Include(p => p.Empresa)
                 .Include(p => p.Cliente)
                 .Include(p => p.Detalles)
+                .Include(p => p.CostosAdicionales)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (proforma == null)
@@ -757,6 +927,24 @@ namespace FashionM.Controllers
 
             var totalPares = detallesAgrupados
                 .Sum(x => x.Cantidad);
+
+            // Total de costos adicionales
+            var costosAdicionales = proforma.CostosAdicionales
+                .ToList();
+
+            var totalCostosAdicionales = costosAdicionales
+                .Sum(c => c.Monto);
+
+            // El descuento general se aplica únicamente a productos
+       
+
+            // Total de productos después del descuento general
+            var subtotalFinalProductos =
+                subtotalProductos - descuentoGeneral;
+
+            // Total de productos + costos adicionales
+            var totalCalculado =
+                subtotalFinalProductos + totalCostosAdicionales;
 
             var primaryColor = "#0f172a";
             var accentColor = "#2563eb";
@@ -839,54 +1027,51 @@ namespace FashionM.Controllers
 
                                 table.Header(header =>
                                 {
-                                    table.Header(header =>
-                                    {
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .Text("Código")
-                                            .Bold();
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .Text("Código")
+                                        .Bold();
 
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .Text("Color")
-                                            .Bold();
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .Text("Color")
+                                        .Bold();
 
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .AlignRight()
-                                            .Text("Cant")
-                                            .Bold();
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text("Cant.")
+                                        .Bold();
 
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .AlignRight()
-                                            .Text("Precio")
-                                            .Bold();
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text("Precio")
+                                        .Bold();
 
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .AlignRight()
-                                            .Text("Desc.")
-                                            .Bold();
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text("Desc.")
+                                        .Bold();
 
-                                        header.Cell()
-                                            .BorderBottom(2)
-                                            .BorderColor(accentColor)
-                                            .Padding(6)
-                                            .AlignRight()
-                                            .Text("Subtotal")
-                                            .Bold();
-                                    });
+                                    header.Cell()
+                                        .BorderBottom(2)
+                                        .BorderColor(accentColor)
+                                        .Padding(6)
+                                        .AlignRight()
+                                        .Text("Subtotal")
+                                        .Bold();
                                 });
 
                                 foreach (var item in detallesAgrupados)
@@ -935,42 +1120,43 @@ namespace FashionM.Controllers
                                 }
                             });
 
-                            // 🔷 TOTAL
+
+                            // 🔷 RESUMEN DE TOTALES
                             content.Item()
                                 .AlignRight()
-                                .Width(300)
+                                .Width(320)
                                 .Column(total =>
                                 {
                                     total.Spacing(5);
 
                                     total.Item()
-                                        .BorderTop(2)
-                                        .BorderColor("#e5e7eb");
+                                    .BorderTop(2)
+                                    .BorderColor("#e5e7eb");
 
                                     // TOTAL DE PARES
                                     total.Item().Row(row =>
                                     {
                                         row.RelativeItem()
-                                            .Text("TOTAL DE PARES")
-                                            .Bold()
-                                            .FontSize(11);
+                                        .Text("TOTAL DE PARES")
+                                        .Bold()
+                                        .FontSize(11);
 
                                         row.RelativeItem()
-                                            .AlignRight()
-                                            .Text(totalPares.ToString())
-                                            .Bold()
-                                            .FontSize(11);
+                                        .AlignRight()
+                                        .Text(totalPares.ToString())
+                                        .Bold()
+                                        .FontSize(11);
                                     });
 
-                                    // SUBTOTAL
+                                    // SUBTOTAL DE PRODUCTOS
                                     total.Item().Row(row =>
                                     {
                                         row.RelativeItem()
-                                            .Text("SUBTOTAL");
+                                        .Text("Subtotal de productos");
 
                                         row.RelativeItem()
-                                            .AlignRight()
-                                            .Text($"₡ {subtotalProductos:N2}");
+                                        .AlignRight()
+                                        .Text($"₡ {subtotalProductos:N2}");
                                     });
 
                                     // DESCUENTO GENERAL
@@ -979,33 +1165,73 @@ namespace FashionM.Controllers
                                         total.Item().Row(row =>
                                         {
                                             row.RelativeItem()
-                                                .Text(
-                                                    $"Descuento general ({proforma.DescuentoPorcentaje:N2}%)");
+                                            .Text(
+                                                $"Descuento general ({proforma.DescuentoPorcentaje:N2}%)");
 
                                             row.RelativeItem()
+                                            .AlignRight()
+                                            .Text($"-₡ {descuentoGeneral:N2}");
+                                        });
+                                    }
+
+                                    // COSTOS ADICIONALES
+                                    if (costosAdicionales.Any())
+                                    {
+                                        total.Item()
+                                        .PaddingTop(5)
+                                        .Text("COSTOS ADICIONALES")
+                                        .Bold()
+                                        .FontSize(10);
+
+                                        foreach (var costo in costosAdicionales)
+                                        {
+                                            total.Item().Row(row =>
+                                            {
+                                                row.RelativeItem()
+                                                .Text(costo.Descripcion)
+                                                .FontSize(10);
+
+                                                row.RelativeItem()
                                                 .AlignRight()
-                                                .Text($"-₡ {descuentoGeneral:N2}");
+                                                .Text($"₡ {costo.Monto:N2}")
+                                                .FontSize(10);
+                                            });
+                                        }
+
+                                        total.Item().Row(row =>
+                                        {
+                                            row.RelativeItem()
+                                            .Text("Total costos adicionales")
+                                            .Bold();
+
+                                            row.RelativeItem()
+                                            .AlignRight()
+                                            .Text($"₡ {totalCostosAdicionales:N2}")
+                                            .Bold();
                                         });
                                     }
 
                                     // TOTAL FINAL
                                     total.Item()
-                                        .PaddingTop(5)
-                                        .Row(row =>
-                                        {
-                                            row.RelativeItem()
-                                            .Text("TOTAL")
-                                            .Bold()
-                                            .FontSize(12);
+                                    .PaddingTop(6)
+                                    .BorderTop(1)
+                                    .BorderColor("#e5e7eb")
+                                    .Row(row =>
+                                    {
+                                        row.RelativeItem()
+                                        .Text("TOTAL")
+                                        .Bold()
+                                        .FontSize(12);
 
-                                            row.RelativeItem()
-                                            .AlignRight()
-                                            .Text($"₡ {proforma.Total:N2}")
-                                            .Bold()
-                                            .FontSize(18)
-                                            .FontColor(primaryColor);
-                                        });
+                                        row.RelativeItem()
+                                        .AlignRight()
+                                        .Text($"₡ {proforma.Total:N2}")
+                                        .Bold()
+                                        .FontSize(18)
+                                        .FontColor(primaryColor);
+                                    });
                                 });
+
 
                             // 🔷 DETALLE
                             if (!string.IsNullOrWhiteSpace(proforma.Detalle))
@@ -1351,6 +1577,35 @@ namespace FashionM.Controllers
                     nameof(Details),
                     new { id });
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CambiarEstado(int id, string estado)
+        {
+            var estadosPermitidos = new[] { "Nulo", "Pendiente", "Confirmado" };
+
+            if (!estadosPermitidos.Contains(estado))
+            {
+                TempData["Error"] = "El estado seleccionado no es válido.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var proforma = await _context.Proformas
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (proforma == null)
+            {
+                return NotFound();
+            }
+
+            proforma.Estado = estado;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "El estado de la proforma se actualizó correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

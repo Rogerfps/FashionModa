@@ -913,6 +913,11 @@ namespace FashionM.Migrations
                     b.Property<int>("EmpresaId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("FacturadoPor")
                         .IsRequired()
                         .HasColumnType("text");
@@ -941,6 +946,32 @@ namespace FashionM.Migrations
                         .IsUnique();
 
                     b.ToTable("Proformas");
+                });
+
+            modelBuilder.Entity("FashionM.Models.ProformaCostoAdicional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<decimal>("Monto")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("ProformaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProformaId");
+
+                    b.ToTable("ProformaCostosAdicionales");
                 });
 
             modelBuilder.Entity("FashionM.Models.ProformaDetalle", b =>
@@ -1770,6 +1801,17 @@ namespace FashionM.Migrations
                     b.Navigation("Empresa");
                 });
 
+            modelBuilder.Entity("FashionM.Models.ProformaCostoAdicional", b =>
+                {
+                    b.HasOne("FashionM.Models.Proforma", "Proforma")
+                        .WithMany("CostosAdicionales")
+                        .HasForeignKey("ProformaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proforma");
+                });
+
             modelBuilder.Entity("FashionM.Models.ProformaDetalle", b =>
                 {
                     b.HasOne("FashionM.Models.Inventario", null)
@@ -1995,6 +2037,8 @@ namespace FashionM.Migrations
 
             modelBuilder.Entity("FashionM.Models.Proforma", b =>
                 {
+                    b.Navigation("CostosAdicionales");
+
                     b.Navigation("Detalles");
                 });
 

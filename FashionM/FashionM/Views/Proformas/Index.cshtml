@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Proforma>
+﻿
+@model IEnumerable<Proforma>
 
 @{
     ViewData["Title"] = "Proformas";
@@ -7,56 +8,117 @@
 <link rel="stylesheet" href="~/css/Proforma/ProformaIndex.css" />
 
 <div class="container mt-4">
+
     <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">
             <span>📄</span> Proformas
         </h1>
+
         <a asp-action="Create" class="btn-neo">
             <span>➕</span> Nueva Proforma
         </a>
     </div>
 
+    <!-- Mensajes -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Mensaje"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
     <!-- Filtros -->
     <div class="filters-container">
-        <form method="get" class="row g-3">
-            <div class="col-md-4">
+        <form method="get" asp-action="Index" class="row g-3">
+
+            <div class="col-md-3">
+                <label class="form-label">Buscar proforma</label>
                 <input type="text"
                        name="buscar"
                        class="filter-input"
-                       placeholder="🔍 Buscar por # Proforma (Número)..."
+                       placeholder="Número de proforma..."
                        value="@ViewBag.Buscar" />
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label class="form-label">Empresa</label>
                 <select name="empresaId" class="filter-input">
-                    <option value="0">-- Todas las empresas --</option>
+                    <option value="">-- Todas las empresas --</option>
+
                     @foreach (var emp in ViewBag.Empresas)
                     {
                         <option value="@emp.Id"
-                                selected="@(ViewBag.EmpresaId != null && ViewBag.EmpresaId == emp.Id ? "selected" : null)">
+                                selected="@(ViewBag.EmpresaId != null &&
+                                                                        (int?)ViewBag.EmpresaId == emp.Id)">
                             @emp.Nombre
                         </option>
                     }
                 </select>
             </div>
 
-            <div class="col-md-4 d-flex gap-2">
+            <div class="col-md-3">
+                <label class="form-label">Fecha inicial</label>
+                <input type="date"
+                       name="fechaInicio"
+                       class="filter-input"
+                       value="@ViewBag.FechaInicio" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha final</label>
+                <input type="date"
+                       name="fechaFin"
+                       class="filter-input"
+                       value="@ViewBag.FechaFin" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="filter-input">
+                    <option value="">-- Todos los estados --</option>
+
+                    <option value="Pendiente"
+                            selected="@(ViewBag.Estado as string == "Pendiente")">
+                        Pendiente
+                    </option>
+
+                    <option value="Confirmado"
+                            selected="@(ViewBag.Estado as string == "Confirmado")">
+                        Confirmado
+                    </option>
+
+                    <option value="Nulo"
+                            selected="@(ViewBag.Estado as string == "Nulo")">
+                        Nulo
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-8 d-flex align-items-end gap-2 flex-wrap">
                 <button type="submit" class="btn-primary">
                     🔍 Buscar
                 </button>
-                <a asp-action="Index"
-                   asp-route-empresaId="0"
-                   class="btn-secondary">
-                    ✖ Limpiar
+
+                <a asp-action="Index" class="btn-secondary">
+                    ✖ Limpiar filtros
                 </a>
             </div>
+
         </form>
     </div>
 
     <!-- Tabla -->
     <div class="table-wrapper">
         <div class="table-responsive">
+
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -64,6 +126,7 @@
                         <th>Fecha</th>
                         <th>Empresa</th>
                         <th>Cliente</th>
+                        <th>Estado</th>
                         <th>Total</th>
                         <th>Acciones</th>
                     </tr>
@@ -73,10 +136,12 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <div class="empty-icon">📄</div>
-                                    <div class="empty-text">No hay proformas registradas</div>
+                                    <div class="empty-text">
+                                        No hay proformas que coincidan con los filtros
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -86,7 +151,6 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <!-- 🔥 CAMBIO CLAVE -->
                                 <td class="fw-semibold">
                                     <span class="proforma-badge">
                                         #@item.Numero
@@ -98,7 +162,9 @@
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.Empresa?.Nombre))
                                     {
-                                        <span class="empresa-badge">@item.Empresa.Nombre</span>
+                                        <span class="empresa-badge">
+                                            @item.Empresa.Nombre
+                                        </span>
                                     }
                                     else
                                     {
@@ -110,8 +176,12 @@
                                     @if (item.Cliente != null)
                                     {
                                         <div class="cliente-info">
-                                            <span class="cliente-nombre">@item.Cliente.Nombre @item.Cliente.Apellidos</span>
-                                            <span class="cliente-cedula">@item.Cliente.Cedula</span>
+                                            <span class="cliente-nombre">
+                                                @item.Cliente.Nombre @item.Cliente.Apellidos
+                                            </span>
+                                            <span class="cliente-cedula">
+                                                @item.Cliente.Cedula
+                                            </span>
                                         </div>
                                     }
                                     else
@@ -120,39 +190,103 @@
                                     }
                                 </td>
 
-                                <td class="total-monto">₡ @item.Total.ToString("N2")</td>
+                                <!-- Estado actual -->
+                                <td>
+                                    @{
+                                        var claseEstado = item.Estado switch
+                                        {
+                                            "Confirmado" => "estado-confirmado",
+                                            "Nulo" => "estado-nulo",
+                                            _ => "estado-pendiente"
+                                        };
+                                    }
+
+                                    <span class="estado-badge @claseEstado">
+                                        @(string.IsNullOrWhiteSpace(item.Estado)
+                                            ? "Pendiente"
+                                            : item.Estado)
+                                    </span>
+
+                                    <!-- Cambiar estado -->
+                                    <form asp-action="CambiarEstado"
+                                          method="post"
+                                          class="mt-2">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.Id" />
+
+                                        <select name="estado"
+                                                class="form-select form-select-sm"
+                                                onchange="if(confirm('¿Deseas cambiar el estado de esta proforma?')) { this.form.submit(); } else { this.value = this.dataset.estado; }"
+                                                data-estado="@item.Estado">
+
+                                            <option value="Pendiente"
+                                                    selected="@(item.Estado == "Pendiente")">
+                                                Pendiente
+                                            </option>
+
+                                            <option value="Confirmado"
+                                                    selected="@(item.Estado == "Confirmado")">
+                                                Confirmado
+                                            </option>
+
+                                            <option value="Nulo"
+                                                    selected="@(item.Estado == "Nulo")">
+                                                Nulo
+                                            </option>
+                                        </select>
+                                    </form>
+                                </td>
+
+                                <td class="total-monto">
+                                    ₡ @item.Total.ToString("N2")
+                                </td>
 
                                 <td>
                                     <div class="action-group">
-                                        <a asp-action="Details" asp-route-id="@item.Id"
-                                               class="btn-action btn-view"
-                                               title="Ver detalles">
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn-action btn-view"
+                                           title="Ver detalles">
                                             👁 Ver
                                         </a>
 
-                                        <a asp-action="AgregarProducto" asp-route-id="@item.Id"
-                                               class="btn-action btn-productos"
-                                               title="Agregar productos">
+                                        <a asp-action="AgregarProducto"
+                                           asp-route-id="@item.Id"
+                                           class="btn-action btn-productos"
+                                           title="Agregar productos">
                                             🛒 Productos
                                         </a>
 
-                                        <form asp-action="Delete" method="post" style="display:inline;">
+                                        <form asp-action="Delete"
+                                              method="post"
+                                              style="display:inline;">
+
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@item.Id" />
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@item.Id" />
+
                                             <button type="submit"
                                                     class="btn-delete"
                                                     onclick="return confirm('¿Eliminar esta proforma?');">
                                                 🗑 Eliminar
                                             </button>
                                         </form>
+
                                     </div>
                                 </td>
                             </tr>
                         }
                     }
                 </tbody>
-
             </table>
+
         </div>
     </div>
 </div>

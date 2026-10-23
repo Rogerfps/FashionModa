@@ -300,3 +300,28 @@ body {
         gap: 0.5rem;
     }
 }
+
+/* Estados de las proformas */
+.estado-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.estado-confirmado {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.estado-nulo {
+    background-color: #f8d7da;
+    color: #842029;
+}

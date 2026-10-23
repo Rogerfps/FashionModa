@@ -30,9 +30,15 @@ namespace FashionM.Models
         public decimal DescuentoPorcentaje { get; set; }
         public decimal DescuentoMonto { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string Estado { get; set; } = "Pendiente";
+
         public string? Detalle { get; set; }
 
         public ICollection<ProformaDetalle> Detalles { get; set; } = new List<ProformaDetalle>();
+
+        public ICollection<ProformaCostoAdicional> CostosAdicionales { get; set; } = new List<ProformaCostoAdicional>();
     }
 }
 

@@ -36,6 +36,7 @@ namespace FashionM.Data
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Proforma> Proformas { get; set; }
         public DbSet<ProformaDetalle> ProformaDetalles { get; set; }
+        public DbSet<ProformaCostoAdicional> ProformaCostosAdicionales { get; set; }
         public DbSet<HistorialInventario> HistorialInventarios { get; set; }
 
 

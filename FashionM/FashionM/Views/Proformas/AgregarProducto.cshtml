@@ -81,6 +81,32 @@
 
     </div>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Cerrar"></button>
+        </div>
+    }
+
 
     <!-- FORM -->
     <div class="form-card">
@@ -416,33 +442,19 @@
 
         </div>
 
+        
+        <!-- COSTOS ADICIONALES -->
+        <div class="form-card mt-4">
 
-        <!-- RESUMEN -->
-        <div class="total-footer">
+            <div class="section-title">
+                <span>🚚</span>
+                Costos adicionales
+            </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
-
-                <span>
-                    Subtotal:
-                </span>
-
-                <span>
-                    ₡ @{
-                    var subtotalAntesDescuentoGeneral =
-                        Model.Total + Model.DescuentoMonto;
-                }
-                @subtotalAntesDescuentoGeneral.ToString("N2")
-            </span>
-
-        </div>
-
-
-        <!-- DESCUENTO GENERAL -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-
-            <form asp-action="AplicarDescuentoGeneral"
+            <!-- FORMULARIO PARA AGREGAR COSTO -->
+            <form asp-action="AgregarCostoAdicional"
                   method="post"
-                  class="d-flex align-items-center gap-2">
+                  class="row g-3 align-items-end mb-4">
 
                 @Html.AntiForgeryToken()
 
@@ -450,50 +462,210 @@
                        name="proformaId"
                        value="@Model.Id" />
 
-                <span>
-                    Descuento general:
-                </span>
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Descripción del costo
+                    </label>
 
-                <input type="number"
-                       name="descuentoPorcentaje"
-                       value="@Model.DescuentoPorcentaje.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
-                       min="0"
-                       max="100"
-                       step="0.01"
-                       class="form-control"
-                       style="width:100px;" />
+                    <input type="text"
+                           name="descripcion"
+                           class="form-control"
+                           maxlength="150"
+                           placeholder="Ej. Envío, embalaje, transporte..."
+                           required />
+                </div>
 
-                <span>%</span>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Monto (₡)
+                    </label>
 
-                <button type="submit"
-                        class="btn btn-sm btn-primary">
+                    <input type="number"
+                           name="monto"
+                           class="form-control"
+                           min="0.01"
+                           step="0.01"
+                           placeholder="0.00"
+                           required />
+                </div>
 
-                    Aplicar
-
-                </button>
+                <div class="col-md-3">
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        ➕ Agregar costo
+                    </button>
+                </div>
 
             </form>
 
+            <!-- LISTA DE COSTOS REGISTRADOS -->
+            <div class="table-responsive">
 
-            <span>
-                -₡ @Model.DescuentoMonto.ToString("N2")
-            </span>
+                <table class="productos-table">
+
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th class="text-end">Monto</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.CostosAdicionales != null &&
+                             Model.CostosAdicionales.Any())
+                        {
+                            @foreach (var costo in Model.CostosAdicionales)
+                            {
+                                <tr>
+                                    <td>
+                                        @costo.Descripcion
+                                    </td>
+
+                                    <td class="text-end fw-bold">
+                                        ₡ @costo.Monto.ToString("N2")
+                                    </td>
+
+                                    <td class="text-center">
+                                        <form asp-action="EliminarCostoAdicional"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('¿Desea eliminar este costo adicional?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@costo.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger">
+                                                🗑️ Eliminar
+                                            </button>
+
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3"
+                                    class="text-center text-muted py-3">
+                                    No hay costos adicionales registrados.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th>Total de costos adicionales</th>
+                            <th class="text-end">
+                                ₡ @((Model.CostosAdicionales?.Sum(c => c.Monto) ?? 0m).ToString("N2"))
+                            </th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
 
         </div>
 
 
-        <!-- TOTAL -->
-        <div class="d-flex justify-content-between align-items-center">
+        
+        <!-- RESUMEN -->
+        @{
+            decimal totalCostosAdicionales =
+                Model.CostosAdicionales?.Sum(c => c.Monto) ?? 0m;
 
-            <strong>
-                Total:
-            </strong>
+            decimal subtotalProductos =
+                Model.Total
+                - totalCostosAdicionales
+                + Model.DescuentoMonto;
+        }
 
-            <strong>
-                ₡ @Model.Total.ToString("N2")
-            </strong>
+        <div class="total-footer">
+
+            <!-- SUBTOTAL DE PRODUCTOS -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Subtotal de productos:</span>
+
+                <span>
+                    ₡ @subtotalProductos.ToString("N2")
+                </span>
+            </div>
+
+            <!-- DESCUENTO GENERAL -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <form asp-action="AplicarDescuentoGeneral"
+                      method="post"
+                      class="d-flex align-items-center gap-2 flex-wrap">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="proformaId"
+                           value="@Model.Id" />
+
+                    <label for="descuentoGeneral">
+                        Descuento general:
+                    </label>
+
+                    <input type="number"
+                           id="descuentoGeneral"
+                           name="descuentoPorcentaje"
+                           value="@Model.DescuentoPorcentaje.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                           min="0"
+                           max="100"
+                           step="0.01"
+                           class="form-control"
+                           style="width:100px;" />
+
+                    <span>%</span>
+
+                    <button type="submit"
+                            class="btn btn-sm btn-primary">
+                        Aplicar
+                    </button>
+
+                </form>
+
+                <span class="text-danger">
+                    -₡ @Model.DescuentoMonto.ToString("N2")
+                </span>
+
+            </div>
+
+            <!-- COSTOS ADICIONALES -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Costos adicionales:</span>
+
+                <span>
+                    +₡ @totalCostosAdicionales.ToString("N2")
+                </span>
+            </div>
+
+            <!-- TOTAL FINAL -->
+            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+
+                <strong>Total:</strong>
+
+                <strong class="fs-4">
+                    ₡ @Model.Total.ToString("N2")
+                </strong>
+
+            </div>
 
         </div>
+
+
+
+       
 
     </div>
 
